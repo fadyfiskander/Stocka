@@ -29,5 +29,11 @@
     <Project Path="src/Modules/Inventory/Inventory.Domain/Inventory.Domain.csproj" />
     <Project Path="src/Modules/Inventory/Inventory.Infrastructure/Inventory.Infrastructure.csproj" Id="8148db5c-3fa7-43a6-afc8-ae7b4270efcf" />
   </Folder>
+  <Folder Name="/src/Modules/Organization/">
+    <Project Path="src/Modules/Organization/Organization.Application/Organization.Application.csproj" />
+    <Project Path="src/Modules/Organization/Organization.Contracts/Organization.Contracts.csproj" />
+    <Project Path="src/Modules/Organization/Organization.Domain/Organization.Domain.csproj" />
+    <Project Path="src/Modules/Organization/Organization.Infrastructure/Organization.Infrastructure.csproj" />
+  </Folder>
   <Project Path="test/test.csproj" Id="51d764df-7bed-4517-acb3-93669b0f3444" />
 </Solution>
