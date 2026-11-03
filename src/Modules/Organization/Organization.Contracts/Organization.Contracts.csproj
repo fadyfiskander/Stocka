@@ -7,9 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Common\" />
-    <Folder Include="DTOs\" />
     <Folder Include="Requests\" />
-    <Folder Include="Services\" />
     <Folder Include="UseCases\" />
   </ItemGroup>
 

@@ -19,9 +19,7 @@
     <Folder Include="Behaviors\" />
     <Folder Include="Common\" />
     <Folder Include="Primitives\" />
-    <Folder Include="Repositories\" />
-    <Folder Include="Services\" />
-    <Folder Include="UseCases\" />
+    <Folder Include="UseCases\NewFolder\" />
     <Folder Include="Validators\" />
   </ItemGroup>
 
