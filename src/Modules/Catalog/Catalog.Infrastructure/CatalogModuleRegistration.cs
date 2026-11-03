@@ -1,7 +1,7 @@
-﻿using Catalog.Application;
+﻿using BuildingBlocks.Application.Common.Interfaces;
+using Catalog.Application;
 using Catalog.Application.Common.Interfaces;
 using Catalog.Application.Repositories.Commands;
-using Catalog.Application.Repositories.Commands.Bases;
 using Catalog.Application.Repositories.Queries.Category;
 using Catalog.Application.Repositories.Queries.Product;
 using Catalog.Contracts.Services;

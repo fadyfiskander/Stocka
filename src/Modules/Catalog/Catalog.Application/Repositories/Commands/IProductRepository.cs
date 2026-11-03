@@ -1,4 +1,4 @@
-﻿using Catalog.Application.Repositories.Commands.Bases;
+﻿using BuildingBlocks.Application.Common.Interfaces;
 using Catalog.Domain.Entities;
 using Catalog.Domain.Primitives.Identifiers;
 

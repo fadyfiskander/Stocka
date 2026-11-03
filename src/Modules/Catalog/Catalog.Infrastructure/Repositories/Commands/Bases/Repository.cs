@@ -1,5 +1,5 @@
-﻿using BuildingBlocks.Domain.Bases;
-using Catalog.Application.Repositories.Commands.Bases;
+﻿using BuildingBlocks.Application.Common.Interfaces;
+using BuildingBlocks.Domain.Bases;
 using Catalog.Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 
