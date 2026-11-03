@@ -16,4 +16,8 @@
     <ProjectReference Include="..\Identity.Domain\Identity.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\Identity\Users\Login\AuthenticateResult\" />
+  </ItemGroup>
+
 </Project>

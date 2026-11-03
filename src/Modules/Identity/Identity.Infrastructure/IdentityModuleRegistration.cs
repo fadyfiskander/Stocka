@@ -80,6 +80,7 @@ namespace Identity.Infrastructure
             #region Service Registrations
             services.AddScoped<IIdentityUnitOfWork, UnitOfWork>();
             services.AddScoped<IIdentityService, IdentityService>();
+            services.AddScoped<IUserServices, UserServices>();
             services.AddScoped<ITokenGenerator, TokenGenerator>();
             services.AddScoped<ICurrentUserContext, CurrentUserContext>();
             #endregion

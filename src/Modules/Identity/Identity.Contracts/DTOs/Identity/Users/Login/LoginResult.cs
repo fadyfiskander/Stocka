@@ -1,14 +1,17 @@
-﻿using System;
+﻿using Identity.Contracts.DTOs;
+using Organization.Contracts.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Identity.Application.DTOs.Identity.Users.Login
+namespace Identity.Contracts.DTOs.Identity.Users.Login
 {
     public sealed record LoginResult(
         Guid UserId,
-        Guid PartyId, 
+        Guid PartyId,
         string FirstName,
         string LastName,
         string Email,
-        IEnumerable<Org>)
+        string UserName,
+        IEnumerable<OrganizationAccessDto> Organizations);
 }
