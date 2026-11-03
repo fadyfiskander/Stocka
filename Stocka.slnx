@@ -8,14 +8,9 @@
   <Folder Name="/src/Modules/" />
   <Folder Name="/src/Modules/Catalog/">
     <Project Path="src/Modules/Catalog/Catalog.Application/Catalog.Application.csproj" Id="d86c426d-a69d-4783-b24b-cc6276f4bea0" />
+    <Project Path="src/Modules/Catalog/Catalog.Contracts/Catalog.Contracts.csproj" Id="7bbc2a6b-9b1e-4d0e-b98f-32a7605b8fa4" />
     <Project Path="src/Modules/Catalog/Catalog.Domain/Catalog.Domain.csproj" Id="83f102b9-4bf9-4662-b17e-fdf483a6cd75" />
     <Project Path="src/Modules/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj" Id="6091d9cb-01e0-42b6-8f31-e1af86e8acaf" />
-  </Folder>
-  <Folder Name="/src/Modules/Core/">
-    <Project Path="src/Modules/Core/Core.Application/Core.Application.csproj" />
-    <Project Path="src/Modules/Core/Core.Contracts/Core.Contracts.csproj" Id="d6214d4b-83ab-4daa-b011-8763ad41759e" />
-    <Project Path="src/Modules/Core/Core.Domain/Core.Domain.csproj" Id="ce09bc18-c10b-4d77-b7d9-7753aba26cb7" />
-    <Project Path="src/Modules/Core/Core.Infrastructure/Core.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/src/Modules/Identity/">
     <Project Path="src/Modules/Identity/Identity.Application/Identity.Application.csproj" />
