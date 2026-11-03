@@ -1,5 +1,6 @@
-using Catalog.Application.UseCases.Categories;
-using MediatR;
+using Catalog.Contracts.DTOs.Category;
+using Catalog.Contracts.UseCases.CategoryCases;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stocka.MVC.Models;
 using System.Diagnostics;
@@ -8,29 +9,30 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
 {
     [Area("Catalog")]
     [Route("[area]/[controller]")]
+    [Authorize(Roles = "Owner")]
     public class CategoriesController : Controller
     {
-        private readonly IMediator _mediator;
+        private readonly ICategoryCases _categoryCases;
 
-        public CategoriesController(IMediator mediator)
+        public CategoriesController(ICategoryCases categoryCases)
         {
-            _mediator = mediator;
+            _categoryCases = categoryCases;
         }
 
         // GET: /Catalog/Categories  or /Catalog/Categories/Index
-        // UseCase: ListCategoriesCommand
+        // UseCase: ListCategoriesQuery
         [HttpGet("")]
         [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
             ViewBag.Title = "Categories";
-            var command = new ListCategoriesCommand { BrandId = Guid.Empty };
-            var categories = await _mediator.Send(command);
+            var query = new ListCategoriesQuery { OrganizationId = Guid.Empty };
+            var categories = await _categoryCases.ListCategoriesAsync(query);
             return View(categories);
         }
 
         // GET: /Catalog/Categories/Details/{id}
-        // UseCase: RetrieveCategoryCommand
+        // UseCase: RetrieveCategoryQuery
         [HttpGet("Details/{id:guid}")]
         public async Task<IActionResult> Details(Guid id)
         {
@@ -39,8 +41,8 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
 
             try
             {
-                var command = new RetrieveCategoryCommand { CategoryId = id };
-                var category = await _mediator.Send(command);
+                ViewBag.Title = "Category Details";
+                var category = await _categoryCases.RetrieveCategoryAsync(new RetrieveCategoryQuery(id));
                 return View(category);
             }
             catch (KeyNotFoundException ex)
@@ -56,7 +58,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         }
 
         // GET: /Catalog/Categories/SearchByName?name=...
-        // UseCase: RetrieveCategoryByNameCommand
+        // UseCase: RetrieveCategoryByNameQuery
         [HttpGet("SearchByName")]
         public async Task<IActionResult> SearchByName(string? name)
         {
@@ -66,8 +68,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
 
             try
             {
-                var command = new RetrieveCategoryByNameCommand { Name = name };
-                var category = await _mediator.Send(command);
+                var category = await _categoryCases.RetrieveCategoryByNameAsync(new RetrieveCategoryByNameQuery(name));
                 return View(category);
             }
             catch (KeyNotFoundException ex)
@@ -102,8 +103,8 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
 
             try
             {
-                var result = await _mediator.Send(command);
-                if (result == null)
+                var result = await _categoryCases.RegisterCategoryAsync(command);
+                if (result is null)
                 {
                     ModelState.AddModelError(string.Empty, "Failed to create category.");
                     return View(command);
@@ -125,7 +126,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         }
 
         // GET: /Catalog/Categories/Edit/{id}
-        // UseCase: UpdateCategoryCommand (GET - retrieve current)
+        // UseCase: RetrieveCategoryQuery + UpdateCategoryCommand (GET - load current)
         [HttpGet("Edit/{id:guid}")]
         public async Task<IActionResult> Edit(Guid id)
         {
@@ -134,15 +135,13 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
 
             try
             {
-                var retrieve = new RetrieveCategoryCommand { CategoryId = id };
-                var category = await _mediator.Send(retrieve);
-                var model = new UpdateCategoryCommand
+                var category = await _categoryCases.RetrieveCategoryAsync(new RetrieveCategoryQuery(id));
+                ViewBag.Title = "Edit Category";
+                return View(new UpdateCategoryCommand
                 {
                     CategoryId = category.Id,
                     Name = category.Name
-                };
-                ViewBag.Title = "Edit Category";
-                return View(model);
+                });
             }
             catch (KeyNotFoundException ex)
             {
@@ -162,7 +161,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
 
             try
             {
-                var result = await _mediator.Send(command);
+                var result = await _categoryCases.UpdateCategoryAsync(command);
                 TempData["Success"] = $"Category '{result.Name}' updated successfully.";
                 return RedirectToAction(nameof(Details), new { id = result.Id });
             }
@@ -192,8 +191,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
 
             try
             {
-                var command = new ActivateCategoryCommand { CategoryId = id };
-                var result = await _mediator.Send(command);
+                var result = await _categoryCases.ActivateCategoryAsync(new ActivateCategoryCommand(id));
                 TempData["Success"] = $"Category '{result.Name}' activated.";
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is ArgumentException)
@@ -218,8 +216,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
 
             try
             {
-                var command = new DeactivateCategoryCommand { CategoryId = id };
-                var result = await _mediator.Send(command);
+                var result = await _categoryCases.DeactivateCategoryAsync(new DeactivateCategoryCommand(id));
                 TempData["Success"] = $"Category '{result.Name}' deactivated.";
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is ArgumentException)

@@ -1,8 +1,12 @@
 using BuildingBlocks.Application.Abstractions;
+using BuildingBlocks.Application.Common.Interfaces;
 using Catalog.Infrastructure;
-using Core.Infrastructure;
+using Identity.Infrastructure;
+using Organization.Infrastructure;
 using Inventory.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Localization;
 using Stocka.MVC.Infrastructure;
 using System.Globalization;
@@ -22,9 +26,44 @@ builder.Logging.AddDebug();
 var configuration = builder.Configuration;
 builder.Services.AddInventoryModule(configuration);
 builder.Services.AddCatalogModule(configuration);
-builder.Services.AddCoreModule(configuration);
+builder.Services.AddOrganizationModule(configuration);
+builder.Services.AddIdentityModule(configuration);
+// Host-level user context: registered after AddIdentityModule so it wins the
+// ICurrentUserContext resolution — unlike the module's CurrentUserContext it
+// keeps serving anonymous (pre-login) requests with a least-privileged fallback
+// instead of throwing when no role claim exists yet.
+builder.Services.AddScoped<ICurrentUserContext, HttpUserContext>();
 #endregion
 
+// Host-owned authentication: the classic MVC cookie flow is the host's scheme.
+// ((AddIdentityModule keeps its own JwtBearer registered for API surfaces — defaults
+// here win because this call comes after it in registration order.)
+builder.Services
+    .AddAuthentication(options =>
+    {
+        // CookieAuthenticationDefaults.AuthenticationScheme == "Cookies"
+        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    })
+    .AddCookie(options =>
+    {
+        // Account area routes (area = Account, controller = Account).
+        options.LoginPath = "/Account/Account/Login";
+        options.AccessDeniedPath = "/Account/Account/AccessDenied";
+
+        options.Cookie.Name = "Stocka.Auth";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+
+        options.Cookie.SameSite = SameSiteMode.Lax;
+
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.SlidingExpiration = true;
+    });
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -40,8 +79,11 @@ if (app.Environment.IsDevelopment())
         var inventoryCtx = scope.ServiceProvider.GetService<Inventory.Infrastructure.Contexts.InventoryDbContext>();
         if (inventoryCtx != null) await inventoryCtx.Database.MigrateAsync();
 
-        var coreCtx = scope.ServiceProvider.GetService<Core.Infrastructure.Contexts.CoreDbContext>();
-        if (coreCtx != null) await coreCtx.Database.MigrateAsync();
+        var organizationCtx = scope.ServiceProvider.GetService<Organization.Infrastructure.Contexts.OrganizationDbContext>();
+        if (organizationCtx != null) await organizationCtx.Database.MigrateAsync();
+
+        var identityCtx = scope.ServiceProvider.GetService<Identity.Infrastructure.Persistence.AppIdentityDbContext>();
+        if (identityCtx != null) await identityCtx.Database.MigrateAsync();
     }
     catch (Exception ex)
     {
@@ -67,6 +109,8 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     SupportedUICultures = supportedCultures
 });
 app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

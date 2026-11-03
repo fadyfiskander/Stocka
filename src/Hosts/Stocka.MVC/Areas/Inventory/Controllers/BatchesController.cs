@@ -1,12 +1,14 @@
 ﻿using Inventory.Contracts.DTOs.Batch;
 using Inventory.Contracts.UseCases.BatchCases;
 using Inventory.Contracts.UseCases.WarehouseCases;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Stocka.MVC.Areas.Inventory.Controllers
 {
     [Area("Inventory")]
     [Route("[area]/[controller]")]
+    [Authorize(Roles = "Owner")]
     public class BatchesController : Controller
     {
         private readonly IBatchCases _batchCases;

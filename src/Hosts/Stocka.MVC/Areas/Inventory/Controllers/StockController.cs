@@ -1,5 +1,6 @@
 ﻿using Inventory.Contracts.DTOs.StockMovement;
 using Inventory.Contracts.UseCases.StockCases;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Stocka.MVC.Areas.Inventory.Controllers
@@ -10,6 +11,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
     /// </summary>
     [Area("Inventory")]
     [Route("[area]/[controller]")]
+    [Authorize(Roles = "Owner")]
     public class StockController : Controller
     {
         private readonly IStockCases _stockCases;

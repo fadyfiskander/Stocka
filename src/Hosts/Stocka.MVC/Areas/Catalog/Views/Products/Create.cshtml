@@ -1,4 +1,4 @@
-﻿@model Catalog.Application.UseCases.Products.RegisterProductCommand
+﻿@model RegisterProductCommand
 
 @{
     ViewData["Title"] = "Create Product";
@@ -99,26 +99,6 @@
                             </select>
 
                             <span asp-validation-for="CategoryId"
-                                  class="text-danger small">
-                            </span>
-                        </div>
-
-                        <!-- Image -->
-                        <div class="mb-4">
-                            <label asp-for="Image" class="form-label">
-                                Product Image
-                            </label>
-
-                            <input asp-for="Image"
-                                   type="file"
-                                   class="form-control"
-                                   accept="image/*" />
-
-                            <div class="form-text">
-                                Supported image formats: JPG, PNG, WEBP
-                            </div>
-
-                            <span asp-validation-for="Image"
                                   class="text-danger small">
                             </span>
                         </div>

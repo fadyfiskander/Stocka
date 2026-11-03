@@ -1,5 +1,6 @@
 ﻿using Inventory.Contracts.DTOs.Reports;
 using Inventory.Contracts.UseCases.ReportCases;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Stocka.MVC.Areas.Inventory.Controllers
@@ -7,6 +8,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
     /// <summary>Read-only reporting pages. All data is brand-scoped, database-aggregated, and paginated.</summary>
     [Area("Inventory")]
     [Route("[area]/[controller]")]
+    [Authorize(Roles = "Owner")]
     public class ReportsController : Controller
     {
         private readonly IInventoryReportCases _reportCases;

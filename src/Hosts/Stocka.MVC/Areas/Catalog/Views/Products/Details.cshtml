@@ -1,4 +1,4 @@
-@model Catalog.Application.DTOs.Product.ProductDto
+@model ProductDto
 @{
     ViewData["Title"] = "Product Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -35,8 +35,8 @@
                                 <div class="fw-semibold font-monospace small">@Model.Id</div>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label text-muted small mb-1">Brand ID</label>
-                                <div class="fw-semibold font-monospace small">@Model.BrandId</div>
+                                <label class="form-label text-muted small mb-1">Organization ID</label>
+                                <div class="fw-semibold font-monospace small">@Model.OrganizationId</div>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label text-muted small mb-1">Name</label>

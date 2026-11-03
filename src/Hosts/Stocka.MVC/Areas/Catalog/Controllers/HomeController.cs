@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Stocka.MVC.Areas.Catalog.Models;
 
 namespace Stocka.MVC.Areas.Catalog.Controllers
 {
     [Area("Catalog")]
     [Route("[area]/[controller]")]
+    [Authorize(Roles = "Owner")]
+
     public class HomeController : Controller
     {
         [HttpGet]

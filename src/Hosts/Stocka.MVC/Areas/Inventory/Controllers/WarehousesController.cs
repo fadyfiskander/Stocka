@@ -1,14 +1,14 @@
-﻿using BuildingBlocks.Application.Common.Models;
-using Inventory.Contracts.DTOs.Reports;
-using Inventory.Contracts.DTOs.Warehouse;
+﻿using Inventory.Contracts.DTOs.Warehouse;
 using Inventory.Contracts.UseCases.ReportCases;
 using Inventory.Contracts.UseCases.WarehouseCases;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Stocka.MVC.Areas.Inventory.Controllers
 {
     [Area("Inventory")]
     [Route("[area]/[controller]")]
+    [Authorize(Roles = "Owner")]
     public class WarehousesController : Controller
     {
         private readonly IWarehouseCases _warehouseCases;

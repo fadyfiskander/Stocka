@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stocka.MVC.Models;
 using System.Diagnostics;
 
 namespace Stocka.MVC.Controllers
 {
+    [Authorize(Roles = "Owner")]
     public class HomeController : Controller
     {
         public IActionResult Index()

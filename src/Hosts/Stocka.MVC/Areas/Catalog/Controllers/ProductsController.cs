@@ -1,7 +1,7 @@
-﻿using Catalog.Application.DTOs.Product;
-using Catalog.Application.UseCases.Categories;
-using Catalog.Application.UseCases.Products;
-using MediatR;
+﻿using Catalog.Contracts.DTOs.Product;
+using Catalog.Contracts.UseCases.CategoryCases;
+using Catalog.Contracts.UseCases.ProductCases;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Stocka.MVC.Models;
@@ -11,24 +11,26 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
 {
     [Area("Catalog")]
     [Route("[area]/[controller]")]
+    [Authorize(Roles = "Owner")]
     public class ProductsController : Controller
     {
-        private readonly IMediator _mediator;
+        private readonly IProductCases _productCases;
+        private readonly ICategoryCases _categoryCases;
 
-        public ProductsController(IMediator mediator)
+        public ProductsController(IProductCases productCases, ICategoryCases categoryCases)
         {
-            _mediator = mediator;
+            _productCases = productCases;
+            _categoryCases = categoryCases;
         }
 
         // GET: /Catalog/Products  or /Catalog/Products/Index
-        // UseCase: ListProductsCommand
+        // UseCase: ListProductsQuery
         [HttpGet("")]
         [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
             ViewBag.Title = "Products";
-            var command = new ListProductsCommand();
-            var products = await _mediator.Send(command);
+            var products = await _productCases.ListProductsAsync(new ListProductsQuery { OrganizationId = null });
 
             if (products == null || !products.Any())
             {
@@ -40,7 +42,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         }
 
         // GET: /Catalog/Products/Details/{id}
-        // UseCase: RetrieveProductCommand
+        // UseCase: RetrieveProductQuery
         [HttpGet("Details/{id:guid}")]
         public async Task<IActionResult> Details(Guid id)
         {
@@ -49,16 +51,8 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
 
             try
             {
-                var command = new RetrieveProductCommand(id);
-                var product = await _mediator.Send(command);
-
-                if (product == null)
-                    return RedirectToAction(nameof(Handler), new
-                    {
-                        HandlerText = "We're sorry, but the product you're looking for isn't available right now.",
-                        Title = "Product Not Found"
-                    });
-
+                ViewBag.Title = "Product Details";
+                var product = await _productCases.RetrieveProductAsync(new RetrieveProductQuery(id));
                 return View(product);
             }
             catch (Exception ex) when (ex is KeyNotFoundException or AggregateException)
@@ -72,7 +66,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         }
 
         // GET: /Catalog/Products/SearchByName?name=...
-        // UseCase: RetrieveProductByNameCommand
+        // UseCase: RetrieveProductByNameQuery
         [HttpGet("SearchByName")]
         public async Task<IActionResult> SearchByName(string? name)
         {
@@ -82,8 +76,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
 
             try
             {
-                var command = new RetrieveProductByNameCommand { Name = name };
-                var product = await _mediator.Send(command);
+                var product = await _productCases.RetrieveProductByNameAsync(new RetrieveProductByNameQuery(name));
                 return View(product);
             }
             catch (KeyNotFoundException ex)
@@ -122,8 +115,8 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
 
             try
             {
-                var createdProduct = await _mediator.Send(command);
-                if (createdProduct == null)
+                var createdProduct = await _productCases.RegisterProductAsync(command);
+                if (createdProduct is null)
                 {
                     await PopulateCategoriesAsync();
                     ModelState.AddModelError(string.Empty, "Failed to create product.");
@@ -133,7 +126,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
                 TempData["Success"] = $"Product '{createdProduct.Name}' created successfully.";
                 return RedirectToAction(nameof(Details), new { id = createdProduct.Id });
             }
-            catch (Exception ex) when (ex is ArgumentNullException || ex is ArgumentException || ex is ArgumentOutOfRangeException)
+            catch (Exception ex) when (ex is ArgumentNullException || ex is ArgumentException || ex is ArgumentOutOfRangeException || ex is KeyNotFoundException)
             {
                 await PopulateCategoriesAsync();
                 ModelState.AddModelError(string.Empty, ex.Message);
@@ -142,7 +135,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         }
 
         // GET: /Catalog/Products/Edit/{id}
-        // UseCase: UpdateProductCommand (GET - load existing)
+        // UseCase: RetrieveProductQuery + UpdateProductCommand (GET - load existing)
         [HttpGet("Edit/{id:guid}")]
         public async Task<IActionResult> Edit(Guid id)
         {
@@ -151,11 +144,11 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
 
             try
             {
-                var product = await _mediator.Send(new RetrieveProductCommand(id));
-                if (product == null)
-                    return RedirectToAction(nameof(Handler), new { HandlerText = "Product not found.", Title = "Not Found" });
+                var product = await _productCases.RetrieveProductAsync(new RetrieveProductQuery(id));
+                ViewBag.Title = "Edit Product";
 
-                var model = new UpdateProductCommand
+                await PopulateCategoriesAsync();
+                return View(new UpdateProductCommand
                 {
                     ProductId = product.Id,
                     Name = product.Name,
@@ -163,11 +156,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
                     SellingPrice = product.Price,
                     Barcode = product.Barcode,
                     ImagePath = product.ImagePath
-                };
-
-                await PopulateCategoriesAsync();
-                ViewBag.Title = "Edit Product";
-                return View(model);
+                });
             }
             catch (Exception ex) when (ex is KeyNotFoundException or AggregateException)
             {
@@ -189,7 +178,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
 
             try
             {
-                var result = await _mediator.Send(command);
+                var result = await _productCases.UpdateProductAsync(command);
                 TempData["Success"] = $"Product '{result.Name}' updated successfully.";
                 return RedirectToAction(nameof(Details), new { id = result.Id });
             }
@@ -221,8 +210,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
 
             try
             {
-                var command = new ActivateProductCommand { ProductId = id };
-                var result = await _mediator.Send(command);
+                var result = await _productCases.ActivateProductAsync(new ActivateProductCommand(id));
                 TempData["Success"] = $"Product '{result.Name}' activated.";
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is ArgumentException)
@@ -247,8 +235,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
 
             try
             {
-                var command = new DeactivateProductCommand { ProductId = id };
-                var result = await _mediator.Send(command);
+                var result = await _productCases.DeactivateProductAsync(new DeactivateProductCommand(id));
                 TempData["Success"] = $"Product '{result.Name}' deactivated.";
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is ArgumentException)
@@ -277,7 +264,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         {
             try
             {
-                var categories = await _mediator.Send(new ListCategoriesCommand { BrandId = Guid.Empty });
+                var categories = await _categoryCases.ListCategoriesAsync(new ListCategoriesQuery { OrganizationId = Guid.Empty });
                 ViewBag.Categories = new SelectList(categories, "Id", "Name");
             }
             catch
