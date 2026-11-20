@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Application.Common.Interfaces;
+﻿using BuildingBlocks.Application.Abstractions;
 using BuildingBlocks.Application.Common.Models;
 using Identity.Application.Repositories.Queries;
 using Identity.Contracts.DTOs;
@@ -16,17 +16,19 @@ namespace Identity.Application.UseCases.Customers
     internal class ListCustomersQueryHandler : IRequestHandler<ListCustomersQuery, PaginatedResult<CustomerDto>>
     {
         private readonly ICustomerQueryRepository _customerQuery;
-        private readonly ICurrentUserContext _currentUserContext;
+        private readonly ICurrentUserService _currentUserContext;
 
-        public ListCustomersQueryHandler(ICustomerQueryRepository customerQuery, ICurrentUserContext currentUserContext)
+        public ListCustomersQueryHandler(ICustomerQueryRepository customerQuery, ICurrentUserService currentUserContext)
         {
             _customerQuery = customerQuery;
             _currentUserContext = currentUserContext;
         }
         public async Task<PaginatedResult<CustomerDto>> Handle(ListCustomersQuery request, CancellationToken cancellationToken)
         {
-            var organizationId = _currentUserContext.ActiveOrganizationId;
-            return await _customerQuery.GetAllPagedAsync(organizationId, 1, 100);
+            var organizationId = _currentUserContext.OrganizationId;
+            if (organizationId is null)
+                throw new ArgumentNullException("organizationId is null, organizationId cannot be null");
+            return await _customerQuery.GetAllPagedAsync(organizationId.Value, 1, 100);
         }
     }
 }

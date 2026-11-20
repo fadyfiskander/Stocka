@@ -1,4 +1,4 @@
-using BuildingBlocks.Application.Common.Interfaces;
+using BuildingBlocks.Application.Abstractions;
 using Identity.Application.Common.Interfaces;
 using Identity.Application.Repositories.Commands;
 using Identity.Domain.Parties;
@@ -15,12 +15,12 @@ internal sealed class DeductCustomerLoyaltyPointsCommandHandler
 {
     private readonly ICustomerRepository _customerRepository;
     private readonly IPartyRepository _partyRepository;
-    private readonly BuildingBlocks.Application.Common.Interfaces.ICurrentUserContext _currentUserContext;
+    private readonly ICurrentUserService _currentUserContext;
 
     public DeductCustomerLoyaltyPointsCommandHandler(
         ICustomerRepository customerRepository,
         IPartyRepository partyRepository,
-        BuildingBlocks.Application.Common.Interfaces.ICurrentUserContext currentUserContext)
+        ICurrentUserService currentUserContext)
     {
         _customerRepository = customerRepository;
         _partyRepository = partyRepository;
@@ -37,12 +37,16 @@ internal sealed class DeductCustomerLoyaltyPointsCommandHandler
         if (request.Points <= 0)
             throw new ArgumentException("Points must be greater than zero.", nameof(request.Points));
 
+        var organizationId = _currentUserContext.OrganizationId;
+        if (organizationId is null)
+            throw new ArgumentNullException("organizationId is null, organizationId cannot be null");
+
         var id = PartyId.From(request.CustomerId);
         var party = await _partyRepository.GetWithOrganizationsAsync(id);
         var customer = await _customerRepository.GetByIdAsync(id);
 
         if (party is null || customer is null || !party.PartyOrganizations.Any(
-                membership => membership.Organization == _currentUserContext.ActiveOrganizationId))
+                membership => membership.Organization == organizationId.Value))
         {
             throw new KeyNotFoundException(
                 $"Customer '{request.CustomerId}' was not found in the active organization.");

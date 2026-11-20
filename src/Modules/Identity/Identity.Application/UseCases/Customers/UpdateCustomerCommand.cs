@@ -1,3 +1,4 @@
+using BuildingBlocks.Application.Abstractions;
 using Identity.Application.Common.Interfaces;
 using Identity.Application.Repositories.Commands;
 using Identity.Contracts.DTOs;
@@ -17,12 +18,12 @@ internal sealed class UpdateCustomerCommandHandler
 {
     private readonly ICustomerRepository _customerRepository;
     private readonly IPartyRepository _partyRepository;
-    private readonly BuildingBlocks.Application.Common.Interfaces.ICurrentUserContext _currentUserContext;
+    private readonly ICurrentUserService _currentUserContext;
 
     public UpdateCustomerCommandHandler(
         ICustomerRepository customerRepository,
         IPartyRepository partyRepository,
-        BuildingBlocks.Application.Common.Interfaces.ICurrentUserContext currentUserContext)
+        ICurrentUserService currentUserContext)
     {
         _customerRepository = customerRepository;
         _partyRepository = partyRepository;
@@ -35,11 +36,15 @@ internal sealed class UpdateCustomerCommandHandler
     {
         Validate(request);
 
+        var organizationId = _currentUserContext.OrganizationId;
+        if (organizationId is null)
+            throw new ArgumentNullException("organizationId is null, organizationId cannot be null");
+
         var customerId = PartyId.From(request.CustomerId);
         var party = await _partyRepository.GetWithOrganizationsAsync(customerId);
 
         if (party is null || !party.PartyOrganizations.Any(
-                membership => membership.Organization == _currentUserContext.ActiveOrganizationId))
+                membership => membership.Organization == organizationId.Value))
         {
             throw new KeyNotFoundException(
                 $"Customer '{request.CustomerId}' was not found in the active organization.");

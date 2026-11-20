@@ -1,176 +1,140 @@
-﻿
-using Identity.Application.Common.Interfaces;
+﻿using Identity.Application.Common.Interfaces;
 using Identity.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace Identity.Infrastructure.Services;
-
-internal sealed class UnitOfWork : IIdentityUnitOfWork, IDisposable
+namespace Identity.Infrastructure.Services
 {
-    private readonly AppIdentityDbContext _context;
-    private IDbContextTransaction? _transaction;
-    private bool _disposed;
-
-    public UnitOfWork(AppIdentityDbContext context)
+    internal class UnitOfWork(AppIdentityDbContext context) : IIdentityUnitOfWork, IDisposable
     {
-        _context = context;
-    }
+        private IDbContextTransaction? _transaction;
 
-    public int SaveChanges()
-    {
-        ThrowIfDisposed();
-
-        try
+        private int SaveChangesCoreSync()
         {
-            return _context.SaveChanges();
+            try
+            {
+                return context.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                throw new InvalidOperationException(
+                    "The stock record was modified by another operation while this request was running. Please retry the operation.",
+                    ex);
+            }
         }
-        catch (DbUpdateConcurrencyException ex)
+
+        public int SaveChanges()
         {
-            throw CreateConcurrencyException(ex);
+            return SaveChangesCoreSync();
         }
-    }
 
-    public async Task<int> SaveChangesAsync(
-        CancellationToken cancellationToken = default)
-    {
-        ThrowIfDisposed();
-
-        try
+        public void BeginTransaction()
         {
-            return await _context.SaveChangesAsync(cancellationToken);
+            if (_transaction != null)
+                return;
+
+            _transaction = context.Database.BeginTransaction();
         }
-        catch (DbUpdateConcurrencyException ex)
+
+        public async Task BeginTransactionAsync(
+            CancellationToken cancellationToken = default)
         {
-            throw CreateConcurrencyException(ex);
+            if (_transaction != null)
+                return;
+
+            _transaction = await context.Database
+                .BeginTransactionAsync(cancellationToken);
         }
-    }
 
-    public void BeginTransaction()
-    {
-        ThrowIfDisposed();
-
-        if (_transaction is not null)
-            return;
-
-        _transaction = _context.Database.BeginTransaction();
-    }
-
-    public async Task BeginTransactionAsync(
-        CancellationToken cancellationToken = default)
-    {
-        ThrowIfDisposed();
-
-        if (_transaction is not null)
-            return;
-
-        _transaction = await _context.Database
-            .BeginTransactionAsync(cancellationToken);
-    }
-
-    public void CommitTransaction()
-    {
-        ThrowIfDisposed();
-
-        var transaction = _transaction;
-
-        if (transaction is null)
-            return;
-
-        try
+        public void CommitTransaction()
         {
-            transaction.Commit();
+            try
+            {
+                _transaction?.Commit();
+            }
+            finally
+            {
+                _transaction?.Dispose();
+                _transaction = null;
+            }
         }
-        finally
+
+        public async Task CommitTransactionAsync(
+            CancellationToken cancellationToken = default)
         {
-            _transaction = null;
-            transaction.Dispose();
+            try
+            {
+                if (_transaction != null)
+                    await _transaction.CommitAsync(cancellationToken);
+            }
+            finally
+            {
+                if (_transaction != null)
+                    await _transaction.DisposeAsync();
+
+                _transaction = null;
+            }
         }
-    }
 
-    public async Task CommitTransactionAsync(
-        CancellationToken cancellationToken = default)
-    {
-        ThrowIfDisposed();
-
-        var transaction = _transaction;
-
-        if (transaction is null)
-            return;
-
-        try
+        public void RollbackTransaction()
         {
-            await transaction.CommitAsync(cancellationToken);
+            try
+            {
+                _transaction?.Rollback();
+            }
+            finally
+            {
+                _transaction?.Dispose();
+                _transaction = null;
+            }
         }
-        finally
+
+        public async Task RollbackTransactionAsync(
+            CancellationToken cancellationToken = default)
         {
-            _transaction = null;
-            await transaction.DisposeAsync();
+            try
+            {
+                if (_transaction != null)
+                    await _transaction.RollbackAsync(cancellationToken);
+            }
+            finally
+            {
+                if (_transaction != null)
+                    await _transaction.DisposeAsync();
+
+                _transaction = null;
+            }
         }
-    }
 
-    public void RollbackTransaction()
-    {
-        var transaction = _transaction;
-
-        if (transaction is null)
-            return;
-
-        try
+        public void Dispose()
         {
-            transaction.Rollback();
+            _transaction?.Dispose();
+            // Do not dispose context — it is scoped and owned by DI container
         }
-        finally
+
+        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            _transaction = null;
-            transaction.Dispose();
+            return SaveChangesCoreAsync(cancellationToken);
         }
-    }
 
-    public async Task RollbackTransactionAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var transaction = _transaction;
-
-        if (transaction is null)
-            return;
-
-        try
+        private async Task<int> SaveChangesCoreAsync(CancellationToken cancellationToken)
         {
-            await transaction.RollbackAsync(cancellationToken);
-        }
-        finally
-        {
-            _transaction = null;
-            await transaction.DisposeAsync();
+            try
+            {
+                return await context.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                // RowVersion optimistic-concurrency conflict: surface a clear retry message
+                // instead of a raw database exception - stock is never silently corrupted.
+                throw new InvalidOperationException(
+                    "The stock record was modified by another operation while this request was running. Please retry the operation.",
+                    ex);
+            }
         }
     }
 
-    public void Dispose()
-    {
-        if (_disposed)
-            return;
-
-        _disposed = true;
-
-        var transaction = _transaction;
-        _transaction = null;
-
-        transaction?.Dispose();
-
-        // DbContext is owned by the DI container.
-    }
-
-    private void ThrowIfDisposed()
-    {
-        ObjectDisposedException.ThrowIf(_disposed, this);
-    }
-
-    private static InvalidOperationException CreateConcurrencyException(
-        DbUpdateConcurrencyException exception)
-    {
-        return new InvalidOperationException(
-            "The record was modified by another operation while this request was running. Please retry the operation.",
-            exception);
-    }
 }

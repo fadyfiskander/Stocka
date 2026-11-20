@@ -1,4 +1,4 @@
-﻿
+﻿using BuildingBlocks.Application.Common.Interfaces;
 using Identity.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -9,7 +9,7 @@ public sealed class UnitOfWorkTransactionBehavior<TRequest, TResponse>
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IBaseTransactionCommand
 {
-    private readonly IIdentityUnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<
         UnitOfWorkTransactionBehavior<TRequest, TResponse>> _logger;
 

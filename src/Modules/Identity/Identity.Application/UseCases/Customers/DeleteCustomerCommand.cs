@@ -1,3 +1,4 @@
+using BuildingBlocks.Application.Abstractions;
 using Identity.Application.Common.Interfaces;
 using Identity.Application.Repositories.Commands;
 using Identity.Domain.Parties;
@@ -12,12 +13,12 @@ internal sealed class DeleteCustomerCommandHandler
 {
     private readonly ICustomerRepository _customerRepository;
     private readonly IPartyRepository _partyRepository;
-    private readonly BuildingBlocks.Application.Common.Interfaces.ICurrentUserContext _currentUserContext;
+    private readonly ICurrentUserService _currentUserContext;
 
     public DeleteCustomerCommandHandler(
         ICustomerRepository customerRepository,
         IPartyRepository partyRepository,
-        BuildingBlocks.Application.Common.Interfaces.ICurrentUserContext currentUserContext)
+        ICurrentUserService currentUserContext)
     {
         _customerRepository = customerRepository;
         _partyRepository = partyRepository;
@@ -31,11 +32,15 @@ internal sealed class DeleteCustomerCommandHandler
         if (request.CustomerId == Guid.Empty)
             throw new ArgumentException("CustomerId cannot be empty.", nameof(request.CustomerId));
 
+        var organizationId = _currentUserContext.OrganizationId;
+        if (organizationId is null)
+            throw new ArgumentNullException("organizationId is null, organizationId cannot be null");
+
         var customerId = PartyId.From(request.CustomerId);
         var party = await _partyRepository.GetWithOrganizationsAsync(customerId);
 
         if (party is null || !party.PartyOrganizations.Any(
-                membership => membership.Organization == _currentUserContext.ActiveOrganizationId))
+                membership => membership.Organization == organizationId.Value))
         {
             throw new KeyNotFoundException(
                 $"Customer '{request.CustomerId}' was not found in the active organization.");

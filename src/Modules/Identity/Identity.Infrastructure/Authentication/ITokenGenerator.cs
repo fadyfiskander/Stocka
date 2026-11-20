@@ -9,6 +9,6 @@ namespace Identity.Infrastructure.Authentication
     /// </summary>
     public interface ITokenGenerator
     {
-        string GenerateToken(UserTokenDetailsDto userDetails);
+        string GenerateToken(TokenGenerationDto tokenGeneration);
     }
 }

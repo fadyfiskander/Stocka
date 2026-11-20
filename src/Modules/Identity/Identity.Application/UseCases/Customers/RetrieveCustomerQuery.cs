@@ -1,5 +1,4 @@
-﻿using BuildingBlocks.Application.Common.Interfaces;
-using Identity.Application.Repositories.Queries;
+﻿using Identity.Application.Repositories.Queries;
 using Identity.Contracts.DTOs;
 using Identity.Domain.Parties;
 using MediatR;
@@ -14,12 +13,10 @@ namespace Identity.Application.UseCases.Customers
     internal class RetrieveCustomerQueryHandler : IRequestHandler<RetrieveCustomerQuery, CustomerDto?>
     {
         private readonly ICustomerQueryRepository _customerQuery;
-        private readonly ICurrentUserContext _currentUserContext;
 
-        public RetrieveCustomerQueryHandler(ICustomerQueryRepository customerQuery, ICurrentUserContext currentUserContext)
+        public RetrieveCustomerQueryHandler(ICustomerQueryRepository customerQuery)
         {
             _customerQuery = customerQuery;
-            _currentUserContext = currentUserContext;
         }
 
         public async Task<CustomerDto?> Handle(RetrieveCustomerQuery request, CancellationToken cancellationToken)
@@ -27,7 +24,6 @@ namespace Identity.Application.UseCases.Customers
             if (request.CustomerId == Guid.Empty)
                 throw new ArgumentException("CustomerId cannot be empty.", nameof(request.CustomerId));
 
-            var organizationId = _currentUserContext.ActiveOrganizationId;
             return await _customerQuery.GetByIdAsync(PartyId.From(request.CustomerId));
         }
     }

@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Application.Common.Interfaces;
+﻿using BuildingBlocks.Application.Abstractions;
 using Identity.Application.Common.Interfaces;
 using Identity.Application.Repositories.Commands;
 using Identity.Contracts.DTOs;
@@ -20,10 +20,10 @@ namespace Identity.Application.UseCases.Customers
     {
         private readonly ICustomerRepository _customerCommand;
         private readonly IPartyRepository _partyCommand;
-        private readonly ICurrentUserContext _currentUserContext;
+        private readonly ICurrentUserService _currentUserContext;
         private readonly IIdentityUnitOfWork _unitOfWork;
 
-        public RegisterCustomerCommandHandler(ICustomerRepository customerCommand, ICurrentUserContext currentUserContext, IPartyRepository partyCommand, IIdentityUnitOfWork unitOfWork)
+        public RegisterCustomerCommandHandler(ICustomerRepository customerCommand, ICurrentUserService currentUserContext, IPartyRepository partyCommand, IIdentityUnitOfWork unitOfWork)
         {
             _customerCommand = customerCommand;
             _currentUserContext = currentUserContext;
@@ -40,14 +40,16 @@ namespace Identity.Application.UseCases.Customers
             if (string.IsNullOrWhiteSpace(request.PhoneNumber))
                 throw new ArgumentException("PhoneNumber cannot be empty.", nameof(request.PhoneNumber));
 
-            var organizationId = _currentUserContext.ActiveOrganizationId;
-        
-            var party = Domain.Parties.Party.Create(organizationId, request.FirstName, request.LastName, request.PhoneNumber);
+            var organizationId = _currentUserContext.OrganizationId;
+            if (organizationId is null)
+                throw new ArgumentNullException("organizationId is null, organizationId cannot be null");
+
+            var party = Domain.Parties.Party.Create(organizationId.Value, request.FirstName, request.LastName, request.PhoneNumber);
             var customer = Domain.Customer.Customer.Create(party.Id);
-            
+
             await _partyCommand.AddAsync(party);
             await _customerCommand.AddAsync(customer);
-            
+
             return new CustomerDto
             (
                 customer.Id.Value,

@@ -1,4 +1,4 @@
-using BuildingBlocks.Application.Common.Interfaces;
+using BuildingBlocks.Application.Abstractions;
 using Identity.Application.Common.Interfaces;
 using Identity.Application.Repositories.Commands;
 using Identity.Domain.Parties;
@@ -15,12 +15,12 @@ internal sealed class AddCustomerLoyaltyPointsCommandHandler
 {
     private readonly ICustomerRepository _customerRepository;
     private readonly IPartyRepository _partyRepository;
-    private readonly BuildingBlocks.Application.Common.Interfaces.ICurrentUserContext _currentUserContext;
+    private readonly ICurrentUserService _currentUserContext;
 
     public AddCustomerLoyaltyPointsCommandHandler(
         ICustomerRepository customerRepository,
         IPartyRepository partyRepository,
-        BuildingBlocks.Application.Common.Interfaces.ICurrentUserContext currentUserContext)
+        ICurrentUserService currentUserContext)
     {
         _customerRepository = customerRepository;
         _partyRepository = partyRepository;
@@ -43,8 +43,12 @@ internal sealed class AddCustomerLoyaltyPointsCommandHandler
         var party = await _partyRepository.GetWithOrganizationsAsync(id);
         var customer = await _customerRepository.GetByIdAsync(id);
 
+        var organizationId = _currentUserContext.OrganizationId;
+        if(organizationId is null)
+            throw new ArgumentNullException("organizationId is null, organizationId cannot be null");
+
         if (party is null || customer is null || !party.PartyOrganizations.Any(
-                membership => membership.Organization == _currentUserContext.ActiveOrganizationId))
+                membership => membership.Organization == organizationId.Value))
         {
             throw new KeyNotFoundException($"Customer '{customerId}' was not found in the active organization.");
         }

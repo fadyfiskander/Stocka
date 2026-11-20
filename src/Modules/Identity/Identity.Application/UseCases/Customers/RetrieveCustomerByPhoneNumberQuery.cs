@@ -1,4 +1,4 @@
-using BuildingBlocks.Application.Common.Interfaces;
+using BuildingBlocks.Application.Abstractions;
 using Identity.Application.Repositories.Queries;
 using Identity.Contracts.DTOs;
 using MediatR;
@@ -12,11 +12,11 @@ internal sealed class RetrieveCustomerByPhoneNumberQueryHandler
     : IRequestHandler<RetrieveCustomerByPhoneNumberQuery, CustomerDto?>
 {
     private readonly ICustomerQueryRepository _customerQuery;
-    private readonly ICurrentUserContext _currentUserContext;
+    private readonly ICurrentUserService _currentUserContext;
 
     public RetrieveCustomerByPhoneNumberQueryHandler(
         ICustomerQueryRepository customerQuery,
-        ICurrentUserContext currentUserContext)
+        ICurrentUserService currentUserContext)
     {
         _customerQuery = customerQuery;
         _currentUserContext = currentUserContext;
@@ -29,8 +29,12 @@ internal sealed class RetrieveCustomerByPhoneNumberQueryHandler
         if (string.IsNullOrWhiteSpace(request.PhoneNumber))
             throw new ArgumentException("Phone number cannot be empty.", nameof(request.PhoneNumber));
 
+        var organizationId = _currentUserContext.OrganizationId;
+        if (organizationId is null)
+            throw new ArgumentNullException("organizationId is null, organizationId cannot be null");
+
         return await _customerQuery.GetByPhoneNumberAsync(
-            _currentUserContext.ActiveOrganizationId,
+            organizationId.Value,
             request.PhoneNumber.Trim());
     }
 }

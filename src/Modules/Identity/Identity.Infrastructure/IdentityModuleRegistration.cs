@@ -1,5 +1,4 @@
-﻿using BuildingBlocks.Application.Common.Interfaces;
-using Identity.Application;
+﻿using Identity.Application;
 using Identity.Application.Common.Interfaces;
 using Identity.Application.Repositories.Commands;
 using Identity.Application.Repositories.Queries;
@@ -7,11 +6,8 @@ using Identity.Infrastructure.Authentication;
 using Identity.Infrastructure.Identity;
 using Identity.Infrastructure.Persistence;
 using Identity.Infrastructure.Repositories.Commands;
-using Identity.Infrastructure.Repositories.Commands.Bases;
 using Identity.Infrastructure.Repositories.Queries;
 using Identity.Infrastructure.Services;
-using Infrastructure.Identity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using BuildingBlocks.Application.Abstractions;
 
 namespace Identity.Infrastructure
 {
@@ -27,8 +24,8 @@ namespace Identity.Infrastructure
         public static IServiceCollection AddIdentityModule(this IServiceCollection services, IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("IdentityConnection") ?? throw new ArgumentNullException("Connection String is null");
-        
-            services.AddDbContext<AppIdentityDbContext>(options => 
+
+            services.AddDbContext<AppIdentityDbContext>(options =>
             {
                 options.UseSqlServer(connectionString);
             });
@@ -82,7 +79,7 @@ namespace Identity.Infrastructure
             services.AddScoped<IIdentityService, IdentityService>();
             services.AddScoped<IUserServices, UserServices>();
             services.AddScoped<ITokenGenerator, TokenGenerator>();
-            services.AddScoped<ICurrentUserContext, CurrentUserContext>();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
             #endregion
 
             #region Authentication (JWT + MVC token cookie)
@@ -132,7 +129,11 @@ namespace Identity.Infrastructure
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey)),
 
                         ValidateLifetime = true,
-                        ClockSkew = TimeSpan.FromHours(jwtOptions.DurationInHours)
+                        ClockSkew = TimeSpan.FromHours(jwtOptions.DurationInHours),
+
+                        // The module token emits the sub/org_id/role claim set.
+                        NameClaimType = IdentityClaimTypes.UserId,
+                        RoleClaimType = IdentityClaimTypes.Role
                     };
                 });
             #endregion

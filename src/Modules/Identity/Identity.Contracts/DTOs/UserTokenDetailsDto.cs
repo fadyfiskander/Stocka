@@ -3,13 +3,9 @@ using System.Collections.Generic;
 
 namespace Identity.Contracts.DTOs
 {
-    /// <summary>
-    /// Minimal identity payload the token generator needs.
-    /// Kept transport-agnostic: this record crosses the module boundary.
-    /// </summary>
-    public record UserTokenDetailsDto(
+    public sealed record TokenGenerationDto(
         Guid UserId,
-        string UserName,
-        IEnumerable<string> Roles
+        Guid OrganizationId,
+        string Role
     );
 }
