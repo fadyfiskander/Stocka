@@ -1,5 +1,4 @@
-﻿using BuildingBlocks.Application.Primitives.Identifiers;
-using Catalog.Application.Common.Interfaces;
+﻿using Catalog.Application.Common.Interfaces;
 using Catalog.Contracts.DTOs.Product;
 using Catalog.Application.Repositories.Queries.Bases;
 using Catalog.Application.Repositories.Queries.Product;

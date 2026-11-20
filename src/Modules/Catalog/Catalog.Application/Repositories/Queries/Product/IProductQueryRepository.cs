@@ -1,5 +1,4 @@
 ﻿using BuildingBlocks.Application.Common.Models;
-using BuildingBlocks.Application.Primitives.Identifiers;
 using Catalog.Contracts.DTOs.Product;
 
 namespace Catalog.Application.Repositories.Queries.Product

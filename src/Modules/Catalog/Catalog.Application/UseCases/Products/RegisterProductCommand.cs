@@ -1,9 +1,8 @@
-﻿using BuildingBlocks.Application.Common.Interfaces;
+﻿using BuildingBlocks.Application.Abstractions;
 using Catalog.Application.Bindings.ProductCases;
 using Catalog.Application.DTOs.Product;
 using Catalog.Application.Repositories.Commands;
 using Catalog.Contracts.DTOs.Product;
-using Catalog.Contracts.UseCases.ProductCases;
 using Catalog.Domain.Entities;
 using Catalog.Domain.Primitives;
 using MediatR;
@@ -17,9 +16,9 @@ namespace Catalog.Application.UseCases.Products
     public class RegisterProductCommandHandler : IRequestHandler<RegisterProductCommandMediatR, ProductDto?>
     {
         private readonly IProductRepository _productRepository;
-        private readonly ICurrentUserContext _currentUserContext;
+        private readonly ICurrentUserService _currentUserContext;
 
-        public RegisterProductCommandHandler(IProductRepository productRepository, ICurrentUserContext currentUserContext)
+        public RegisterProductCommandHandler(IProductRepository productRepository, ICurrentUserService currentUserContext)
         {
             _productRepository = productRepository;
             _currentUserContext = currentUserContext;
@@ -37,11 +36,14 @@ namespace Catalog.Application.UseCases.Products
             if (request.Contract.SellingPrice < 0)
                 throw new ArgumentOutOfRangeException(nameof(request.Contract.SellingPrice), "Selling price cannot be negative.");
 
-            var organizationId = _currentUserContext.ActiveOrganizationId;
+            var organizationId = _currentUserContext.OrganizationId;
+
+            if (organizationId is null)
+                throw new ArgumentNullException("organizationId is null, organizationId cannot be null");
 
             // Ensure basic business rules before creating entity
             var product = Product.Create(
-                organizationId,
+                organizationId.Value,
                 CategoryId.FromGuid(request.Contract.CategoryId),
                 request.Contract.Name.Trim(),
                 request.Contract.SellingPrice,

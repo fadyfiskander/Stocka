@@ -1,5 +1,4 @@
-﻿using BuildingBlocks.Application.Primitives.Identifiers;
-using BuildingBlocks.Domain.Bases;
+﻿using BuildingBlocks.Domain.Bases;
 using Catalog.Domain.Primitives;
 using Catalog.Domain.Primitives.Identifiers;
 using System.Diagnostics.CodeAnalysis;
@@ -51,8 +50,6 @@ namespace Catalog.Domain.Entities
         #endregion
 
         #region Navigation Properties
-
-        //Guid IMultiTenantEntity.BrandId { get => BrandId.Value; set => BrandId = new BrandId(value); }
 
         #endregion
 

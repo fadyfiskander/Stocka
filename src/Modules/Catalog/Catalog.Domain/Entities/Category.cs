@@ -1,11 +1,10 @@
-﻿using BuildingBlocks.Application.Primitives.Identifiers;
-using BuildingBlocks.Domain.Bases;
+﻿using BuildingBlocks.Domain.Bases;
 using Catalog.Domain.Primitives;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Catalog.Domain.Entities;
 
-public partial class Category : AggregateRoot<CategoryId>/*, IMultiTenantEntity*/
+public partial class Category : AggregateRoot<CategoryId>
 {
     public Guid OrganizationId { get; private set; }
 
@@ -42,10 +41,4 @@ public partial class Category : AggregateRoot<CategoryId>/*, IMultiTenantEntity*
 
         Name = newName.Trim();
     }
-
-    //Guid IMultiTenantEntity.BrandId
-    //{
-    //    get => BrandId.Value;
-    //    set => BrandId = new BrandId(value);
-    //}
 }

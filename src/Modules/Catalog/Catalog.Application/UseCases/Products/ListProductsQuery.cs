@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Application.Common.Interfaces;
+﻿using BuildingBlocks.Application.Abstractions;
 using Catalog.Application.Bindings.ProductCases;
 using Catalog.Application.DTOs.Product;
 using Catalog.Application.Repositories.Queries.Product;
@@ -14,9 +14,9 @@ namespace Catalog.Application.UseCases.Products
     public class ListProductsQueryHandler : IRequestHandler<ListProductsQueryMediatR, IEnumerable<ProductDto>>
     {
         private readonly IProductQueryRepository _productQueryRepository;
-        private readonly ICurrentUserContext _currentContext;
+        private readonly ICurrentUserService _currentContext;
 
-        public ListProductsQueryHandler(IProductQueryRepository productQueryRepository, ICurrentUserContext currentContext)
+        public ListProductsQueryHandler(IProductQueryRepository productQueryRepository, ICurrentUserService currentContext)
         {
             _productQueryRepository = productQueryRepository;
             _currentContext = currentContext;
@@ -24,8 +24,11 @@ namespace Catalog.Application.UseCases.Products
 
         public async Task<IEnumerable<ProductDto>> Handle(ListProductsQueryMediatR request, CancellationToken cancellationToken)
         {
-            var organizationId = request.Contract.OrganizationId ?? _currentContext.ActiveOrganizationId;
-            var products = await _productQueryRepository.GetAllAsync(organizationId);
+            var organizationId = request.Contract.OrganizationId ?? _currentContext.OrganizationId;
+            if(organizationId is null)
+                throw new ArgumentNullException("organizationId is null, organizationId cannot be null");
+
+            var products = await _productQueryRepository.GetAllAsync(organizationId.Value);
             return products;
         }
     }
