@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Stocka.MVC.Areas.Inventory.Controllers
 {
-    /// <summary>Read-only reporting pages. All data is brand-scoped, database-aggregated, and paginated.</summary>
+    /// <summary>Read-only reporting pages. All data is organization-scoped, database-aggregated, and paginated.</summary>
     [Area("Inventory")]
     [Route("[area]/[controller]")]
     [Authorize(Roles = "Owner")]

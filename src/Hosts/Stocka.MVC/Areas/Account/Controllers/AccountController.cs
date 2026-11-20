@@ -3,6 +3,7 @@ using Identity.Contracts.DTOs.Identity.Users.Login;
 using Identity.Contracts.Exceptions;
 using Identity.Contracts.Services;
 using Identity.Infrastructure.Authentication;
+using Identity.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -74,7 +75,7 @@ namespace Stocka.MVC.Areas.Account.Controllers
                 var claims = new List<Claim>
             {
                 new(
-                    ClaimTypes.NameIdentifier,
+                    IdentityClaimTypes.UserId,
                     result.UserId.ToString()
                 ),
 
@@ -89,7 +90,7 @@ namespace Stocka.MVC.Areas.Account.Controllers
                 ),
 
                 new(
-                    "OrganizationId",
+                    IdentityClaimTypes.OrganizationId,
                     result.Organizations
                     .Select(o => o.OrganizationId)
                     .FirstOrDefault()
@@ -101,7 +102,6 @@ namespace Stocka.MVC.Areas.Account.Controllers
                     ClaimTypes.Role,
                     result.Organizations.Select(o => o.Role)
                     .FirstOrDefault() ?? string.Empty
-                    
                 )
             };
 

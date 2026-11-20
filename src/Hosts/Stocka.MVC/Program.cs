@@ -1,14 +1,15 @@
 using BuildingBlocks.Application.Abstractions;
-using BuildingBlocks.Application.Common.Interfaces;
 using Catalog.Infrastructure;
 using Identity.Infrastructure;
-using Organization.Infrastructure;
 using Inventory.Infrastructure;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication;
+using Inventory.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Localization;
-using Stocka.MVC.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Organization.Infrastructure;
+using Photino.NET;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,22 +18,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddLocalization();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<ITenantContext, HttpTenantContext>();
 builder.Services.AddHealthChecks();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
 #region Modules
 var configuration = builder.Configuration;
+builder.Services.AddIdentityModule(configuration);
 builder.Services.AddInventoryModule(configuration);
 builder.Services.AddCatalogModule(configuration);
 builder.Services.AddOrganizationModule(configuration);
-builder.Services.AddIdentityModule(configuration);
-// Host-level user context: registered after AddIdentityModule so it wins the
-// ICurrentUserContext resolution — unlike the module's CurrentUserContext it
-// keeps serving anonymous (pre-login) requests with a least-privileged fallback
-// instead of throwing when no role claim exists yet.
-builder.Services.AddScoped<ICurrentUserContext, HttpUserContext>();
 #endregion
 
 // Host-owned authentication: the classic MVC cookie flow is the host's scheme.
@@ -76,7 +71,7 @@ if (app.Environment.IsDevelopment())
         var catalogCtx = scope.ServiceProvider.GetService<Catalog.Infrastructure.Contexts.CatalogDbContext>();
         if (catalogCtx != null) await catalogCtx.Database.MigrateAsync();
 
-        var inventoryCtx = scope.ServiceProvider.GetService<Inventory.Infrastructure.Contexts.InventoryDbContext>();
+        var inventoryCtx = scope.ServiceProvider.GetService<InventoryDbContext>();
         if (inventoryCtx != null) await inventoryCtx.Database.MigrateAsync();
 
         var organizationCtx = scope.ServiceProvider.GetService<Organization.Infrastructure.Contexts.OrganizationDbContext>();
@@ -117,7 +112,7 @@ app.UseAuthorization();
 app.MapStaticAssets();
 app.MapHealthChecks("/health");
 
-
+//app.MapFallbackToFile("index.html");
 
 app.MapControllerRoute(
     name: "areas",
@@ -128,5 +123,34 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+#region Photino.NET single-instance lock and window
+// All endpoints must be mapped BEFORE the server starts: mapping after StartAsync
+// throws, and the window would load an app with no controllers registered.
 
-app.Run();
+// Start Kestrel and wait until it is actually listening.
+app.StartAsync().GetAwaiter().GetResult();
+var url = app.Services.GetRequiredService<IServer>()
+    .Features.Get<IServerAddressesFeature>()!.Addresses.First();
+
+try
+{
+    var window = new PhotinoWindow()
+    .SetTitle("Stocka")
+    .SetSize(1280, 800)
+    .Center()
+    .SetDevToolsEnabled(true)
+    .SetContextMenuEnabled(true)
+    .SetBrowserControlInitParameters(
+        "--remote-debugging-port=9222"
+    )
+    .Load(url);
+
+    window.WaitForClose();
+}
+finally
+{
+    // Window closed => stop the service, no background process left.
+    app.StopAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
+}
+#endregion
+
