@@ -1,10 +1,9 @@
 using BuildingBlocks.Application.Abstractions;
-using BuildingBlocks.Application.Primitives.Identifiers;
 using Inventory.Contracts.UseCases.BatchCases;
 using Inventory.Contracts.UseCases.StockCases;
 using Inventory.Contracts.UseCases.WarehouseCases;
 using Inventory.Infrastructure;
-using Inventory.Infrastructure.Contexts;
+using Inventory.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using MediatR;
 using Microsoft.Extensions.Configuration;
@@ -13,25 +12,27 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Inventory.Integration.Tests;
 
 /// <summary>
-/// Tenant context that tests can switch per scope. Scopes that use the same
-/// BrandId share brand data; a different BrandId is a different tenant entirely.
+/// Current-user context that tests can switch per scope. Scopes that use the same
+/// OrganizationId share organization data; a different OrganizationId is a different
+/// tenant entirely. Role is irrelevant for the Inventory module.
 /// </summary>
-public sealed class TestTenantContext : ITenantContext
+public sealed class TestCurrentUserService : ICurrentUserService
 {
-    public BrandId BrandId { get; set; } = BrandId.New();
     public Guid? UserId => null;
+    public Guid? OrganizationId { get; set; } = Guid.NewGuid();
+    public string? Role => null;
 }
 
 public sealed class InventoryScope : IDisposable
 {
     private readonly IServiceScope _scope;
 
-    public InventoryScope(IServiceScope scope, BrandId? brandId = null)
+    public InventoryScope(IServiceScope scope, Guid? organizationId = null)
     {
         _scope = scope;
-        Tenant = (TestTenantContext)scope.ServiceProvider.GetRequiredService<ITenantContext>();
-        if (brandId != null)
-            Tenant.BrandId = brandId!.Value;
+        CurrentUser = (TestCurrentUserService)scope.ServiceProvider.GetRequiredService<ICurrentUserService>();
+        if (organizationId != null)
+            CurrentUser.OrganizationId = organizationId!.Value;
 
         Sender = scope.ServiceProvider.GetRequiredService<ISender>();
         Db = scope.ServiceProvider.GetRequiredService<InventoryDbContext>();
@@ -41,7 +42,7 @@ public sealed class InventoryScope : IDisposable
         StockCases = scope.ServiceProvider.GetRequiredService<IStockCases>();
     }
 
-    public TestTenantContext Tenant { get; }
+    public TestCurrentUserService CurrentUser { get; }
     public ISender Sender { get; }
     public InventoryDbContext Db { get; }
 
@@ -56,7 +57,7 @@ public sealed class InventoryScope : IDisposable
 /// <summary>
 /// One SQL Server (LocalDB) database per test run, migrated to the latest schema, shared by
 /// every Inventory integration test (real relational behavior: constraints, RowVersion,
-/// global query filters — not an EF InMemory fake).
+/// global query filters - not an EF InMemory fake).
 /// </summary>
 public sealed class InventoryDatabaseFixture : IAsyncLifetime
 {
@@ -79,7 +80,11 @@ public sealed class InventoryDatabaseFixture : IAsyncLifetime
         services.AddLogging();
         services.AddSingleton<IConfiguration>(configuration);
         services.AddInventoryModule(configuration);
-        services.AddScoped<ITenantContext, TestTenantContext>();
+
+        // The Inventory module reads the current organization from ICurrentUserService;
+        // in the real host it is registered by the Identity module. Tests supply a
+        // switchable double so a scope can impersonate a specific organization.
+        services.AddScoped<ICurrentUserService, TestCurrentUserService>();
 
         _provider = services.BuildServiceProvider();
     }
@@ -91,8 +96,8 @@ public sealed class InventoryDatabaseFixture : IAsyncLifetime
         await db.Database.MigrateAsync();
     }
 
-    public InventoryScope NewScope(BrandId? brandId = null) =>
-        new(_provider.CreateScope(), brandId);
+    public InventoryScope NewScope(Guid? organizationId = null) =>
+        new(_provider.CreateScope(), organizationId);
 
     public async Task DisposeAsync()
     {

@@ -1,5 +1,4 @@
-﻿using BuildingBlocks.Application.Primitives.Identifiers;
-using Inventory.Contracts.UseCases.StockCases;
+﻿using Inventory.Contracts.UseCases.StockCases;
 using Inventory.Domain.Entities;
 using Inventory.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -20,10 +19,10 @@ public class StockConcurrencyIntegrationTests
     [Fact]
     public async Task Stale_rowversion_surfaces_a_clear_retry_message_and_blocks_the_write()
     {
-        var brand = BrandId.New();
+        var organizationId = Guid.NewGuid();
 
         Guid warehouse, batchId, destination;
-        using (var setup = _fixture.NewScope(brand))
+        using (var setup = _fixture.NewScope(organizationId))
         {
             var (b, w) = await TestOps.CreateStockAsync(setup.WarehouseCases, setup.BatchCases, setup.StockCases, $"ccy-{Guid.NewGuid():N}", 20, 10);
             warehouse = w.Id;
@@ -38,7 +37,7 @@ public class StockConcurrencyIntegrationTests
             destination = destinationWarehouse.Id;
         }
 
-        using var writer = _fixture.NewScope(brand);
+        using var writer = _fixture.NewScope(organizationId);
         var sender = writer.Sender;
         var db = writer.Db;
 
@@ -47,12 +46,12 @@ public class StockConcurrencyIntegrationTests
             wb.WarehouseId == Inventory.Primitives.Identifiers.WarehouseId.From(warehouse)
             && wb.BatchId == Inventory.Primitives.Identifiers.BatchId.From(batchId));
 
-        // Another writer commits a change first: quantity 10 â†’ 9 and the rowversion is bumped.
+        // Another writer commits a change first: quantity 10 -> 9 and the rowversion is bumped.
         await db.Database.ExecuteSqlRawAsync(
             "UPDATE [Inventory].[WarehouseBatches] SET [Quantity] = [Quantity] - 1 WHERE [Id] = {0}",
             tracked.Id.Value);
 
-        // The stale scope now issues a transfer that would deduct 5 from 9 (allowed) â€” but its copy
+        // The stale scope now issues a transfer that would deduct 5 from 9 (allowed) - but its copy
         // was loaded before the other writer's commit: the rowversion check must reject the write.
         var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => writer.StockCases.TransferStockAsync(new TransferStockCommand
         {

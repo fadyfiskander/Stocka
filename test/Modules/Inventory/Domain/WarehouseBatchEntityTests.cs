@@ -1,4 +1,3 @@
-using BuildingBlocks.Application.Primitives.Identifiers;
 using Inventory.Domain.Entities;
 using Inventory.Primitives.Identifiers;
 
@@ -7,20 +6,20 @@ namespace Inventory.Domain.Tests.Entities
     public class WarehouseBatchTests
     {
         private static WarehouseBatch NewWb(int quantity = 10) =>
-            new(WarehouseId.New(), BatchId.New(), BrandId.New(), quantity);
+            new(WarehouseId.New(), BatchId.New(), Guid.NewGuid(), quantity);
 
         [Fact]
         public void Constructor_WithValidData_ShouldSetAllValues()
         {
             var warehouseId = WarehouseId.New();
             var batchId = BatchId.New();
-            var brand = BrandId.New();
+            var organizationId = Guid.NewGuid();
 
-            var wb = new WarehouseBatch(warehouseId, batchId, brand, 7);
+            var wb = new WarehouseBatch(warehouseId, batchId, organizationId, 7);
 
             Assert.Equal(warehouseId, wb.WarehouseId);
             Assert.Equal(batchId, wb.BatchId);
-            Assert.Equal(brand, wb.BrandId);
+            Assert.Equal(organizationId, wb.OrganizationId);
             Assert.Equal(7, wb.Quantity);
             Assert.NotEqual(default, wb.Id);
         }
@@ -30,7 +29,7 @@ namespace Inventory.Domain.Tests.Entities
         [InlineData(-1)]
         public void Constructor_WithNonPositiveInitialQuantity_ShouldThrow(int quantity)
         {
-            Assert.Throws<ArgumentException>(() => new WarehouseBatch(WarehouseId.New(), BatchId.New(), BrandId.New(), quantity));
+            Assert.Throws<ArgumentException>(() => new WarehouseBatch(WarehouseId.New(), BatchId.New(), Guid.NewGuid(), quantity));
         }
 
         [Fact]

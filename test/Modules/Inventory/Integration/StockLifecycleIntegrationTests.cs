@@ -1,5 +1,4 @@
-﻿using BuildingBlocks.Application.Primitives.Identifiers;
-using Inventory.Contracts.UseCases.BatchCases;
+﻿using Inventory.Contracts.UseCases.BatchCases;
 using Inventory.Contracts.UseCases.StockCases;
 using Inventory.Contracts.UseCases.WarehouseCases;
 using Inventory.Domain.Enums;
@@ -9,7 +8,7 @@ namespace Inventory.Integration.Tests;
 /// <summary>
 /// End-to-end stock lifecycle against a real SQL Server (LocalDB) database:
 /// allocation, transfer, sale, return, adjustment, damage write-off, reversal,
-/// brand isolation and atomicity.
+/// organization isolation and atomicity.
 /// </summary>
 [Collection("InventoryDatabase")]
 public class StockLifecycleIntegrationTests
@@ -21,8 +20,8 @@ public class StockLifecycleIntegrationTests
     [Fact]
     public async Task Allocate_decrements_unallocated_creates_warehouse_stock_and_records_PurchaseIn()
     {
-        var brand = BrandId.New();
-        using var scope = _fixture.NewScope(brand);
+        var organizationId = Guid.NewGuid();
+        using var scope = _fixture.NewScope(organizationId);
 
         var (batch, warehouse) = await TestOps.CreateStockAsync(scope.WarehouseCases, scope.BatchCases, scope.StockCases, $"alloc-{Guid.NewGuid():N}", 100, 0);
         Assert.Equal(100, await scope.StockCases.GetProductUnallocatedUnitsAsync(new GetProductUnallocatedUnitsQuery(batch.ProductId)));
@@ -48,8 +47,8 @@ public class StockLifecycleIntegrationTests
     [Fact]
     public async Task Allocate_more_than_unallocated_fails_and_leaves_batch_unchanged()
     {
-        var brand = BrandId.New();
-        using var scope = _fixture.NewScope(brand);
+        var organizationId = Guid.NewGuid();
+        using var scope = _fixture.NewScope(organizationId);
 
         var (batch, warehouse) = await TestOps.CreateStockAsync(scope.WarehouseCases, scope.BatchCases, scope.StockCases, $"over-alloc-{Guid.NewGuid():N}", 10, 0);
 
@@ -67,8 +66,8 @@ public class StockLifecycleIntegrationTests
     [Fact]
     public async Task Allocate_to_an_existing_warehouse_batch_increases_its_quantity()
     {
-        var brand = BrandId.New();
-        using var scope = _fixture.NewScope(brand);
+        var organizationId = Guid.NewGuid();
+        using var scope = _fixture.NewScope(organizationId);
 
         var (batch, warehouse) = await TestOps.CreateStockAsync(scope.WarehouseCases, scope.BatchCases, scope.StockCases, $"alloc-existing-{Guid.NewGuid():N}", 100, 30);
 
@@ -87,8 +86,8 @@ public class StockLifecycleIntegrationTests
     [Fact]
     public async Task Transfer_moves_stock_and_records_one_shared_reference_pair()
     {
-        var brand = BrandId.New();
-        using var scope = _fixture.NewScope(brand);
+        var organizationId = Guid.NewGuid();
+        using var scope = _fixture.NewScope(organizationId);
 
         var (batch, sourceWarehouse) = await TestOps.CreateStockAsync(scope.WarehouseCases, scope.BatchCases, scope.StockCases, $"src-{Guid.NewGuid():N}", 50, 20);
 
@@ -127,8 +126,8 @@ public class StockLifecycleIntegrationTests
     [Fact]
     public async Task Transfer_with_insufficient_source_fails_atomically()
     {
-        var brand = BrandId.New();
-        using var scope = _fixture.NewScope(brand);
+        var organizationId = Guid.NewGuid();
+        using var scope = _fixture.NewScope(organizationId);
 
         var (batch, source) = await TestOps.CreateStockAsync(scope.WarehouseCases, scope.BatchCases, scope.StockCases, $"ins-{Guid.NewGuid():N}", 30, 10);
         var destination = await scope.WarehouseCases.RegisterWarehouseAsync(new RegisterWarehouseCommand
@@ -150,14 +149,14 @@ public class StockLifecycleIntegrationTests
         Assert.Equal(10, await TestOps.WarehouseQuantityAsync(scope.StockCases, batch, source));
         Assert.Equal(0, await scope.StockCases.GetBatchQuantityInWarehouseAsync(new GetBatchQuantityInWarehouseQuery(batch.Id, destination.Id)));
         var history = await TestOps.BatchHistoryAsync(scope.BatchCases, batch);
-        Assert.Single(history); // only the setup allocation's PurchaseIn â€” the failed transfer recorded nothing
+        Assert.Single(history); // only the setup allocation's PurchaseIn - the failed transfer recorded nothing
     }
 
     [Fact]
     public async Task Transfer_to_a_warehouse_that_already_has_the_batch_increases_its_quantity()
     {
-        var brand = BrandId.New();
-        using var scope = _fixture.NewScope(brand);
+        var organizationId = Guid.NewGuid();
+        using var scope = _fixture.NewScope(organizationId);
 
         var (batch, source) = await TestOps.CreateStockAsync(scope.WarehouseCases, scope.BatchCases, scope.StockCases, $"txe-{Guid.NewGuid():N}", 50, 20);
         var destination = await scope.WarehouseCases.RegisterWarehouseAsync(new RegisterWarehouseCommand
@@ -191,8 +190,8 @@ public class StockLifecycleIntegrationTests
     [Fact]
     public async Task Sale_reduces_warehouse_stock_without_touching_batch_unallocated()
     {
-        var brand = BrandId.New();
-        using var scope = _fixture.NewScope(brand);
+        var organizationId = Guid.NewGuid();
+        using var scope = _fixture.NewScope(organizationId);
 
         var (batch, warehouse) = await TestOps.CreateStockAsync(scope.WarehouseCases, scope.BatchCases, scope.StockCases, $"sale-{Guid.NewGuid():N}", 40, 10);
 
@@ -214,8 +213,8 @@ public class StockLifecycleIntegrationTests
     [Fact]
     public async Task Customer_return_reenters_same_warehouse_and_does_not_change_unallocated()
     {
-        var brand = BrandId.New();
-        using var scope = _fixture.NewScope(brand);
+        var organizationId = Guid.NewGuid();
+        using var scope = _fixture.NewScope(organizationId);
 
         var (batch, warehouse) = await TestOps.CreateStockAsync(scope.WarehouseCases, scope.BatchCases, scope.StockCases, $"ret-{Guid.NewGuid():N}", 40, 10);
         await scope.StockCases.RecordSaleOutAsync(new RecordSaleOutCommand
@@ -245,8 +244,8 @@ public class StockLifecycleIntegrationTests
     [Fact]
     public async Task Adjustment_is_idempotent_when_counted_equals_current()
     {
-        var brand = BrandId.New();
-        using var scope = _fixture.NewScope(brand);
+        var organizationId = Guid.NewGuid();
+        using var scope = _fixture.NewScope(organizationId);
 
         var (batch, warehouse) = await TestOps.CreateStockAsync(scope.WarehouseCases, scope.BatchCases, scope.StockCases, $"adj-{Guid.NewGuid():N}", 20, 10);
 
@@ -255,7 +254,7 @@ public class StockLifecycleIntegrationTests
             BatchId = batch.Id,
             WarehouseId = warehouse.Id,
             CountedQuantity = 10,
-            Reason = "Physical count â€” no change expected"
+            Reason = "Physical count - no change expected"
         });
 
         Assert.Null(noChange.MovementId);
@@ -285,7 +284,7 @@ public class StockLifecycleIntegrationTests
         var history = await TestOps.BatchHistoryAsync(scope.BatchCases, batch);
         Assert.Equal(1, history.Count(m => m.MovementType == (int)StockMovementType.AdjustmentIn));
         Assert.Equal(1, history.Count(m => m.MovementType == (int)StockMovementType.AdjustmentOut));
-        // Idempotency: still exactly one of each â€” recounting 10 again created nothing.
+        // Idempotency: still exactly one of each - recounting 10 again created nothing.
         await scope.StockCases.AdjustStockAsync(new AdjustStockCommand
         {
             BatchId = batch.Id,
@@ -300,8 +299,8 @@ public class StockLifecycleIntegrationTests
     [Fact]
     public async Task Write_off_requires_reason_and_reduces_stock()
     {
-        var brand = BrandId.New();
-        using var scope = _fixture.NewScope(brand);
+        var organizationId = Guid.NewGuid();
+        using var scope = _fixture.NewScope(organizationId);
 
         var (batch, warehouse) = await TestOps.CreateStockAsync(scope.WarehouseCases, scope.BatchCases, scope.StockCases, $"dmg-{Guid.NewGuid():N}", 20, 10);
 
@@ -333,8 +332,8 @@ public class StockLifecycleIntegrationTests
     [Fact]
     public async Task Reversal_of_sale_and_of_allocation_balance_stock_and_restore_unallocated()
     {
-        var brand = BrandId.New();
-        using var scope = _fixture.NewScope(brand);
+        var organizationId = Guid.NewGuid();
+        using var scope = _fixture.NewScope(organizationId);
 
         var (batch, warehouse) = await TestOps.CreateStockAsync(scope.WarehouseCases, scope.BatchCases, scope.StockCases, $"rev-{Guid.NewGuid():N}", 50, 10);
         var sale = await scope.StockCases.RecordSaleOutAsync(new RecordSaleOutCommand
@@ -377,8 +376,8 @@ public class StockLifecycleIntegrationTests
     [Fact]
     public async Task Transfer_leg_cannot_be_reversed()
     {
-        var brand = BrandId.New();
-        using var scope = _fixture.NewScope(brand);
+        var organizationId = Guid.NewGuid();
+        using var scope = _fixture.NewScope(organizationId);
 
         var (batch, source) = await TestOps.CreateStockAsync(scope.WarehouseCases, scope.BatchCases, scope.StockCases, $"towrev-{Guid.NewGuid():N}", 30, 10);
         var destination = await scope.WarehouseCases.RegisterWarehouseAsync(new RegisterWarehouseCommand
@@ -412,8 +411,8 @@ public class StockLifecycleIntegrationTests
     [Fact]
     public async Task Reversal_requires_a_reason()
     {
-        var brand = BrandId.New();
-        using var scope = _fixture.NewScope(brand);
+        var organizationId = Guid.NewGuid();
+        using var scope = _fixture.NewScope(organizationId);
 
         var (batch, warehouse) = await TestOps.CreateStockAsync(scope.WarehouseCases, scope.BatchCases, scope.StockCases, $"no-rev-{Guid.NewGuid():N}", 20, 5);
         var sale = await scope.StockCases.RecordSaleOutAsync(new RecordSaleOutCommand
@@ -434,8 +433,8 @@ public class StockLifecycleIntegrationTests
     [Fact]
     public async Task Deactivated_warehouse_rejects_new_stock_but_keeps_what_it_holds()
     {
-        var brand = BrandId.New();
-        using var scope = _fixture.NewScope(brand);
+        var organizationId = Guid.NewGuid();
+        using var scope = _fixture.NewScope(organizationId);
 
         var (batch, warehouse) = await TestOps.CreateStockAsync(scope.WarehouseCases, scope.BatchCases, scope.StockCases, $"deact-{Guid.NewGuid():N}", 20, 5);
 
@@ -461,13 +460,13 @@ public class StockLifecycleIntegrationTests
     }
 
     [Fact]
-    public async Task Cross_brand_ids_are_invisible_to_other_brands()
+    public async Task Cross_organization_ids_are_invisible_to_other_organizations()
     {
-        var brandA = BrandId.New();
-        var brandB = BrandId.New();
+        var organizationA = Guid.NewGuid();
+        var organizationB = Guid.NewGuid();
 
         Guid warehouseA1, warehouseA2;
-        using (var scopeA = _fixture.NewScope(brandA))
+        using (var scopeA = _fixture.NewScope(organizationA))
         {
             var (batchA, warehouse1) = await TestOps.CreateStockAsync(scopeA.WarehouseCases, scopeA.BatchCases, scopeA.StockCases, $"iso-{Guid.NewGuid():N}", 10, 10);
             warehouseA1 = warehouse1.Id;
@@ -480,8 +479,8 @@ public class StockLifecycleIntegrationTests
             });
             warehouseA2 = warehouse2.Id;
 
-            // Brand B cannot see or touch Brand A's warehouse/batch.
-            using var scopeB = _fixture.NewScope(brandB);
+            // Organization B cannot see or touch Organization A's warehouse/batch.
+            using var scopeB = _fixture.NewScope(organizationB);
             await Assert.ThrowsAsync<KeyNotFoundException>(() =>
                 scopeB.WarehouseCases.RetrieveWarehouseAsync(new RetrieveWarehouseQuery(warehouseA1)));
             await Assert.ThrowsAsync<KeyNotFoundException>(() =>
@@ -494,8 +493,8 @@ public class StockLifecycleIntegrationTests
                 }));
         }
 
-        // Brand A still sees exactly its own data (both warehouses, both reachable).
-        using var readerA = _fixture.NewScope(brandA);
+        // Organization A still sees exactly its own data (both warehouses, both reachable).
+        using var readerA = _fixture.NewScope(organizationA);
         var activeWarehouses = (await readerA.WarehouseCases.ListWarehousesAsync(new ListWarehousesQuery { IsActive = true })).Items
             .Select(w => w.Id).ToList();
         Assert.Contains(warehouseA1, activeWarehouses);

@@ -1,4 +1,3 @@
-using BuildingBlocks.Application.Primitives.Identifiers;
 using Inventory.Domain.Entities;
 
 namespace Inventory.Domain.Tests.Entities
@@ -6,14 +5,14 @@ namespace Inventory.Domain.Tests.Entities
     public class BatchTests
     {
         private static Batch NewBatch(int initial = 100, decimal cost = 10m) =>
-            new(Guid.NewGuid(), Guid.NewGuid(), BrandId.New(), initial, cost);
+            new(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), initial, cost);
 
         [Fact]
         public void Constructor_WithValidData_ShouldSetRemainingEqualToInitial()
         {
             var purchaseItemId = Guid.NewGuid();
             var productId = Guid.NewGuid();
-            var batch = new Batch(purchaseItemId, productId, BrandId.New(), 50, 7.5m);
+            var batch = new Batch(purchaseItemId, productId, Guid.NewGuid(), 50, 7.5m);
 
             Assert.Equal(purchaseItemId, batch.PurchaseItemId);
             Assert.Equal(productId, batch.ProductId);
@@ -28,7 +27,7 @@ namespace Inventory.Domain.Tests.Entities
         [InlineData(-5)]
         public void Constructor_WithNonPositiveInitialQuantity_ShouldThrow(int quantity)
         {
-            Assert.Throws<ArgumentException>(() => new Batch(Guid.NewGuid(), Guid.NewGuid(), BrandId.New(), quantity, 1m));
+            Assert.Throws<ArgumentException>(() => new Batch(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), quantity, 1m));
         }
 
         [Theory]
@@ -36,19 +35,19 @@ namespace Inventory.Domain.Tests.Entities
         [InlineData(-1)]
         public void Constructor_WithNonPositiveUnitCost_ShouldThrow(decimal cost)
         {
-            Assert.Throws<ArgumentException>(() => new Batch(Guid.NewGuid(), Guid.NewGuid(), BrandId.New(), 10, cost));
+            Assert.Throws<ArgumentException>(() => new Batch(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 10, cost));
         }
 
         [Fact]
         public void Constructor_WithEmptyPurchaseItemId_ShouldThrow()
         {
-            Assert.Throws<ArgumentException>(() => new Batch(Guid.Empty, Guid.NewGuid(), BrandId.New(), 10, 1m));
+            Assert.Throws<ArgumentException>(() => new Batch(Guid.Empty, Guid.NewGuid(), Guid.NewGuid(), 10, 1m));
         }
 
         [Fact]
         public void Constructor_WithEmptyProductId_ShouldThrow()
         {
-            Assert.Throws<ArgumentException>(() => new Batch(Guid.NewGuid(), Guid.Empty, BrandId.New(), 10, 1m));
+            Assert.Throws<ArgumentException>(() => new Batch(Guid.NewGuid(), Guid.Empty, Guid.NewGuid(), 10, 1m));
         }
 
         [Fact]

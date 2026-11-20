@@ -1,4 +1,3 @@
-using BuildingBlocks.Application.Primitives.Identifiers;
 using Inventory.Domain.Entities;
 using Inventory.Domain.Enums;
 using Inventory.Primitives.Identifiers;
@@ -7,8 +6,8 @@ namespace Inventory.Domain.Tests.Entities
 {
     public class StockMovementTests
     {
-        private static (Guid ProductId, BatchId Batch, WarehouseId Warehouse, BrandId Brand) Ctx() =>
-            (Guid.NewGuid(), BatchId.New(), WarehouseId.New(), BrandId.New());
+        private static (Guid ProductId, BatchId Batch, WarehouseId Warehouse, Guid OrganizationId) Ctx() =>
+            (Guid.NewGuid(), BatchId.New(), WarehouseId.New(), Guid.NewGuid());
 
         private static StockMovement New(
             StockMovementType type,
@@ -17,8 +16,8 @@ namespace Inventory.Domain.Tests.Entities
             int quantity = 5,
             string? reason = null)
         {
-            var (productId, batch, warehouse, brand) = Ctx();
-            return new StockMovement(productId, batch, warehouse, brand, quantity, type, reference, referenceId, reason);
+            var (productId, batch, warehouse, organizationId) = Ctx();
+            return new StockMovement(productId, batch, warehouse, organizationId, quantity, type, reference, referenceId, reason);
         }
 
         [Fact]
@@ -45,14 +44,14 @@ namespace Inventory.Domain.Tests.Entities
         {
             Assert.Throws<ArgumentException>(() =>
             {
-                var (productId, _, warehouse, brand) = Ctx();
-                return new StockMovement(productId, new BatchId(Guid.Empty), warehouse, brand, 1, StockMovementType.AdjustmentIn);
+                var (productId, _, warehouse, organizationId) = Ctx();
+                return new StockMovement(productId, new BatchId(Guid.Empty), warehouse, organizationId, 1, StockMovementType.AdjustmentIn);
             });
 
             Assert.Throws<ArgumentException>(() =>
             {
-                var (productId, batch, _, brand) = Ctx();
-                return new StockMovement(productId, batch, new WarehouseId(Guid.Empty), brand, 1, StockMovementType.AdjustmentIn);
+                var (productId, batch, _, organizationId) = Ctx();
+                return new StockMovement(productId, batch, new WarehouseId(Guid.Empty), organizationId, 1, StockMovementType.AdjustmentIn);
             });
         }
 
