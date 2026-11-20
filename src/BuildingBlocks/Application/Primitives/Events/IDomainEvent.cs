@@ -1,5 +1,11 @@
-namespace BuildingBlocks.Application.Primitives.Events;
-public interface IDomainEvent
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace BuildingBlocks.Application.Primitives.Events
 {
-    DateTime OccurredOn { get; }
+    public interface IDomainEvent
+    {
+        DateTime OccurredOn { get; }
+    }
 }

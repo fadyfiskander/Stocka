@@ -4,6 +4,6 @@ namespace BuildingBlocks.Application.Abstractions
 {
     public interface IMultiTenantEntity
     {
-        Guid BrandId { get; set; }
+        Guid OrganizationId { get; set; }
     }
 }

@@ -1,8 +1,13 @@
-namespace BuildingBlocks.Application.Primitives.Events;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
-public abstract class DomainEvent : IDomainEvent
+namespace BuildingBlocks.Application.Primitives.Events
 {
-    public DateTime OccurredOn { get; } = DateTime.UtcNow;
+    public abstract class DomainEvent : IDomainEvent
+    {
+        public DateTime OccurredOn { get; } = DateTime.UtcNow;
 
-    protected DomainEvent() { }
+        protected DomainEvent() { }
+    }
 }
