@@ -1,31 +1,39 @@
-﻿using BuildingBlocks.Application.Abstractions;
-using BuildingBlocks.Application.Primitives.Identifiers;
+using BuildingBlocks.Application.Abstractions;
 using BuildingBlocks.Domain.Bases;
 using Inventory.Application.Primitives.Events;
 using Inventory.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Inventory.Infrastructure.Contexts
+namespace Inventory.Infrastructure.Persistence
 {
     public class InventoryDbContext : DbContext
     {
         private readonly IPublisher _publisher;
-        private readonly ITenantContext _tenantContext;
+        private readonly ICurrentUserService _currentUser;
 
         public InventoryDbContext(
             DbContextOptions<InventoryDbContext> options,
             IPublisher publisher,
-            ITenantContext tenantContext)
+            ICurrentUserService currentUser)
             : base(options)
         {
             _publisher = publisher;
-            _tenantContext = tenantContext;
+            _currentUser = currentUser;
         }
 
-        // Read per query execution, NOT baked into the cached model — so each
-        // DI scope (its own ITenantContext) gets correct brand isolation.
-        private BrandId CurrentBrandId => _tenantContext.BrandId;
+        // Read per query execution, NOT baked into the cached model - so each
+        // DI scope (its own ICurrentUserService) gets correct organization isolation.
+        private Guid CurrentOrganizationId
+        {
+            get
+            {
+                var organizationId = _currentUser.OrganizationId;
+                if (organizationId is null)
+                    throw new ArgumentNullException("OrganizationId is null, OrganizationId cannot be null");
+                return organizationId.Value;
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,11 +42,11 @@ namespace Inventory.Infrastructure.Contexts
             modelBuilder.HasDefaultSchema("Inventory");
 
             // Global multi-tenant query filters — every EF read/write query is
-            // automatically scoped to the current brand.
-            modelBuilder.Entity<Warehouse>().HasQueryFilter(e => e.BrandId == CurrentBrandId);
-            modelBuilder.Entity<Batch>().HasQueryFilter(e => e.BrandId == CurrentBrandId);
-            modelBuilder.Entity<WarehouseBatch>().HasQueryFilter(e => e.BrandId == CurrentBrandId);
-            modelBuilder.Entity<StockMovement>().HasQueryFilter(e => e.BrandId == CurrentBrandId);
+            // automatically scoped to the current organization.
+            modelBuilder.Entity<Warehouse>().HasQueryFilter(e => e.OrganizationId == CurrentOrganizationId);
+            modelBuilder.Entity<Batch>().HasQueryFilter(e => e.OrganizationId == CurrentOrganizationId);
+            modelBuilder.Entity<WarehouseBatch>().HasQueryFilter(e => e.OrganizationId == CurrentOrganizationId);
+            modelBuilder.Entity<StockMovement>().HasQueryFilter(e => e.OrganizationId == CurrentOrganizationId);
         }
 
         public DbSet<Warehouse> Warehouses { get; set; }

@@ -1,14 +1,14 @@
-﻿namespace Inventory.Contracts.DTOs
+namespace Inventory.Contracts.DTOs
 {
     /// <summary>
-    /// Brand-level inventory rollup exposed cross-module.
+    /// Organization-level inventory rollup exposed cross-module.
     /// UnitTotals is a raw unit count (products may have different units of measure).
     /// TotalInventoryCost uses the recorded per-batch unit costs only — no inventory
     /// valuation policy (FIFO / weighted average) has been approved, so treat it as
     /// traceable cost data, not an approved financial valuation.
     /// </summary>
     public record InventoryReport(
-        Guid BrandId,
+        Guid OrganizationId,
         int TotalWarehouses,
         int ActiveWarehouses,
         int TotalBatches,

@@ -1,10 +1,10 @@
-﻿using BuildingBlocks.Application.Primitives.Identifiers;
+
 using Inventory.Domain.Entities;
 using Inventory.Primitives.Identifiers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Inventory.Infrastructure.Configurations
+namespace Inventory.Infrastructure.Persistence.Configurations
 {
     internal class BatchConfiguration : IEntityTypeConfiguration<Batch>
     {
@@ -26,8 +26,7 @@ namespace Inventory.Infrastructure.Configurations
                 .IsRequired();
 
             builder
-                .Property(b => b.BrandId)
-                .HasConversion(b => b.Value, b => BrandId.FromGuid(b))
+                .Property(b => b.OrganizationId)
                 .IsRequired();
 
             builder
@@ -46,9 +45,9 @@ namespace Inventory.Infrastructure.Configurations
                 .Property(b => b.RowVersion)
                 .IsRowVersion();
 
-            // Frequent report filters: product-level and purchase-level batch lookups, brand-scoped.
-            builder.HasIndex(b => new { b.BrandId, b.ProductId });
-            builder.HasIndex(b => new { b.BrandId, b.PurchaseItemId });
+            // Frequent report filters: product-level and purchase-level batch lookups, organization-scoped.
+            builder.HasIndex(b => new { b.OrganizationId, b.ProductId });
+            builder.HasIndex(b => new { b.OrganizationId, b.PurchaseItemId });
 
             // Domain invariant persisted at the database level: RemainingQuantity >= 0.
             builder.ToTable("Batches", t =>

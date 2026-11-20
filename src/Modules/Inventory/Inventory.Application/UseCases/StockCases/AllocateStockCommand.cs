@@ -12,7 +12,7 @@ namespace Inventory.Application.UseCases.StockCases;
 
 #region Handler
 /// <summary>
-/// Handles the allocation: validates the batch's unallocated quantity and the warehouse's Brand/activity,
+/// Handles the allocation: validates the batch's unallocated quantity and the warehouse's Organization/activity,
 /// creates or increases the WarehouseBatch placement, deducts the batch's RemainingQuantity, and
 /// records the PurchaseIn movement — all persisted by one SaveChanges via UnitOfWorkBehavior.
 /// </summary>
@@ -22,29 +22,29 @@ public class AllocateStockCommandHandler : IRequestHandler<AllocateStockCommandM
     private readonly IWarehouseRepository _warehouseRepository;
     private readonly IWarehouseBatchRepository _warehouseBatchRepository;
     private readonly IStockMovementRepository _stockMovementRepository;
-    private readonly ITenantContext _tenantContext;
+    private readonly ICurrentUserService _currentUser;
 
     public AllocateStockCommandHandler(
         IBatchRepository batchRepository,
         IWarehouseRepository warehouseRepository,
         IWarehouseBatchRepository warehouseBatchRepository,
         IStockMovementRepository stockMovementRepository,
-        ITenantContext tenantContext)
+        ICurrentUserService currentUser)
     {
         _batchRepository = batchRepository;
         _warehouseRepository = warehouseRepository;
         _warehouseBatchRepository = warehouseBatchRepository;
         _stockMovementRepository = stockMovementRepository;
-        _tenantContext = tenantContext;
+        _currentUser = currentUser;
     }
 
     public async Task<AllocateStockResultDto> Handle(AllocateStockCommandMediatR request, CancellationToken cancellationToken)
     {
-        var brandId = _tenantContext.BrandId;
+        var organizationId = _currentUser.OrganizationId;
 
         var batch = await _batchRepository.GetByIdAsync(BatchId.From(request.Contract.BatchId))
             ?? throw new KeyNotFoundException(StockOperationMessages.BatchNotFound);
-        if (batch.BrandId != brandId) throw new KeyNotFoundException(StockOperationMessages.BatchNotFound);
+        if (batch.OrganizationId != organizationId) throw new KeyNotFoundException(StockOperationMessages.BatchNotFound);
 
         if (request.Contract.Quantity > batch.RemainingQuantity)
             throw new InvalidOperationException(
@@ -52,14 +52,14 @@ public class AllocateStockCommandHandler : IRequestHandler<AllocateStockCommandM
 
         var warehouse = await _warehouseRepository.GetByIdAsync(WarehouseId.From(request.Contract.WarehouseId))
             ?? throw new KeyNotFoundException(StockOperationMessages.WarehouseNotFound);
-        if (warehouse.BrandId != brandId) throw new KeyNotFoundException(StockOperationMessages.WarehouseNotFound);
+        if (warehouse.OrganizationId != organizationId) throw new KeyNotFoundException(StockOperationMessages.WarehouseNotFound);
         if (!warehouse.IsActive) throw new InvalidOperationException(StockOperationMessages.WarehouseInactive);
 
         var existingWarehouseBatch = await _warehouseBatchRepository.FindByWarehouseAndBatchAsync(warehouse.Id, batch.Id);
         WarehouseBatch warehouseBatch;
         if (existingWarehouseBatch == null)
         {
-            warehouseBatch = new WarehouseBatch(warehouse.Id, batch.Id, brandId, request.Contract.Quantity);
+            warehouseBatch = new WarehouseBatch(warehouse.Id, batch.Id, organizationId.Value, request.Contract.Quantity);
             await _warehouseBatchRepository.AddAsync(warehouseBatch);
         }
         else
@@ -76,7 +76,7 @@ public class AllocateStockCommandHandler : IRequestHandler<AllocateStockCommandM
             batch.ProductId,
             batch.Id,
             warehouse.Id,
-            brandId,
+            organizationId.Value,
             request.Contract.Quantity,
             StockMovementType.PurchaseIn,
             StockReferenceType.Purchase,

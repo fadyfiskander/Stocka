@@ -8,7 +8,7 @@ namespace Inventory.Contracts.UseCases.ReportCases;
 /// <summary>
 /// Inventory report use case contract: the pure module boundary for every report read.
 /// Implemented by the Inventory Application layer and consumed via DI. All results are scoped
-/// to the current Brand by the application pipeline (tenant context).
+/// to the current Organization by the application pipeline (tenant context).
 /// </summary>
 public interface IInventoryReportCases
 {
@@ -33,7 +33,7 @@ public interface IInventoryReportCases
     #endregion
 
     #region Stock quantity reports
-    /// <summary>Retrieves products whose total units across the Brand's warehouses are zero, paginated.</summary>
+    /// <summary>Retrieves products whose total units across the organization's warehouses are zero, paginated.</summary>
     Task<PaginatedResult<ZeroStockProductDto>> GetZeroStockProductsAsync(ZeroStockProductsQuery query, CancellationToken cancellationToken = default);
 
     /// <summary>Retrieves batches with no units left to allocate (RemainingQuantity = 0).</summary>
@@ -58,7 +58,7 @@ public interface IInventoryReportCases
     #endregion
 
     #region Summary
-    /// <summary>Retrieves the Brand-level scalar rollup backing the public Inventory report contract.</summary>
+    /// <summary>Retrieves the organization-level scalar rollup backing the public Inventory report contract.</summary>
     Task<InventorySummaryDto> GetInventorySummaryAsync(InventorySummaryQuery query, CancellationToken cancellationToken = default);
     #endregion
 }

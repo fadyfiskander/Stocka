@@ -1,5 +1,4 @@
 ﻿using BuildingBlocks.Application.Common.Models;
-using BuildingBlocks.Application.Primitives.Identifiers;
 using Inventory.Contracts.DTOs.StockMovement;
 using Inventory.Primitives.Identifiers;
 
@@ -22,13 +21,13 @@ namespace Inventory.Application.Repositories.Queries
 
     public interface IStockMovementQueryRepository
     {
-        Task<StockMovementDto?> GetByIdAsync(BrandId brandId, StockMovementId id);
-        Task<IEnumerable<StockMovementDto>> GetAllAsync(BrandId brandId, WarehouseId warehouseId);
+        Task<StockMovementDto?> GetByIdAsync(Guid organizationId, StockMovementId id);
+        Task<IEnumerable<StockMovementDto>> GetAllAsync(Guid organizationId, WarehouseId warehouseId);
 
         /// <summary>Batch movement (audit) history, oldest first.</summary>
-        Task<IEnumerable<StockMovementDto>> GetByBatchAsync(BrandId brandId, BatchId batchId);
+        Task<IEnumerable<StockMovementDto>> GetByBatchAsync(Guid organizationId, BatchId batchId);
 
         /// <summary>Paged, filtered movement history (warehouse, product, batch, types, date range).</summary>
-        Task<PaginatedResult<StockMovementDto>> GetPagedAsync(BrandId brandId, MovementQueryCriteria criteria);
+        Task<PaginatedResult<StockMovementDto>> GetPagedAsync(Guid organizationId, MovementQueryCriteria criteria);
     }
 }

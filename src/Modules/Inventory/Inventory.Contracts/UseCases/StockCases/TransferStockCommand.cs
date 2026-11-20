@@ -1,9 +1,9 @@
-﻿using Inventory.Contracts.DTOs.Stock;
+using Inventory.Contracts.DTOs.Stock;
 
 namespace Inventory.Contracts.UseCases.StockCases;
 
 /// <summary>
-/// Moves units of a batch between two warehouses of the current Brand as ONE business operation:
+/// Moves units of a batch between two warehouses of the current Organization as ONE business operation:
 /// TransferOut at the source + TransferIn at the destination, sharing one Transfer reference id,
 /// all persisted in a single SaveChanges. A partial commit cannot occur â€” if the source deduction
 /// fails, the whole operation rolls back.

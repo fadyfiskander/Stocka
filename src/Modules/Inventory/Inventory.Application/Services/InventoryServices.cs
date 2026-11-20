@@ -1,4 +1,4 @@
-﻿using Inventory.Contracts.DTOs;
+using Inventory.Contracts.DTOs;
 using Inventory.Contracts.Requests;
 using Inventory.Contracts.Services;
 using Inventory.Contracts.UseCases.ReportCases;
@@ -33,7 +33,7 @@ namespace Inventory.Application.Services
         {
             var summary = await _reports.GetInventorySummaryAsync(new InventorySummaryQuery(), cancellationToken);
             return new InventoryReport(
-                summary.BrandId,
+                summary.OrganizationId,
                 summary.TotalWarehouses,
                 summary.ActiveWarehouses,
                 summary.TotalBatches,
@@ -69,7 +69,7 @@ namespace Inventory.Application.Services
             {
                 IsActive = true,
                 Page = 1,
-                // Dictionary-style read: return the full active set (bounded by warehouse count per Brand).
+                // Dictionary-style read: return the full active set (bounded by warehouse count per Organization).
                 PageSize = 100
             }, cancellationToken);
 

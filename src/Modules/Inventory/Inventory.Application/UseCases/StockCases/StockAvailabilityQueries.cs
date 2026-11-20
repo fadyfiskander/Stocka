@@ -10,18 +10,18 @@ namespace Inventory.Application.UseCases.StockCases;
 
 #region GetProductStockQuery
 /// <summary>
-/// Handles the product stock distribution: aggregates the brand-wide distribution (optionally
+/// Handles the product stock distribution: aggregates the organization-wide distribution (optionally
 /// filtered down to one warehouse) with the total counted units.
 /// </summary>
 public class GetProductStockQueryHandler : IRequestHandler<GetProductStockQueryMediatR, ProductStockDistributionDto>
 {
     private readonly IInventoryReportQueryRepository _reportRepository;
-    private readonly ITenantContext _tenantContext;
+    private readonly ICurrentUserService _currentUser;
 
-    public GetProductStockQueryHandler(IInventoryReportQueryRepository reportRepository, ITenantContext tenantContext)
+    public GetProductStockQueryHandler(IInventoryReportQueryRepository reportRepository, ICurrentUserService currentUser)
     {
         _reportRepository = reportRepository;
-        _tenantContext = tenantContext;
+        _currentUser = currentUser;
     }
 
     public async Task<ProductStockDistributionDto> Handle(GetProductStockQueryMediatR request, CancellationToken cancellationToken)
@@ -29,13 +29,15 @@ public class GetProductStockQueryHandler : IRequestHandler<GetProductStockQueryM
         if (request.Contract.ProductId == Guid.Empty)
             throw new ArgumentException("Product ID cannot be empty.", nameof(request.Contract.ProductId));
 
-        var brandId = _tenantContext.BrandId;
+        var organizationId = _currentUser.OrganizationId;
+        if (organizationId is null)
+            throw new ArgumentNullException("OrganizationId is null, OrganizationId cannot be null");
 
-        var rows = await _reportRepository.GetProductStockDistributionAsync(brandId, request.Contract.ProductId);
+        var rows = await _reportRepository.GetProductStockDistributionAsync(organizationId.Value, request.Contract.ProductId);
         if (request.Contract.WarehouseId is { } wid && wid != Guid.Empty)
             rows = rows.Where(r => r.WarehouseId == wid).ToList();
 
-        var total = await _reportRepository.GetProductTotalUnitsAsync(brandId, request.Contract.ProductId);
+        var total = await _reportRepository.GetProductTotalUnitsAsync(organizationId.Value, request.Contract.ProductId);
 
         return new ProductStockDistributionDto(request.Contract.ProductId, total, rows.ToList());
     }
@@ -47,12 +49,12 @@ public class GetProductStockQueryHandler : IRequestHandler<GetProductStockQueryM
 public class GetProductUnallocatedUnitsQueryHandler : IRequestHandler<GetProductUnallocatedUnitsQueryMediatR, int>
 {
     private readonly IInventoryReportQueryRepository _reportRepository;
-    private readonly ITenantContext _tenantContext;
+    private readonly ICurrentUserService _currentUser;
 
-    public GetProductUnallocatedUnitsQueryHandler(IInventoryReportQueryRepository reportRepository, ITenantContext tenantContext)
+    public GetProductUnallocatedUnitsQueryHandler(IInventoryReportQueryRepository reportRepository, ICurrentUserService currentUser)
     {
         _reportRepository = reportRepository;
-        _tenantContext = tenantContext;
+        _currentUser = currentUser;
     }
 
     public async Task<int> Handle(GetProductUnallocatedUnitsQueryMediatR request, CancellationToken cancellationToken)
@@ -60,7 +62,11 @@ public class GetProductUnallocatedUnitsQueryHandler : IRequestHandler<GetProduct
         if (request.Contract.ProductId == Guid.Empty)
             throw new ArgumentException("Product ID cannot be empty.", nameof(request.Contract.ProductId));
 
-        return await _reportRepository.GetProductUnallocatedUnitsAsync(_tenantContext.BrandId, request.Contract.ProductId);
+        var organizationId = _currentUser.OrganizationId;
+        if (organizationId is null)
+            throw new ArgumentNullException("OrganizationId is null, OrganizationId cannot be null");
+
+        return await _reportRepository.GetProductUnallocatedUnitsAsync(organizationId.Value, request.Contract.ProductId);
     }
 }
 #endregion
@@ -70,18 +76,22 @@ public class GetProductUnallocatedUnitsQueryHandler : IRequestHandler<GetProduct
 public class GetBatchQuantityInWarehouseQueryHandler : IRequestHandler<GetBatchQuantityInWarehouseQueryMediatR, int>
 {
     private readonly IWarehouseBatchQueryRepository _warehouseBatchQueryRepository;
-    private readonly ITenantContext _tenantContext;
+    private readonly ICurrentUserService _currentUser;
 
-    public GetBatchQuantityInWarehouseQueryHandler(IWarehouseBatchQueryRepository warehouseBatchQueryRepository, ITenantContext tenantContext)
+    public GetBatchQuantityInWarehouseQueryHandler(IWarehouseBatchQueryRepository warehouseBatchQueryRepository, ICurrentUserService currentUser)
     {
         _warehouseBatchQueryRepository = warehouseBatchQueryRepository;
-        _tenantContext = tenantContext;
+        _currentUser = currentUser;
     }
 
     public async Task<int> Handle(GetBatchQuantityInWarehouseQueryMediatR request, CancellationToken cancellationToken)
     {
+        var organizationId = _currentUser.OrganizationId;
+        if (organizationId is null)
+            throw new ArgumentNullException("OrganizationId is null, OrganizationId cannot be null");
+
         return await _warehouseBatchQueryRepository.GetQuantityInWarehouseAsync(
-            _tenantContext.BrandId,
+            organizationId.Value,
             WarehouseId.From(request.Contract.WarehouseId),
             BatchId.From(request.Contract.BatchId));
     }
@@ -93,12 +103,12 @@ public class GetBatchQuantityInWarehouseQueryHandler : IRequestHandler<GetBatchQ
 public class GetWarehouseTotalUnitsQueryHandler : IRequestHandler<GetWarehouseTotalUnitsQueryMediatR, int>
 {
     private readonly IWarehouseBatchQueryRepository _warehouseBatchQueryRepository;
-    private readonly ITenantContext _tenantContext;
+    private readonly ICurrentUserService _currentUser;
 
-    public GetWarehouseTotalUnitsQueryHandler(IWarehouseBatchQueryRepository warehouseBatchQueryRepository, ITenantContext tenantContext)
+    public GetWarehouseTotalUnitsQueryHandler(IWarehouseBatchQueryRepository warehouseBatchQueryRepository, ICurrentUserService currentUser)
     {
         _warehouseBatchQueryRepository = warehouseBatchQueryRepository;
-        _tenantContext = tenantContext;
+        _currentUser = currentUser;
     }
 
     public async Task<int> Handle(GetWarehouseTotalUnitsQueryMediatR request, CancellationToken cancellationToken)
@@ -106,7 +116,11 @@ public class GetWarehouseTotalUnitsQueryHandler : IRequestHandler<GetWarehouseTo
         if (request.Contract.WarehouseId == Guid.Empty)
             throw new ArgumentException("Warehouse ID cannot be empty.", nameof(request.Contract.WarehouseId));
 
-        var placements = await _warehouseBatchQueryRepository.GetAllAsync(_tenantContext.BrandId, WarehouseId.From(request.Contract.WarehouseId));
+        var organizationId = _currentUser.OrganizationId;
+        if (organizationId is null)
+            throw new ArgumentNullException("OrganizationId is null, OrganizationId cannot be null");
+
+        var placements = await _warehouseBatchQueryRepository.GetAllAsync(organizationId.Value, WarehouseId.From(request.Contract.WarehouseId));
         return placements.Sum(p => p.Quantity);
     }
 }

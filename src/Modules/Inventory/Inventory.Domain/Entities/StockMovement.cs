@@ -1,5 +1,4 @@
 ﻿using BuildingBlocks.Application.Abstractions;
-using BuildingBlocks.Application.Primitives.Identifiers;
 using BuildingBlocks.Domain.Bases;
 using Inventory.Domain.Enums;
 using Inventory.Primitives.Identifiers;
@@ -12,7 +11,7 @@ namespace Inventory.Domain.Entities
         public Guid ProductId { get; private set; }
         public BatchId BatchId { get; private set; }
         public WarehouseId WarehouseId { get; private set; }
-        public BrandId BrandId { get; private set; }
+        public Guid OrganizationId { get; private set; }
 
         public int Quantity { get; private set; }
 
@@ -37,7 +36,7 @@ namespace Inventory.Domain.Entities
             Guid productId,
             BatchId batchId,
             WarehouseId warehouseId,
-            BrandId brandId,
+            Guid organizationId,
             int quantity,
             StockMovementType movementType,
             StockReferenceType? referenceType = null,
@@ -74,7 +73,7 @@ namespace Inventory.Domain.Entities
             ProductId = productId;
             BatchId = batchId;
             WarehouseId = warehouseId;
-            BrandId = brandId;
+            OrganizationId = organizationId;
 
             Quantity = quantity;
             MovementType = movementType;
@@ -110,13 +109,13 @@ namespace Inventory.Domain.Entities
         {
             private static readonly Dictionary<StockMovementType, StockReferenceType[]> _allowed = new()
             {
-                [StockMovementType.PurchaseIn]    = [StockReferenceType.Purchase],
-                [StockMovementType.SaleOut]       = [StockReferenceType.Order],
-                [StockMovementType.TransferIn]    = [StockReferenceType.Transfer],
-                [StockMovementType.TransferOut]   = [StockReferenceType.Transfer],
-                [StockMovementType.AdjustmentIn]  = [StockReferenceType.Adjustment, StockReferenceType.ReversalOfMovement],
+                [StockMovementType.PurchaseIn] = [StockReferenceType.Purchase],
+                [StockMovementType.SaleOut] = [StockReferenceType.Order],
+                [StockMovementType.TransferIn] = [StockReferenceType.Transfer],
+                [StockMovementType.TransferOut] = [StockReferenceType.Transfer],
+                [StockMovementType.AdjustmentIn] = [StockReferenceType.Adjustment, StockReferenceType.ReversalOfMovement],
                 [StockMovementType.AdjustmentOut] = [StockReferenceType.Adjustment, StockReferenceType.ReversalOfMovement],
-                [StockMovementType.OrderReturn]   = [StockReferenceType.Return, StockReferenceType.Order],
+                [StockMovementType.OrderReturn] = [StockReferenceType.Return, StockReferenceType.Order],
             };
 
             public static bool IsAllowed(StockMovementType movementType, StockReferenceType? referenceType) =>
@@ -140,10 +139,10 @@ namespace Inventory.Domain.Entities
             ReferenceId = referenceId;
         }
 
-        Guid IMultiTenantEntity.BrandId
+        Guid IMultiTenantEntity.OrganizationId
         {
-            get => BrandId.Value;
-            set => BrandId = new BrandId(value);
+            get => OrganizationId;
+            set => OrganizationId = value;
         }
     }
 }

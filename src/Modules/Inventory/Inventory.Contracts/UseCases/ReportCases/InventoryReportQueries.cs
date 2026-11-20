@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Application.Common.Models;
+using BuildingBlocks.Application.Common.Models;
 using Inventory.Contracts.DTOs.Batch;
 using Inventory.Contracts.DTOs.Reports;
 using Inventory.Contracts.DTOs.StockMovement;
@@ -35,7 +35,7 @@ public record InactiveWarehousesWithStockQuery;
 #endregion
 
 #region Stock quantity reports
-/// <summary>Products whose total units across the Brand's warehouses are zero, paginated.</summary>
+/// <summary>Products whose total units across the organization's warehouses are zero, paginated.</summary>
 /// <param name="Page">Requested page number (clamped to â‰¥ 1).</param>
 /// <param name="PageSize">Page size (clamped to [1, 100]).</param>
 public record ZeroStockProductsQuery(int Page = 1, int PageSize = 20);
@@ -77,6 +77,6 @@ public record HistoricalBalanceQuery(DateTime AsOfUtc, int Page = 1, int PageSiz
 #endregion
 
 #region Summary
-/// <summary>Brand-level scalar rollup backing the public Inventory report contract.</summary>
+/// <summary>Organization-level scalar rollup backing the public Inventory report contract.</summary>
 public record InventorySummaryQuery;
 #endregion

@@ -17,7 +17,7 @@ public interface IWarehouseCases
     /// <summary>Deactivates an existing warehouse (non-destructive; stock and history are kept).</summary>
     Task<WarehouseDto> DeactivateWarehouseAsync(DeactivateWarehouseCommand command, CancellationToken cancellationToken = default);
 
-    /// <summary>Registers a new warehouse for the current Brand.</summary>
+    /// <summary>Registers a new warehouse for the current Organization.</summary>
     Task<WarehouseDto> RegisterWarehouseAsync(RegisterWarehouseCommand command, CancellationToken cancellationToken = default);
 
     /// <summary>Applies a partial metadata update; only provided fields change.</summary>
@@ -25,7 +25,7 @@ public interface IWarehouseCases
     #endregion
 
     #region Queries
-    /// <summary>Retrieves one warehouse by ID (cross-Brand IDs are indistinguishable from not-found).</summary>
+    /// <summary>Retrieves one warehouse by ID (cross-Organization IDs are indistinguishable from not-found).</summary>
     Task<WarehouseDto> RetrieveWarehouseAsync(RetrieveWarehouseQuery query, CancellationToken cancellationToken = default);
 
     /// <summary>Retrieves warehouses whose name contains the search value.</summary>

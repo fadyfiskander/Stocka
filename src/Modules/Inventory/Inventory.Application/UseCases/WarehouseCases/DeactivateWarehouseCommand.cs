@@ -15,12 +15,12 @@ namespace Inventory.Application.UseCases.WarehouseCases;
 public class DeactivateWarehouseCommandHandler : IRequestHandler<DeactivateWarehouseCommandMediatR, WarehouseDto>
 {
     private readonly IWarehouseRepository _warehouseRepository;
-    private readonly ITenantContext _tenantContext;
+    private readonly ICurrentUserService _currentUser;
 
-    public DeactivateWarehouseCommandHandler(IWarehouseRepository warehouseRepository, ITenantContext tenantContext)
+    public DeactivateWarehouseCommandHandler(IWarehouseRepository warehouseRepository, ICurrentUserService currentUser)
     {
         _warehouseRepository = warehouseRepository;
-        _tenantContext = tenantContext;
+        _currentUser = currentUser;
     }
 
     public async Task<WarehouseDto> Handle(DeactivateWarehouseCommandMediatR request, CancellationToken cancellationToken)
@@ -28,7 +28,7 @@ public class DeactivateWarehouseCommandHandler : IRequestHandler<DeactivateWareh
         var warehouse = await _warehouseRepository.GetByIdAsync(WarehouseId.From(request.Contract.WarehouseId))
             ?? throw new KeyNotFoundException($"Warehouse '{request.Contract.WarehouseId}' was not found.");
 
-        if (warehouse.BrandId != _tenantContext.BrandId)
+        if (warehouse.OrganizationId != _currentUser.OrganizationId)
             throw new KeyNotFoundException($"Warehouse '{request.Contract.WarehouseId}' was not found.");
 
         warehouse.Deactivate();
@@ -36,7 +36,7 @@ public class DeactivateWarehouseCommandHandler : IRequestHandler<DeactivateWareh
 
         return new WarehouseDto(
             warehouse.Id.Value,
-            warehouse.BrandId.Value,
+            warehouse.OrganizationId,
             warehouse.Name,
             warehouse.Location,
             warehouse.Description,

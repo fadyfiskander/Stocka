@@ -1,10 +1,10 @@
-﻿using BuildingBlocks.Application.Common.Models;
+using BuildingBlocks.Application.Common.Models;
 using Inventory.Contracts.DTOs.Warehouse;
 
 namespace Inventory.Contracts.UseCases.WarehouseCases;
 
 /// <summary>
-/// Paged warehouse listing for the current Brand.
+/// Paged warehouse listing for the current Organization.
 /// IsActive filters to a single activation state; null returns both.
 /// Total-stock ranking uses WarehousesRankedByStockQuery (database-side aggregation).
 /// </summary>

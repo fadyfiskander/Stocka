@@ -1,5 +1,4 @@
 ﻿using BuildingBlocks.Application.Abstractions;
-using BuildingBlocks.Application.Primitives.Identifiers;
 using BuildingBlocks.Domain.Bases;
 using Inventory.Primitives.Identifiers;
 using System.Diagnostics.CodeAnalysis;
@@ -18,14 +17,14 @@ public partial class WarehouseBatch : Entity<WarehouseBatchId>, IMultiTenantEnti
     /// </summary>
     public byte[] RowVersion { get; private set; } = null!;
 
-    public BrandId BrandId { get; private set; }
+    public Guid OrganizationId { get; private set; }
 
     public virtual Warehouse Warehouse { get; private set; } = null!;
 
     private WarehouseBatch() { }
 
     [SetsRequiredMembers]
-    public WarehouseBatch(WarehouseId warehouseId, BatchId batchId, BrandId brandId, int quantity)
+    public WarehouseBatch(WarehouseId warehouseId, BatchId batchId, Guid organizationId, int quantity)
     {
         Id = WarehouseBatchId.New();
 
@@ -34,7 +33,7 @@ public partial class WarehouseBatch : Entity<WarehouseBatchId>, IMultiTenantEnti
 
         WarehouseId = warehouseId;
         BatchId = batchId;
-        BrandId = brandId;
+        OrganizationId = organizationId;
         Quantity = quantity;
     }
 
@@ -71,9 +70,9 @@ public partial class WarehouseBatch : Entity<WarehouseBatchId>, IMultiTenantEnti
 
     public bool IsEmpty => Quantity == 0;
 
-    Guid IMultiTenantEntity.BrandId
+    Guid IMultiTenantEntity.OrganizationId
     {
-        get => BrandId.Value;
-        set => BrandId = new BrandId(value);
+        get => OrganizationId;
+        set => OrganizationId = value;
     }
 }

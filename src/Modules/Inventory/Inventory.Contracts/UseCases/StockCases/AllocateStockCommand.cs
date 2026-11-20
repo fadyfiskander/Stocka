@@ -1,4 +1,4 @@
-﻿using Inventory.Contracts.DTOs.Stock;
+using Inventory.Contracts.DTOs.Stock;
 
 namespace Inventory.Contracts.UseCases.StockCases;
 
@@ -17,7 +17,7 @@ public record AllocateStockCommand
     /// <summary>The batch whose unallocated units are being placed.</summary>
     public Guid BatchId { get; init; }
 
-    /// <summary>The destination warehouse (must belong to the Brand and be active).</summary>
+    /// <summary>The destination warehouse (must belong to the Organization and be active).</summary>
     public Guid WarehouseId { get; init; }
 
     /// <summary>Number of units to allocate; must not exceed the batch's RemainingQuantity.</summary>

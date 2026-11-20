@@ -7,7 +7,7 @@ namespace Inventory.Contracts.DTOs.StockMovement
         Guid ProductId,
         Guid BatchId,
         Guid WarehouseId,
-        Guid BrandId,
+        Guid OrganizationId,
         int Quantity,
         int MovementType,
         int? ReferenceType,

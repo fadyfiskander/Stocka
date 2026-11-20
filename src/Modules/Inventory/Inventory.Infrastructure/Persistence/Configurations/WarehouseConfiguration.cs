@@ -1,10 +1,10 @@
-﻿using BuildingBlocks.Application.Primitives.Identifiers;
+﻿
 using Inventory.Domain.Entities;
 using Inventory.Primitives.Identifiers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Inventory.Infrastructure.Configurations
+namespace Inventory.Infrastructure.Persistence.Configurations
 {
     internal class WarehouseConfiguration : IEntityTypeConfiguration<Warehouse>
     {
@@ -24,7 +24,7 @@ namespace Inventory.Infrastructure.Configurations
                 .HasColumnType("NVARCHAR(50)")
                 .IsRequired();
             builder
-                .HasIndex(w => new { w.BrandId, w.Name })
+                .HasIndex(w => new { w.OrganizationId, w.Name })
                 .IsUnique();
 
             builder
@@ -45,8 +45,7 @@ namespace Inventory.Infrastructure.Configurations
             builder.ToTable("Warehouse");
 
             builder
-                .Property(w => w.BrandId)
-                .HasConversion(w => w.Value, bid => BrandId.FromGuid(bid))
+                .Property(w => w.OrganizationId)
                 .IsRequired();
 
             builder

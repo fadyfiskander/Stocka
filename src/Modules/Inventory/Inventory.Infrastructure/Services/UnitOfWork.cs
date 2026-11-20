@@ -1,5 +1,5 @@
 ﻿using Inventory.Application.Common.Interfaces;
-using Inventory.Infrastructure.Contexts;
+using Inventory.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 

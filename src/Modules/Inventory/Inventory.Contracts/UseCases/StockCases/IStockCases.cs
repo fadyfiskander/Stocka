@@ -40,7 +40,7 @@ public interface IStockCases
     /// <summary>Retrieves a paged movement history with optional filters.</summary>
     Task<PaginatedResult<StockMovementDto>> ListMovementsAsync(ListMovementsQuery query, CancellationToken cancellationToken = default);
 
-    /// <summary>Retrieves a product's brand-wide stock total and per-warehouse distribution.</summary>
+    /// <summary>Retrieves a product's organization-wide stock total and per-warehouse distribution.</summary>
     Task<ProductStockDistributionDto> GetProductStockAsync(GetProductStockQuery query, CancellationToken cancellationToken = default);
 
     /// <summary>Retrieves the units of one product still unallocated across all its batches.</summary>

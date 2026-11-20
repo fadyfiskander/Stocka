@@ -1,10 +1,10 @@
-﻿using BuildingBlocks.Application.Primitives.Identifiers;
+﻿
 using Inventory.Domain.Entities;
 using Inventory.Primitives.Identifiers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Inventory.Infrastructure.Configurations
+namespace Inventory.Infrastructure.Persistence.Configurations
 {
     internal class WarehouseBatchConfiguration : IEntityTypeConfiguration<WarehouseBatch>
     {
@@ -32,9 +32,7 @@ namespace Inventory.Infrastructure.Configurations
                     value => new BatchId(value))
                 .IsRequired();
 
-            builder.Property(e => e.BrandId).HasConversion(
-                    id => id.Value,
-                    value => new BrandId(value))
+            builder.Property(e => e.OrganizationId)
                 .IsRequired();
 
             builder.Property(e => e.Quantity)

@@ -1,9 +1,9 @@
-﻿using Inventory.Contracts.DTOs.Warehouse;
+using Inventory.Contracts.DTOs.Warehouse;
 
 namespace Inventory.Contracts.UseCases.WarehouseCases;
 
 /// <summary>
-/// Registers a new warehouse for the current Brand.
+/// Registers a new warehouse for the current Organization.
 /// </summary>
 /// <remarks>
 /// Rules (including the type check) are enforced by the RegisterWarehouseCommandValidator;
@@ -11,7 +11,7 @@ namespace Inventory.Contracts.UseCases.WarehouseCases;
 /// </remarks>
 public record RegisterWarehouseCommand
 {
-    /// <summary>Display name; must be unique within the Brand (database NVARCHAR(50)).</summary>
+    /// <summary>Display name; must be unique within the Organization (database NVARCHAR(50)).</summary>
     public string Name { get; init; } = default!;
 
     /// <summary>Physical location of the warehouse (database NVARCHAR(100)).</summary>

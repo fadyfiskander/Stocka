@@ -1,12 +1,12 @@
 ﻿using BuildingBlocks.Application.Common.Interfaces;
 using Inventory.Application;
 using Inventory.Application.Common.Interfaces;
-using Inventory.Infrastructure.Contexts;
 using Inventory.Infrastructure.Services;
 using Inventory.Infrastructure.Repositories.Commands.Bases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Inventory.Infrastructure.Persistence;
 
 namespace Inventory.Infrastructure;
 

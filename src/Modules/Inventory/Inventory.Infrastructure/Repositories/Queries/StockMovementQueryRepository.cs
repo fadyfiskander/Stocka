@@ -4,7 +4,6 @@ using Inventory.Application.Repositories.Queries;
 using Inventory.Contracts.DTOs.StockMovement;
 using Inventory.Infrastructure.Repositories.Queries.Bases;
 using Inventory.Primitives.Identifiers;
-using BuildingBlocks.Application.Primitives.Identifiers;
 using BuildingBlocks.Application.Common.Models;
 using System.Collections.Generic;
 using System.Data;
@@ -16,31 +15,31 @@ namespace Inventory.Infrastructure.Repositories.Queries
     internal class StockMovementQueryRepository : QueryRepository, IStockMovementQueryRepository
     {
         private const string BaseSelect =
-            "SELECT Id, ProductId, BatchId, WarehouseId, BrandId, Quantity, MovementType, ReferenceType, ReferenceId, CreatedAt, Reason FROM " + TableStockMovements;
+            "SELECT Id, ProductId, BatchId, WarehouseId, OrganizationId, Quantity, MovementType, ReferenceType, ReferenceId, CreatedAt, Reason FROM " + TableStockMovements;
 
         public StockMovementQueryRepository(IInventoryDbConnection connection) : base(connection)
         {
         }
 
-        public async Task<IEnumerable<StockMovementDto>> GetAllAsync(BrandId brandId, WarehouseId warehouseId)
+        public async Task<IEnumerable<StockMovementDto>> GetAllAsync(Guid organizationId, WarehouseId warehouseId)
         {
-            var sql = $"{BaseSelect} WHERE WarehouseId = @WarehouseId AND BrandId = @BrandId ORDER BY CreatedAt DESC";
-            return await _connection.QueryAsync<StockMovementDto>(sql, new { WarehouseId = warehouseId.Value, BrandId = brandId.Value });
+            var sql = $"{BaseSelect} WHERE WarehouseId = @WarehouseId AND OrganizationId = @OrganizationId ORDER BY CreatedAt DESC";
+            return await _connection.QueryAsync<StockMovementDto>(sql, new { WarehouseId = warehouseId.Value, OrganizationId = organizationId });
         }
 
-        public async Task<IEnumerable<StockMovementDto>> GetByBatchAsync(BrandId brandId, BatchId batchId)
+        public async Task<IEnumerable<StockMovementDto>> GetByBatchAsync(Guid organizationId, BatchId batchId)
         {
-            var sql = $"{BaseSelect} WHERE BatchId = @BatchId AND BrandId = @BrandId ORDER BY CreatedAt ASC";
-            return await _connection.QueryAsync<StockMovementDto>(sql, new { BatchId = batchId.Value, BrandId = brandId.Value });
+            var sql = $"{BaseSelect} WHERE BatchId = @BatchId AND OrganizationId = @OrganizationId ORDER BY CreatedAt ASC";
+            return await _connection.QueryAsync<StockMovementDto>(sql, new { BatchId = batchId.Value, OrganizationId = organizationId });
         }
 
-        public async Task<PaginatedResult<StockMovementDto>> GetPagedAsync(BrandId brandId, MovementQueryCriteria criteria)
+        public async Task<PaginatedResult<StockMovementDto>> GetPagedAsync(Guid organizationId, MovementQueryCriteria criteria)
         {
             var page = Math.Max(1, criteria.Page);
             var pageSize = Math.Clamp(criteria.PageSize, 1, 100);
 
-            var where = new StringBuilder(" WHERE BrandId = @BrandId");
-            var parameters = new Dictionary<string, object?> { ["BrandId"] = brandId.Value };
+            var where = new StringBuilder(" WHERE OrganizationId = @OrganizationId");
+            var parameters = new Dictionary<string, object?> { ["OrganizationId"] = organizationId };
 
             AppendFilter(where, parameters, "WarehouseId", criteria.WarehouseId);
             AppendFilter(where, parameters, "BatchId", criteria.BatchId);
@@ -92,10 +91,10 @@ namespace Inventory.Infrastructure.Repositories.Queries
             parameters[columnName] = guidValue;
         }
 
-        public async Task<StockMovementDto?> GetByIdAsync(BrandId brandId, StockMovementId id)
+        public async Task<StockMovementDto?> GetByIdAsync(Guid organizationId, StockMovementId id)
         {
-            var sql = $"{BaseSelect} WHERE Id = @Id AND BrandId = @BrandId";
-            return await _connection.QueryFirstOrDefaultAsync<StockMovementDto>(sql, new { Id = id.Value, BrandId = brandId.Value });
+            var sql = $"{BaseSelect} WHERE Id = @Id AND OrganizationId = @OrganizationId";
+            return await _connection.QueryFirstOrDefaultAsync<StockMovementDto>(sql, new { Id = id.Value, OrganizationId = organizationId });
         }
     }
 }

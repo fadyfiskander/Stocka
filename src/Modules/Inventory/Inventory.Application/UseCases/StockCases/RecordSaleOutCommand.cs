@@ -13,7 +13,7 @@ namespace Inventory.Application.UseCases.StockCases;
 
 #region Handler
 /// <summary>
-/// Handles the sale issue: loads the batch with a Brand guard, deducts the units from the
+/// Handles the sale issue: loads the batch with an organization guard, deducts the units from the
 /// warehouse placement, and records the SaleOut movement with the Order reference. Also hosts
 /// the shared movement-to-DTO projector used by the other stock-operation handlers.
 /// </summary>
@@ -22,27 +22,27 @@ public class RecordSaleOutCommandHandler : IRequestHandler<RecordSaleOutCommandM
     private readonly IBatchRepository _batchRepository;
     private readonly IWarehouseBatchRepository _warehouseBatchRepository;
     private readonly IStockMovementRepository _stockMovementRepository;
-    private readonly ITenantContext _tenantContext;
+    private readonly ICurrentUserService _currentUser;
 
     public RecordSaleOutCommandHandler(
         IBatchRepository batchRepository,
         IWarehouseBatchRepository warehouseBatchRepository,
         IStockMovementRepository stockMovementRepository,
-        ITenantContext tenantContext)
+        ICurrentUserService currentUser)
     {
         _batchRepository = batchRepository;
         _warehouseBatchRepository = warehouseBatchRepository;
         _stockMovementRepository = stockMovementRepository;
-        _tenantContext = tenantContext;
+        _currentUser = currentUser;
     }
 
     public async Task<StockMovementDto> Handle(RecordSaleOutCommandMediatR request, CancellationToken cancellationToken)
     {
-        var brandId = _tenantContext.BrandId;
+        var organizationId = _currentUser.OrganizationId;
 
         var batch = await _batchRepository.GetByIdAsync(BatchId.From(request.Contract.BatchId))
             ?? throw new KeyNotFoundException(StockOperationMessages.BatchNotFound);
-        if (batch.BrandId != brandId) throw new KeyNotFoundException(StockOperationMessages.BatchNotFound);
+        if (batch.OrganizationId != organizationId) throw new KeyNotFoundException(StockOperationMessages.BatchNotFound);
 
         var warehouseBatch = await _warehouseBatchRepository.FindByWarehouseAndBatchAsync(
             WarehouseId.From(request.Contract.WarehouseId), batch.Id)
@@ -54,7 +54,7 @@ public class RecordSaleOutCommandHandler : IRequestHandler<RecordSaleOutCommandM
             batch.ProductId,
             batch.Id,
             warehouseBatch.WarehouseId,
-            brandId,
+            organizationId.Value,
             request.Contract.Quantity,
             StockMovementType.SaleOut,
             StockReferenceType.Order,
@@ -73,7 +73,7 @@ public class RecordSaleOutCommandHandler : IRequestHandler<RecordSaleOutCommandM
             movement.ProductId,
             movement.BatchId.Value,
             movement.WarehouseId.Value,
-            movement.BrandId.Value,
+            movement.OrganizationId,
             movement.Quantity,
             (int)movement.MovementType,
             movement.ReferenceType.HasValue ? (int)movement.ReferenceType.Value : null,

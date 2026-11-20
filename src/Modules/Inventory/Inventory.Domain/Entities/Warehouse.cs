@@ -1,5 +1,4 @@
 ﻿using BuildingBlocks.Application.Abstractions;
-using BuildingBlocks.Application.Primitives.Identifiers;
 using BuildingBlocks.Domain.Bases;
 using Inventory.Domain.Enums;
 using Inventory.Primitives.Identifiers;
@@ -14,7 +13,7 @@ namespace Inventory.Domain.Entities
         private const int LocationMaxLength = 100;
         private const int DescriptionMaxLength = 600;
 
-        public BrandId BrandId { get; private set; }
+        public Guid OrganizationId { get; private set; }
 
         public string Name { get; private set; } = null!;
 
@@ -32,7 +31,7 @@ namespace Inventory.Domain.Entities
         private Warehouse() { }
 
         [SetsRequiredMembers]
-        private Warehouse(BrandId brandId, string name, WarehouseType type, string location, string? description = null)
+        private Warehouse(Guid organizationId, string name, WarehouseType type, string location, string? description = null)
         {
             Id = WarehouseId.New();
             if (string.IsNullOrWhiteSpace(name))
@@ -50,7 +49,7 @@ namespace Inventory.Domain.Entities
             if (description?.Trim().Length > DescriptionMaxLength)
                 throw new ArgumentException($"Warehouse description cannot exceed {DescriptionMaxLength} characters.", nameof(description));
 
-            BrandId = brandId;
+            OrganizationId = organizationId;
             Name = name.Trim();
             Location = location.Trim();
             Description = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
@@ -58,9 +57,9 @@ namespace Inventory.Domain.Entities
             IsActive = true;
         }
 
-        public static Warehouse Create(BrandId brandId, string name, WarehouseType type, string location, string? description = null)
+        public static Warehouse Create(Guid organizationId, string name, WarehouseType type, string location, string? description = null)
         {
-            return new Warehouse(brandId, name, type, location, description);
+            return new Warehouse(organizationId, name, type, location, description);
         }
 
         public void Rename(string newName)
@@ -124,9 +123,9 @@ namespace Inventory.Domain.Entities
             _warehouseBatches.Add(batch);
         }
 
-        public WarehouseBatch AddBatch(BatchId batchId, BrandId brandId, int quantity)
+        public WarehouseBatch AddBatch(BatchId batchId, Guid organizationId, int quantity)
         {
-            var batch = new WarehouseBatch(Id, batchId, brandId, quantity);
+            var batch = new WarehouseBatch(Id, batchId, organizationId, quantity);
             AddBatch(batch);
             return batch;
         }
@@ -149,10 +148,10 @@ namespace Inventory.Domain.Entities
             _warehouseBatches.Remove(batch);
         }
 
-        Guid IMultiTenantEntity.BrandId
+        Guid IMultiTenantEntity.OrganizationId
         {
-            get => BrandId.Value;
-            set => BrandId = new BrandId(value);
+            get => OrganizationId;
+            set => OrganizationId = value;
         }
     }
 }

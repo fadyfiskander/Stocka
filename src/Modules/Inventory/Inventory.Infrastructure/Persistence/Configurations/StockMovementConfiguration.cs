@@ -1,11 +1,11 @@
 
-using BuildingBlocks.Application.Primitives.Identifiers;
+
 using Inventory.Domain.Entities;
 using Inventory.Primitives.Identifiers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Inventory.Infrastructure.Configurations
+namespace Inventory.Infrastructure.Persistence.Configurations
 {
     public class StockMovementConfiguration : IEntityTypeConfiguration<StockMovement>
     {
@@ -34,9 +34,8 @@ namespace Inventory.Infrastructure.Configurations
                     value => new WarehouseId(value));
 
             builder
-                .Property(e => e.BrandId).HasConversion(
-                    id => id.Value,
-                    value => new BrandId(value));
+                .Property(e => e.OrganizationId)
+                .IsRequired();
 
             builder
                 .Property(e => e.Quantity)
@@ -55,10 +54,10 @@ namespace Inventory.Infrastructure.Configurations
                 .HasColumnType("NVARCHAR(300)")
                 .IsRequired(false);
 
-            // Report-supporting indexes: brand-scoped date scans and warehouse/product histories.
-            builder.HasIndex(e => new { e.BrandId, e.CreatedAt });
+            // Report-supporting indexes: organization-scoped date scans and warehouse/product histories.
+            builder.HasIndex(e => new { e.OrganizationId, e.CreatedAt });
             builder.HasIndex(e => new { e.WarehouseId, e.CreatedAt });
-            builder.HasIndex(e => new { e.BrandId, e.ProductId });
+            builder.HasIndex(e => new { e.OrganizationId, e.ProductId });
 
             // Domain invariant persisted at the database level: Quantity > 0.
             builder.ToTable("StockMovements", t =>
@@ -80,10 +79,6 @@ namespace Inventory.Infrastructure.Configurations
                 .HasForeignKey(d => d.WarehouseId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("FK_StockMovements_Warehouses_WarehouseId");
-
-            //builder.HasOne<Brand>().WithMany()
-            //    .HasForeignKey(d => d.BrandId)
-            //    .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

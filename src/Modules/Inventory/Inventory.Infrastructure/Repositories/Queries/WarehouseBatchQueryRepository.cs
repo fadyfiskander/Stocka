@@ -4,7 +4,6 @@ using Inventory.Application.Repositories.Queries;
 using Inventory.Contracts.DTOs.WarehouseBatch;
 using Inventory.Infrastructure.Repositories.Queries.Bases;
 using Inventory.Primitives.Identifiers;
-using BuildingBlocks.Application.Primitives.Identifiers;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
@@ -14,48 +13,48 @@ namespace Inventory.Infrastructure.Repositories.Queries
     internal class WarehouseBatchQueryRepository : QueryRepository, IWarehouseBatchQueryRepository
     {
         private const string BaseSelect =
-            "SELECT Id, WarehouseId, BatchId, Quantity, BrandId FROM " + TableWarehouseBatches;
+            "SELECT Id, WarehouseId, BatchId, Quantity, OrganizationId FROM " + TableWarehouseBatches;
 
         public WarehouseBatchQueryRepository(IInventoryDbConnection connection) : base(connection)
         {
         }
 
-        public async Task<IEnumerable<WarehouseBatchDto>> GetAllAsync(BrandId brandId, WarehouseId warehouseId)
+        public async Task<IEnumerable<WarehouseBatchDto>> GetAllAsync(Guid organizationId, WarehouseId warehouseId)
         {
-            var sql = $"{BaseSelect} WHERE WarehouseId = @WarehouseId AND BrandId = @BrandId ORDER BY BatchId";
-            return await _connection.QueryAsync<WarehouseBatchDto>(sql, new { WarehouseId = warehouseId.Value, BrandId = brandId.Value });
+            var sql = $"{BaseSelect} WHERE WarehouseId = @WarehouseId AND OrganizationId = @OrganizationId ORDER BY BatchId";
+            return await _connection.QueryAsync<WarehouseBatchDto>(sql, new { WarehouseId = warehouseId.Value, OrganizationId = organizationId });
         }
 
-        public async Task<WarehouseBatchDto?> GetByWarehouseAndBatchAsync(BrandId brandId, WarehouseId warehouseId, BatchId batchId)
+        public async Task<WarehouseBatchDto?> GetByWarehouseAndBatchAsync(Guid organizationId, WarehouseId warehouseId, BatchId batchId)
         {
-            var sql = $"{BaseSelect} WHERE WarehouseId = @WarehouseId AND BatchId = @BatchId AND BrandId = @BrandId";
+            var sql = $"{BaseSelect} WHERE WarehouseId = @WarehouseId AND BatchId = @BatchId AND OrganizationId = @OrganizationId";
             return await _connection.QueryFirstOrDefaultAsync<WarehouseBatchDto>(
-                sql, new { WarehouseId = warehouseId.Value, BatchId = batchId.Value, BrandId = brandId.Value });
+                sql, new { WarehouseId = warehouseId.Value, BatchId = batchId.Value, OrganizationId = organizationId });
         }
 
-        public async Task<IEnumerable<WarehouseBatchDto>> GetByBatchAsync(BrandId brandId, BatchId batchId)
+        public async Task<IEnumerable<WarehouseBatchDto>> GetByBatchAsync(Guid organizationId, BatchId batchId)
         {
-            var sql = $"{BaseSelect} WHERE BatchId = @BatchId AND BrandId = @BrandId ORDER BY WarehouseId";
-            return await _connection.QueryAsync<WarehouseBatchDto>(sql, new { BatchId = batchId.Value, BrandId = brandId.Value });
+            var sql = $"{BaseSelect} WHERE BatchId = @BatchId AND OrganizationId = @OrganizationId ORDER BY WarehouseId";
+            return await _connection.QueryAsync<WarehouseBatchDto>(sql, new { BatchId = batchId.Value, OrganizationId = organizationId });
         }
 
-        public async Task<int> GetQuantityInWarehouseAsync(BrandId brandId, WarehouseId warehouseId, BatchId batchId)
+        public async Task<int> GetQuantityInWarehouseAsync(Guid organizationId, WarehouseId warehouseId, BatchId batchId)
         {
-            var sql = $"SELECT COALESCE(SUM(Quantity), 0) FROM {TableWarehouseBatches} WHERE WarehouseId = @WarehouseId AND BatchId = @BatchId AND BrandId = @BrandId";
+            var sql = $"SELECT COALESCE(SUM(Quantity), 0) FROM {TableWarehouseBatches} WHERE WarehouseId = @WarehouseId AND BatchId = @BatchId AND OrganizationId = @OrganizationId";
             return await _connection.ExecuteScalarAsync<int>(
-                sql, new { WarehouseId = warehouseId.Value, BatchId = batchId.Value, BrandId = brandId.Value });
+                sql, new { WarehouseId = warehouseId.Value, BatchId = batchId.Value, OrganizationId = organizationId });
         }
 
-        public async Task<int> GetTotalQuantityInWarehousesAsync(BrandId brandId, BatchId batchId)
+        public async Task<int> GetTotalQuantityInWarehousesAsync(Guid organizationId, BatchId batchId)
         {
-            var sql = $"SELECT COALESCE(SUM(Quantity), 0) FROM {TableWarehouseBatches} WHERE BatchId = @BatchId AND BrandId = @BrandId";
-            return await _connection.ExecuteScalarAsync<int>(sql, new { BatchId = batchId.Value, BrandId = brandId.Value });
+            var sql = $"SELECT COALESCE(SUM(Quantity), 0) FROM {TableWarehouseBatches} WHERE BatchId = @BatchId AND OrganizationId = @OrganizationId";
+            return await _connection.ExecuteScalarAsync<int>(sql, new { BatchId = batchId.Value, OrganizationId = organizationId });
         }
 
-        public async Task<WarehouseBatchDto?> GetByIdAsync(BrandId brandId, WarehouseBatchId id)
+        public async Task<WarehouseBatchDto?> GetByIdAsync(Guid organizationId, WarehouseBatchId id)
         {
-            var sql = $"{BaseSelect} WHERE Id = @Id AND BrandId = @BrandId";
-            return await _connection.QueryFirstOrDefaultAsync<WarehouseBatchDto>(sql, new { Id = id.Value, BrandId = brandId.Value });
+            var sql = $"{BaseSelect} WHERE Id = @Id AND OrganizationId = @OrganizationId";
+            return await _connection.QueryFirstOrDefaultAsync<WarehouseBatchDto>(sql, new { Id = id.Value, OrganizationId = organizationId });
         }
     }
 }

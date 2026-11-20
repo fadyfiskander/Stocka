@@ -1,5 +1,4 @@
 ﻿using BuildingBlocks.Application.Abstractions;
-using BuildingBlocks.Application.Primitives.Identifiers;
 using BuildingBlocks.Domain.Bases;
 using Inventory.Primitives.Identifiers;
 using System.Diagnostics.CodeAnalysis;
@@ -15,7 +14,7 @@ namespace Inventory.Domain.Entities
         /// Modules stay decoupled: no FK to Catalog; doc-level references are validated only by convention.
         /// </summary>
         public Guid ProductId { get; private set; }
-        public BrandId BrandId { get; private set; }
+        public Guid OrganizationId { get; private set; }
 
         public int InitialQuantity { get; private set; }
 
@@ -38,7 +37,7 @@ namespace Inventory.Domain.Entities
         private Batch() { }
 
         [SetsRequiredMembers]
-        public Batch(Guid purchaseItemId, Guid productId, BrandId brandId, int initialQuantity, decimal unitCost)
+        public Batch(Guid purchaseItemId, Guid productId, Guid organizationId, int initialQuantity, decimal unitCost)
         {
             Id = BatchId.New();
 
@@ -56,7 +55,7 @@ namespace Inventory.Domain.Entities
 
             PurchaseItemId = purchaseItemId;
             ProductId = productId;
-            BrandId = brandId;
+            OrganizationId = organizationId;
             InitialQuantity = initialQuantity;
             RemainingQuantity = initialQuantity;
             UnitCost = unitCost;
@@ -98,10 +97,10 @@ namespace Inventory.Domain.Entities
         /// <summary>Value of what is currently left in the batch.</summary>
         public decimal GetRemainingValue() => RemainingQuantity * UnitCost;
 
-        Guid IMultiTenantEntity.BrandId
+        Guid IMultiTenantEntity.OrganizationId
         {
-            get => BrandId.Value;
-            set => BrandId = new BrandId(value);
+            get => OrganizationId;
+            set => OrganizationId = value;
         }
     }
 }

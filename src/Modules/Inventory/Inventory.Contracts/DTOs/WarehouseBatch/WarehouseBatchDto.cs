@@ -7,7 +7,7 @@ namespace Inventory.Contracts.DTOs.WarehouseBatch
         Guid WarehouseId,
         Guid BatchId,
         int Quantity,
-        Guid BrandId
+        Guid OrganizationId
     );
 }
 

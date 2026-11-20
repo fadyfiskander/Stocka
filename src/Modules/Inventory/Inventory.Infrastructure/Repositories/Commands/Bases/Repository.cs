@@ -1,6 +1,6 @@
 ﻿using BuildingBlocks.Application.Common.Interfaces;
 using BuildingBlocks.Domain.Bases;
-using Inventory.Infrastructure.Contexts;
+using Inventory.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Infrastructure.Repositories.Commands.Bases

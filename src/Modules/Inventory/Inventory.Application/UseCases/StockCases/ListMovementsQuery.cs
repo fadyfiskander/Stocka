@@ -13,23 +13,27 @@ namespace Inventory.Application.UseCases.StockCases;
 /// <summary>
 /// Handles the movement history listing: maps the request filters onto
 /// MovementQueryCriteria (dropping empty Guid filters) and delegates to the Dapper-backed paged
-/// query scoped to the current Brand.
+/// query scoped to the current Organization.
 /// </summary>
 public class ListMovementsQueryHandler : IRequestHandler<ListMovementsQueryMediatR, PaginatedResult<StockMovementDto>>
 {
     private readonly IStockMovementQueryRepository _stockMovementQueryRepository;
-    private readonly ITenantContext _tenantContext;
+    private readonly ICurrentUserService _currentUser;
 
-    public ListMovementsQueryHandler(IStockMovementQueryRepository stockMovementQueryRepository, ITenantContext tenantContext)
+    public ListMovementsQueryHandler(IStockMovementQueryRepository stockMovementQueryRepository, ICurrentUserService currentUser)
     {
         _stockMovementQueryRepository = stockMovementQueryRepository;
-        _tenantContext = tenantContext;
+        _currentUser = currentUser;
     }
 
     public async Task<PaginatedResult<StockMovementDto>> Handle(ListMovementsQueryMediatR request, CancellationToken cancellationToken)
     {
         var page = Math.Max(1, request.Contract.Page);
         var pageSize = Math.Clamp(request.Contract.PageSize, 1, 100);
+
+        var organizationId = _currentUser.OrganizationId;
+        if (organizationId is null)
+            throw new ArgumentNullException("OrganizationId is null, OrganizationId cannot be null");
 
         var criteria = new MovementQueryCriteria
         {
@@ -46,7 +50,7 @@ public class ListMovementsQueryHandler : IRequestHandler<ListMovementsQueryMedia
             PageSize = pageSize
         };
 
-        return await _stockMovementQueryRepository.GetPagedAsync(_tenantContext.BrandId, criteria);
+        return await _stockMovementQueryRepository.GetPagedAsync(organizationId.Value, criteria);
     }
 }
 #endregion

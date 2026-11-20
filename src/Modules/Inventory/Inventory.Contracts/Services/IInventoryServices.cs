@@ -1,10 +1,10 @@
-﻿using Inventory.Contracts.DTOs;
+using Inventory.Contracts.DTOs;
 using Inventory.Contracts.Requests;
 
 namespace Inventory.Contracts.Services
 {
     /// <summary>
-    /// Public Inventory module contract. Read-only cross-module surfaces; Brand isolation is
+    /// Public Inventory module contract. Read-only cross-module surfaces; Organization isolation is
     /// enforced by the application pipeline (tenant context), never by trusting caller-supplied IDs.
     /// </summary>
     public interface IInventoryServices

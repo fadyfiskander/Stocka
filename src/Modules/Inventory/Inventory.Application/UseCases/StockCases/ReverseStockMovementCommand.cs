@@ -1,5 +1,4 @@
 using BuildingBlocks.Application.Abstractions;
-using BuildingBlocks.Application.Primitives.Identifiers;
 using Inventory.Application.Bindings.StockCases;
 using Inventory.Application.Repositories.Commands;
 using Inventory.Contracts.DTOs.StockMovement;
@@ -22,27 +21,27 @@ public class ReverseStockMovementCommandHandler : IRequestHandler<ReverseStockMo
     private readonly IStockMovementRepository _stockMovementRepository;
     private readonly IBatchRepository _batchRepository;
     private readonly IWarehouseBatchRepository _warehouseBatchRepository;
-    private readonly ITenantContext _tenantContext;
+    private readonly ICurrentUserService _currentUser;
 
     public ReverseStockMovementCommandHandler(
         IStockMovementRepository stockMovementRepository,
         IBatchRepository batchRepository,
         IWarehouseBatchRepository warehouseBatchRepository,
-        ITenantContext tenantContext)
+        ICurrentUserService currentUser)
     {
         _stockMovementRepository = stockMovementRepository;
         _batchRepository = batchRepository;
         _warehouseBatchRepository = warehouseBatchRepository;
-        _tenantContext = tenantContext;
+        _currentUser = currentUser;
     }
 
     public async Task<StockMovementDto> Handle(ReverseStockMovementCommandMediatR request, CancellationToken cancellationToken)
     {
-        var brandId = _tenantContext.BrandId;
+        var organizationId = _currentUser.OrganizationId;
 
         var original = await _stockMovementRepository.GetByIdAsync(StockMovementId.From(request.Contract.MovementId))
             ?? throw new KeyNotFoundException("Stock movement not found.");
-        if (original.BrandId != brandId) throw new KeyNotFoundException("Stock movement not found.");
+        if (original.OrganizationId != organizationId) throw new KeyNotFoundException("Stock movement not found.");
 
         if (original.MovementType is StockMovementType.TransferIn or StockMovementType.TransferOut)
             throw new InvalidOperationException(
@@ -57,7 +56,7 @@ public class ReverseStockMovementCommandHandler : IRequestHandler<ReverseStockMo
             original.ProductId,
             original.BatchId,
             original.WarehouseId,
-            brandId,
+            organizationId.Value,
             original.Quantity,
             reversalType,
             referenceType,

@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Application.Common.Models;
+using BuildingBlocks.Application.Common.Models;
 using System;
 using System.Collections.Generic;
 
@@ -23,9 +23,9 @@ namespace Inventory.Contracts.DTOs.Reports
 
     /// <summary>One product/batch line inside a warehouse inventory breakdown.</summary>
     public record WarehouseInventoryItemDto(
-        Guid ProductId,
-        Guid BatchId,
         Guid WarehouseBatchId,
+        Guid BatchId,
+        Guid ProductId,
         int Quantity,
         decimal BatchUnitCost,
         decimal LineCost,
@@ -37,7 +37,7 @@ namespace Inventory.Contracts.DTOs.Reports
         int Quantity
     );
 
-    /// <summary>Current stock of a product across the Brand.</summary>
+    /// <summary>Current stock of a product across the Organization.</summary>
     public record ProductStockDistributionDto(
         Guid ProductId,
         int TotalQuantity,
@@ -93,9 +93,9 @@ namespace Inventory.Contracts.DTOs.Reports
         int MovementsConsidered
     );
 
-    /// <summary>Brand-level scalar rollup used by the public Inventory report contract.</summary>
+    /// <summary>Organization-level scalar rollup used by the public Inventory report contract.</summary>
     public record InventorySummaryDto(
-        Guid BrandId,
+        Guid OrganizationId,
         int TotalWarehouses,
         int ActiveWarehouses,
         int TotalBatches,

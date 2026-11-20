@@ -9,18 +9,18 @@ namespace Inventory.Application.UseCases.WarehouseCases;
 
 #region Handler
 /// <summary>
-/// Handles the name search: returns the warehouses of the current Brand whose name contains the
+/// Handles the name search: returns the warehouses of the current Organization whose name contains the
 /// trimmed search value.
 /// </summary>
 public class RetrieveWarehousesByNameQueryHandler : IRequestHandler<RetrieveWarehousesByNameQueryMediatR, IEnumerable<WarehouseDto>>
 {
     private readonly IWarehouseQueryRepository _warehouseQueryRepository;
-    private readonly ITenantContext _tenantContext;
+    private readonly ICurrentUserService _currentUser;
 
-    public RetrieveWarehousesByNameQueryHandler(IWarehouseQueryRepository warehouseQueryRepository, ITenantContext tenantContext)
+    public RetrieveWarehousesByNameQueryHandler(IWarehouseQueryRepository warehouseQueryRepository, ICurrentUserService currentUser)
     {
         _warehouseQueryRepository = warehouseQueryRepository;
-        _tenantContext = tenantContext;
+        _currentUser = currentUser;
     }
 
     public async Task<IEnumerable<WarehouseDto>> Handle(RetrieveWarehousesByNameQueryMediatR request, CancellationToken cancellationToken)
@@ -28,7 +28,11 @@ public class RetrieveWarehousesByNameQueryHandler : IRequestHandler<RetrieveWare
         if (string.IsNullOrWhiteSpace(request.Contract.Name))
             throw new ArgumentException("Warehouse name search value cannot be empty.", nameof(request.Contract.Name));
 
-        return await _warehouseQueryRepository.GetByNameAsync(_tenantContext.BrandId, request.Contract.Name.Trim());
+        var organizationId = _currentUser.OrganizationId;
+        if (organizationId is null)
+            throw new ArgumentNullException("OrganizationId is null, OrganizationId cannot be null");
+
+        return await _warehouseQueryRepository.GetByNameAsync(organizationId.Value, request.Contract.Name.Trim());
     }
 }
 #endregion

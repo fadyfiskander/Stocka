@@ -1,8 +1,8 @@
-﻿using Inventory.Contracts.DTOs.Reports;
+using Inventory.Contracts.DTOs.Reports;
 
 namespace Inventory.Contracts.UseCases.StockCases;
 
-/// <summary>Current stock of a product: brand-wide total plus per-warehouse distribution.</summary>
+/// <summary>Current stock of a product: organization-wide total plus per-warehouse distribution.</summary>
 /// <param name="ProductId">The product whose stock is queried.</param>
 /// <param name="WarehouseId">Optional: restricts the returned distribution to one warehouse.</param>
 /// <remarks>

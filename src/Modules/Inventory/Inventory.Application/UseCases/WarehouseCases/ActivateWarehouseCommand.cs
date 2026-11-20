@@ -15,12 +15,12 @@ namespace Inventory.Application.UseCases.WarehouseCases;
 public class ActivateWarehouseCommandHandler : IRequestHandler<ActivateWarehouseCommandMediatR, WarehouseDto>
 {
     private readonly IWarehouseRepository _warehouseRepository;
-    private readonly ITenantContext _tenantContext;
+    private readonly ICurrentUserService _currentUser;
 
-    public ActivateWarehouseCommandHandler(IWarehouseRepository warehouseRepository, ITenantContext tenantContext)
+    public ActivateWarehouseCommandHandler(IWarehouseRepository warehouseRepository, ICurrentUserService currentUser)
     {
         _warehouseRepository = warehouseRepository;
-        _tenantContext = tenantContext;
+        _currentUser = currentUser;
     }
 
     public async Task<WarehouseDto> Handle(ActivateWarehouseCommandMediatR request, CancellationToken cancellationToken)
@@ -28,7 +28,11 @@ public class ActivateWarehouseCommandHandler : IRequestHandler<ActivateWarehouse
         var warehouse = await _warehouseRepository.GetByIdAsync(WarehouseId.From(request.Contract.WarehouseId))
             ?? throw new KeyNotFoundException($"Warehouse '{request.Contract.WarehouseId}' was not found.");
 
-        if (warehouse.BrandId != _tenantContext.BrandId)
+        var organizationId = _currentUser.OrganizationId;
+        if (organizationId is null)
+            throw new ArgumentNullException("OrganizationId is null, OrganizationId cannot be null");
+
+        if (warehouse.OrganizationId != organizationId.Value)
             throw new KeyNotFoundException($"Warehouse '{request.Contract.WarehouseId}' was not found.");
 
         warehouse.Activate();
@@ -36,7 +40,7 @@ public class ActivateWarehouseCommandHandler : IRequestHandler<ActivateWarehouse
 
         return new WarehouseDto(
             warehouse.Id.Value,
-            warehouse.BrandId.Value,
+            warehouse.OrganizationId,
             warehouse.Name,
             warehouse.Location,
             warehouse.Description,

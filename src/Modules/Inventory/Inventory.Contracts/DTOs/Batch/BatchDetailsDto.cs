@@ -16,7 +16,7 @@ namespace Inventory.Contracts.DTOs.Batch
         Guid Id,
         Guid ProductId,
         Guid PurchaseItemId,
-        Guid BrandId,
+        Guid OrganizationId,
         int InitialQuantity,
         int RemainingQuantity,
         int AllocatedQuantity,

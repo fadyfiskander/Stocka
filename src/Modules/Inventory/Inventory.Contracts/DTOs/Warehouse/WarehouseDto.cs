@@ -4,7 +4,7 @@ namespace Inventory.Contracts.DTOs.Warehouse
 {
     public record WarehouseDto(
         Guid Id,
-        Guid BrandId,
+        Guid OrganizationId,
         string Name,
         string Location,
         string? Description,

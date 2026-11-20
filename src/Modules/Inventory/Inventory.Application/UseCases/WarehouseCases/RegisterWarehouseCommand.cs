@@ -2,7 +2,6 @@ using BuildingBlocks.Application.Abstractions;
 using Inventory.Application.Bindings.WarehouseCases;
 using Inventory.Application.Repositories.Commands;
 using Inventory.Contracts.DTOs.Warehouse;
-using Inventory.Contracts.UseCases.WarehouseCases;
 using Inventory.Domain.Entities;
 using Inventory.Domain.Enums;
 using MediatR;
@@ -17,20 +16,22 @@ namespace Inventory.Application.UseCases.WarehouseCases;
 public class RegisterWarehouseCommandHandler : IRequestHandler<RegisterWarehouseCommandMediatR, WarehouseDto>
 {
     private readonly IWarehouseRepository _warehouseRepository;
-    private readonly ITenantContext _tenantContext;
+    private readonly ICurrentUserService _currentUser;
 
-    public RegisterWarehouseCommandHandler(IWarehouseRepository warehouseRepository, ITenantContext tenantContext)
+    public RegisterWarehouseCommandHandler(IWarehouseRepository warehouseRepository, ICurrentUserService currentUser)
     {
         _warehouseRepository = warehouseRepository;
-        _tenantContext = tenantContext;
+        _currentUser = currentUser;
     }
 
     public async Task<WarehouseDto> Handle(RegisterWarehouseCommandMediatR request, CancellationToken cancellationToken)
     {
-        var brandId = _tenantContext.BrandId;
+        var organizationId = _currentUser.OrganizationId;
+        if (organizationId is null)
+            throw new ArgumentNullException("OrganizationId is null, OrganizationId cannot be null");
 
         var warehouse = Warehouse.Create(
-            brandId,
+            organizationId.Value,
             request.Contract.Name,
             (WarehouseType)request.Contract.Type,
             request.Contract.Location,
@@ -40,7 +41,7 @@ public class RegisterWarehouseCommandHandler : IRequestHandler<RegisterWarehouse
 
         return new WarehouseDto(
             warehouse.Id.Value,
-            warehouse.BrandId.Value,
+            warehouse.OrganizationId,
             warehouse.Name,
             warehouse.Location,
             warehouse.Description,
