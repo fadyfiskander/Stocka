@@ -140,7 +140,7 @@ namespace Stocka.MVC.Areas.Account.Controllers
 
                 // 7. Redirect after successful login.
 
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Home", new { area = "" });
             }
             catch (InvalidCredentialsException)
             {
