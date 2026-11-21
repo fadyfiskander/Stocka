@@ -1,7 +1,7 @@
 ﻿using Inventory.Domain.Batches;
+using Inventory.Domain.StockMovements;
 using Inventory.Domain.Entities;
 using Inventory.Primitives.Identifiers;
-using Inventory.Domain.Enums;
 
 namespace Inventory.Domain.Tests.Entities
 {

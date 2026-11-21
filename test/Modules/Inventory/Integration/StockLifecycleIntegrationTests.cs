@@ -1,6 +1,7 @@
 ﻿using Inventory.Contracts.UseCases.BatchCases;
 using Inventory.Contracts.UseCases.StockCases;
 using Inventory.Contracts.UseCases.WarehouseCases;
+using Inventory.Domain.StockMovements;
 using Inventory.Domain.Enums;
 
 namespace Inventory.Integration.Tests;

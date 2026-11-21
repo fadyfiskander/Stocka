@@ -1,6 +1,5 @@
 ﻿using BuildingBlocks.Application.Common.Interfaces;
-using Inventory.Domain.Entities;
-using Inventory.Primitives.Identifiers;
+using Inventory.Domain.StockMovements;
 
 namespace Inventory.Application.Repositories.Commands
 {

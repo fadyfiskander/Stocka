@@ -2,6 +2,7 @@
 using BuildingBlocks.Domain.Bases;
 using Inventory.Application.Primitives.Events;
 using Inventory.Domain.Batches;
+using Inventory.Domain.StockMovements;
 using Inventory.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

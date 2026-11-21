@@ -1,4 +1,4 @@
-namespace Inventory.Primitives.Identifiers;
+namespace Inventory.Domain.StockMovements;
 
 public readonly record struct StockMovementId(Guid Value)
 {

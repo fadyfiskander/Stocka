@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Inventory.Contracts.UseCases.StockCases;
 using Inventory.Domain.Batches;
-using Inventory.Domain.Entities;
+using Inventory.Domain.StockMovements;
 
 namespace Inventory.Application.Validators.StockCases;
 

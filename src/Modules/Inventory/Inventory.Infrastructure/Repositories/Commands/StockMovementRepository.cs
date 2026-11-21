@@ -1,6 +1,5 @@
 ﻿using Inventory.Application.Repositories.Commands;
-using Inventory.Domain.Entities;
-using Inventory.Primitives.Identifiers;
+using Inventory.Domain.StockMovements;
 using Inventory.Infrastructure.Persistence;
 using Inventory.Infrastructure.Repositories.Commands.Bases;
 

@@ -1,12 +1,10 @@
 ﻿using BuildingBlocks.Application.Abstractions;
 using BuildingBlocks.Domain.Bases;
-using Inventory.Domain.Enums;
 using Inventory.Domain.Batches;
-using Inventory.Domain.Entities;
 using Inventory.Primitives.Identifiers;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Inventory.Domain.Entities
+namespace Inventory.Domain.StockMovements
 {
     public class StockMovement : AggregateRoot<StockMovementId>, IMultiTenantEntity
     {

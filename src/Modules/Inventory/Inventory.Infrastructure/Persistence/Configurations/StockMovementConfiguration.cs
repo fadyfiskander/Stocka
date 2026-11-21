@@ -1,6 +1,7 @@
 ﻿
 
 using Inventory.Domain.Batches;
+using Inventory.Domain.StockMovements;
 using Inventory.Domain.Entities;
 using Inventory.Primitives.Identifiers;
 using Microsoft.EntityFrameworkCore;

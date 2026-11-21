@@ -4,9 +4,9 @@ using Inventory.Application.Repositories.Commands;
 using Inventory.Contracts.DTOs.Stock;
 using Inventory.Contracts.UseCases.StockCases;
 using Inventory.Domain.Batches;
+using Inventory.Domain.StockMovements;
 using Inventory.Domain.Entities;
 using Inventory.Primitives.Identifiers;
-using Inventory.Domain.Enums;
 using MediatR;
 
 namespace Inventory.Application.UseCases.StockCases;
