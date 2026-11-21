@@ -1,45 +1,57 @@
 ﻿@model IEnumerable<MovementTypeTotalsDto>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = Loc.T("ReportMovements_Title");
+    string T(string key) => Loc.T(key);
+    string MoveType(int t) => Loc.T(t switch
+    {
+        0 => "Move_PurchaseIn",
+        1 => "Move_SaleOut",
+        2 => "Move_TransferIn",
+        3 => "Move_TransferOut",
+        4 => "Move_AdjustmentIn",
+        5 => "Move_AdjustmentOut",
+        6 => "Move_OrderReturn",
+        _ => "Move_PurchaseIn"
+    });
     var from = (DateTime?)ViewBag.From;
     var to = (DateTime?)ViewBag.To;
     var inboundOutbound = (InboundOutboundSummaryDto?)ViewBag.InboundOutbound;
     var transfers = (PaginatedResult<TransferHistoryDto>?)ViewBag.TransferHistory;
     var adjustments = (PaginatedResult<Inventory.Contracts.DTOs.StockMovement.StockMovementDto>?)ViewBag.AdjustmentHistory;
-    string[] typeNames = { "PurchaseIn", "SaleOut", "TransferIn", "TransferOut", "AdjustmentIn", "AdjustmentOut", "OrderReturn" };
 }
 
 <div class="container-fluid py-4">
-    <h2 class="mb-1">Stock Movement Reports</h2>
-    <p class="text-muted mb-3">Transfer pairs are reported once (out + in legs aggregated) â€” no double counting.</p>
+    <h2 class="mb-1">@T("ReportMovements_Title")</h2>
+    <p class="text-muted mb-3">@T("ReportMovements_Sub")</p>
 
     <form method="get" class="row g-2 mb-3" asp-area="Inventory" asp-controller="Reports" asp-action="Movements">
         <div class="col-md-3"><input type="date" class="form-control" name="from" value="@(from?.ToString("yyyy-MM-dd"))" /></div>
         <div class="col-md-3"><input type="date" class="form-control" name="to" value="@(to?.ToString("yyyy-MM-dd"))" /></div>
-        <div class="col-auto"><button class="btn btn-primary">Apply</button></div>
+        <div class="col-auto"><button class="btn btn-primary">@T("Common_Apply")</button></div>
     </form>
 
     @if (inboundOutbound != null)
     {
         <div class="row g-3 mb-4">
-            <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">Inbound units (net)</h6><h3 class="mb-0">@inboundOutbound.InboundUnits</h3></div></div></div>
-            <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">Outbound units (net)</h6><h3 class="mb-0">@inboundOutbound.OutboundUnits</h3></div></div></div>
-            <div class="col-md-6"><div class="card border-0 shadow-sm"><div class="card-body"><small class="text-muted">Date range @inboundOutbound.DateFromUtc.ToString("yyyy-MM-dd") &rarr; @inboundOutbound.DateToUtc.ToString("yyyy-MM-dd"). Transfer legs excluded (internal movements); see transfer history below.</small></div></div></div>
+            <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">@T("ReportMovements_Inbound")</h6><h3 class="mb-0">@inboundOutbound.InboundUnits</h3></div></div></div>
+            <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">@T("ReportMovements_Outbound")</h6><h3 class="mb-0">@inboundOutbound.OutboundUnits</h3></div></div></div>
+            <div class="col-md-6"><div class="card border-0 shadow-sm"><div class="card-body"><small class="text-muted">@Loc.F("ReportMovements_Range", inboundOutbound.DateFromUtc.ToString("yyyy-MM-dd"), inboundOutbound.DateToUtc.ToString("yyyy-MM-dd"))</small></div></div></div>
         </div>
     }
 
     <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white"><strong>Totals by movement type</strong></div>
+        <div class="card-header bg-white"><strong>@T("ReportMovements_TotalsByType")</strong></div>
         <div class="card-body p-0">
             <table class="table-hover mb-0 table align-middle">
-                <thead class="table-light"><tr><th class="ps-4">Type</th><th>Movements</th><th>Units</th><th>Net signed</th></tr></thead>
+                <thead class="table-light"><tr><th class="ps-4">@T("Common_Type")</th><th>@T("Reports_Col_Movements")</th><th>@T("ReportMovements_Col_Units")</th><th>@T("Reports_Col_NetSigned")</th></tr></thead>
                 <tbody>
                     @if (Model != null && Model.Any())
                     {
                         @foreach (var t in Model)
                          {
                              <tr>
-                                 <td class="ps-4"><span class="badge text-bg-@(t.MovementType == 0 || t.MovementType == 2 || t.MovementType == 4 || t.MovementType == 6 ? "success" : "danger")">@typeNames[t.MovementType]</span></td>
+                                 <td class="ps-4"><span class="badge text-bg-@(t.MovementType == 0 || t.MovementType == 2 || t.MovementType == 4 || t.MovementType == 6 ? "success" : "danger")">@MoveType(t.MovementType)</span></td>
                                  <td>@t.MovementCount</td>
                                  <td>@t.TotalQuantity</td>
                                  <td>@t.SignedQuantity</td>
@@ -48,7 +60,7 @@
                     }
                     else
                     {
-                        <tr><td colspan="4" class="py-4 text-center text-muted">No movements in this range.</td></tr>
+                        <tr><td colspan="4" class="py-4 text-center text-muted">@T("ReportMovements_NoneInRange")</td></tr>
                     }
                 </tbody>
             </table>
@@ -56,10 +68,10 @@
     </div>
 
     <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white"><strong>Transfer history (source &rarr; destination)</strong></div>
+        <div class="card-header bg-white"><strong>@T("ReportMovements_TransferHistory")</strong></div>
         <div class="card-body p-0">
             <table class="table-hover mb-0 table align-middle">
-                <thead class="table-light"><tr><th class="ps-4">Date (UTC)</th><th>Transfer ref</th><th>Source</th><th>Destination</th><th>Quantity</th></tr></thead>
+                <thead class="table-light"><tr><th class="ps-4">@T("Common_Date")</th><th>@T("ReportMovements_Col_TransferRef")</th><th>@T("Batches_Source")</th><th>@T("Batches_Destination")</th><th>@T("Common_Quantity")</th></tr></thead>
                 <tbody>
                     @if (transfers != null)
                     {
@@ -75,7 +87,7 @@
                          }
                          if (!transfers.Items.Any())
                          {
-                             <tr><td colspan="5" class="py-4 text-center text-muted">No transfers recorded.</td></tr>
+                             <tr><td colspan="5" class="py-4 text-center text-muted">@T("ReportMovements_NoTransfers")</td></tr>
                          }
                     }
                 </tbody>
@@ -84,10 +96,10 @@
     </div>
 
     <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white"><strong>Adjustments, damage &amp; reversals (with recorded reasons)</strong></div>
+        <div class="card-header bg-white"><strong>@T("ReportMovements_Adjustments")</strong></div>
         <div class="card-body p-0">
             <table class="table-hover mb-0 table align-middle">
-                <thead class="table-light"><tr><th class="ps-4">Date (UTC)</th><th>Type</th><th>Quantity</th><th>Reason</th><th>Reference</th></tr></thead>
+                <thead class="table-light"><tr><th class="ps-4">@T("Common_Date")</th><th>@T("Common_Type")</th><th>@T("Common_Quantity")</th><th>@T("Common_Reason")</th><th>@T("Common_Reference")</th></tr></thead>
                 <tbody>
                     @if (adjustments != null)
                     {
@@ -95,7 +107,7 @@
                          {
                              <tr>
                                  <td class="ps-4">@m.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
-                                 <td><span class="badge text-bg-@(m.MovementType == 4 ? "success" : "warning text-dark")">@typeNames[m.MovementType]</span></td>
+                                 <td><span class="badge text-bg-@(m.MovementType == 4 ? "success" : "warning text-dark")">@MoveType(m.MovementType)</span></td>
                                  <td>@m.Quantity</td>
                                  <td>@m.Reason</td>
                                  <td><small>@(m.ReferenceId?.ToString() ?? "-")</small></td>
@@ -103,7 +115,7 @@
                          }
                          if (!adjustments.Items.Any())
                          {
-                             <tr><td colspan="5" class="py-4 text-center text-muted">No adjustments, write-offs or reversals recorded.</td></tr>
+                             <tr><td colspan="5" class="py-4 text-center text-muted">@T("ReportMovements_NoAdjustments")</td></tr>
                          }
                     }
                 </tbody>

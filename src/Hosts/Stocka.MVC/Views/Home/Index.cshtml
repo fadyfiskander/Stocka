@@ -1,11 +1,12 @@
 ﻿@{
-    ViewData["Title"] = "Stocka";
+    ViewData["Title"] = Loc.T("Home_Title");
+    string T(string key) => Loc.T(key);
 }
 
 <section class="page">
-    <header class="page-head"><div><h1 class="page-title">لوحة العمل</h1><p class="page-sub">نقطة انطلاق سريعة لإدارة الأصناف والمخزون والتقارير.</p></div></header>
+    <header class="page-head"><div><h1 class="page-title">@T("Home_Title")</h1><p class="page-sub">@T("Home_Sub")</p></div></header>
     <div class="grid-2">
-        <article class="card"><div class="card-body"><h2 class="card-title">الكتالوج</h2><p class="page-sub">أضف المنتجات والفئات ونظّم بيانات البيع.</p><a class="btn btn-primary" asp-area="Catalog" asp-controller="Products" asp-action="Index">عرض المنتجات</a></div></article>
-        <article class="card"><div class="card-body"><h2 class="card-title">المخزون</h2><p class="page-sub">راجع المستودعات والدفعات وحركة المخزون.</p><a class="btn btn-ghost" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index">عرض المستودعات</a></div></article>
+        <article class="card"><div class="card-body"><h2 class="card-title">@T("Home_CatalogTitle")</h2><p class="page-sub">@T("Home_CatalogText")</p><a class="btn btn-primary" asp-area="Catalog" asp-controller="Products" asp-action="Index">@T("Home_CatalogLink")</a></div></article>
+        <article class="card"><div class="card-body"><h2 class="card-title">@T("Home_InventoryTitle")</h2><p class="page-sub">@T("Home_InventoryText")</p><a class="btn btn-ghost" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index">@T("Home_InventoryLink")</a></div></article>
     </div>
 </section>

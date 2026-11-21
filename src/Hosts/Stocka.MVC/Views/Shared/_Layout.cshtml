@@ -1,9 +1,10 @@
-﻿@using System.Globalization
-@using Microsoft.AspNetCore.Http
+﻿@using Microsoft.AspNetCore.Http
+@using Stocka.MVC.Localization
 @{
     /* ---- Culture & direction (single source for the whole shell) ---- */
-    var isRtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
-    var htmlLang = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var isRtl = Loc.IsRtl;
+    var htmlLang = Loc.Language;
+    string T(string key) => Loc.T(key);
 
     // return URL for the language switch, stripped of any culture parameters
     var langQuery = Context.Request.Query
@@ -13,33 +14,26 @@
     var langQs = QueryString.Create(langQuery);
     var returnUrl = Context.Request.Path + (langQs.HasValue ? langQs.ToUriComponent() : "");
 
-    var other = isRtl ? "en" : "ar";                 // culture we switch to
-    var otherLabel = isRtl ? "EN" : "عربي";          // label of the target language
-
-    // Shell copy intentionally lives with the shell until resource files are introduced.
-    var Loc = new Dictionary<string, string>
-    {
-        ["Val_Required"] = isRtl ? "هذا الحقل مطلوب." : "This field is required.", ["Val_Email"] = isRtl ? "أدخل بريداً إلكترونياً صحيحاً." : "Enter a valid email address.", ["Val_Url"] = isRtl ? "أدخل رابطاً صحيحاً." : "Enter a valid URL.", ["Val_Pattern"] = isRtl ? "القيمة غير صالحة." : "The value is invalid.", ["Val_MinLength"] = isRtl ? "القيمة أقصر من المطلوب." : "The value is too short.", ["Val_MaxLength"] = isRtl ? "القيمة أطول من المسموح." : "The value is too long.", ["Val_Min"] = isRtl ? "القيمة أقل من الحد الأدنى." : "The value is below the minimum.", ["Val_Max"] = isRtl ? "القيمة أكبر من الحد الأقصى." : "The value exceeds the maximum.", ["Val_Step"] = isRtl ? "أدخل قيمة صحيحة." : "Enter a valid step value.", ["Val_Number"] = isRtl ? "أدخل رقماً صحيحاً." : "Enter a valid number.", ["Val_OneIssue"] = isRtl ? "يرجى تصحيح الخطأ التالي:" : "Please fix the following issue:", ["Val_ManyIssues"] = isRtl ? "يرجى تصحيح الأخطاء التالية:" : "Please fix the following issues:",
-        ["SkipToContent"] = isRtl ? "انتقل إلى المحتوى" : "Skip to content", ["Nav_Main"] = isRtl ? "التنقل الرئيسي" : "Main navigation", ["App_Subtitle"] = isRtl ? "إدارة المخزون" : "Inventory control", ["Nav_Home"] = isRtl ? "الرئيسية" : "Home", ["Group_Catalog"] = isRtl ? "الكتالوج" : "Catalog", ["Nav_Products"] = isRtl ? "المنتجات" : "Products", ["Nav_Categories"] = isRtl ? "الفئات" : "Categories", ["Group_Inventory"] = isRtl ? "المخزون" : "Inventory", ["Nav_Warehouses"] = isRtl ? "المستودعات" : "Warehouses", ["Nav_Batches"] = isRtl ? "الدفعات" : "Batches", ["Nav_Movements"] = isRtl ? "الحركات" : "Movements", ["Nav_Reports"] = isRtl ? "التقارير" : "Reports", ["Nav_ReportsOverview"] = isRtl ? "نظرة عامة" : "Overview", ["Nav_Balance"] = isRtl ? "الرصيد" : "Balance", ["Nav_MovementReports"] = isRtl ? "تقرير الحركات" : "Movement report", ["Nav_ZeroStock"] = isRtl ? "نفاد المخزون" : "Zero stock", ["Nav_WarehouseReports"] = isRtl ? "تقارير المستودعات" : "Warehouse reports", ["Nav_Collapse"] = isRtl ? "طي القائمة" : "Collapse navigation", ["Nav_Open"] = isRtl ? "فتح القائمة" : "Open navigation", ["Search_Placeholder"] = isRtl ? "ابحث عن منتج" : "Search products", ["Lang_ChangeTo"] = isRtl ? "التبديل إلى الإنجليزية" : "Switch to Arabic", ["Theme_Light"] = isRtl ? "الوضع الفاتح" : "Light theme", ["Theme_Dark"] = isRtl ? "الوضع الداكن" : "Dark theme", ["Footer_Copy"] = "© Stocka", ["Footer_Note"] = isRtl ? "نظام إدارة الأعمال" : "Business operations system"
-    };
+    var other = Loc.OtherLanguage;                 // culture we switch to
+    var otherLabel = Loc.OtherLanguageLabel;       // label of the target language
 
     string? title = ViewData["Title"] as string;
 
     // validator + JS strings, serialized once, consumed by app.js
     var i18n = new
     {
-        required = (string)Loc["Val_Required"],
-        email    = (string)Loc["Val_Email"],
-        url      = (string)Loc["Val_Url"],
-        pattern  = (string)Loc["Val_Pattern"],
-        minlength = (string)Loc["Val_MinLength"],
-        maxlength = (string)Loc["Val_MaxLength"],
-        min      = (string)Loc["Val_Min"],
-        max      = (string)Loc["Val_Max"],
-        step     = (string)Loc["Val_Step"],
-        number   = (string)Loc["Val_Number"],
-        oneIssue = (string)Loc["Val_OneIssue"],
-        manyIssues = (string)Loc["Val_ManyIssues"]
+        required = T("Val_Required"),
+        email    = T("Val_Email"),
+        url      = T("Val_Url"),
+        pattern  = T("Val_Pattern"),
+        minlength = T("Val_MinLength"),
+        maxlength = T("Val_MaxLength"),
+        min      = T("Val_Min"),
+        max      = T("Val_Max"),
+        step     = T("Val_Step"),
+        number   = T("Val_Number"),
+        oneIssue = T("Val_OneIssue"),
+        manyIssues = T("Val_ManyIssues")
     };
 }
 @functions {
@@ -181,64 +175,64 @@
         </symbol>
     </svg>
 
-    <a class="skip-link" href="#content">@Loc["SkipToContent"]</a>
+    <a class="skip-link" href="#content">@T("SkipToContent")</a>
 
     <div class="shell" id="shell" data-nav-open="false">
 
         @* ============ Sidebar ============ *@
-        <aside class="sidebar" id="sidebar" aria-label="@Loc["Nav_Main"]">
+        <aside class="sidebar" id="sidebar" aria-label="@T("Nav_Main")">
             <a class="brand" asp-area="" asp-controller="Home" asp-action="Index">
                 <span class="brand-mark"><svg class="icon"><use href="#i-box" /></svg></span>
                 <span class="brand-name">
                     <b>Stocka</b>
-                    <span>@Loc["App_Subtitle"]</span>
+                    <span>@T("App_Subtitle")</span>
                 </span>
             </a>
 
             <nav class="nav">
                 <a class="nav-link @NavActive("", "Home")" asp-area="" asp-controller="Home" asp-action="Index">
-                    <svg class="icon"><use href="#i-home" /></svg><span class="nav-text">@Loc["Nav_Home"]</span>
+                    <svg class="icon"><use href="#i-home" /></svg><span class="nav-text">@T("Nav_Home")</span>
                 </a>
 
-                <span class="group-label" aria-hidden="true">@Loc["Group_Catalog"]</span>
+                <span class="group-label" aria-hidden="true">@T("Group_Catalog")</span>
                 <a class="nav-link @NavActive("Catalog", "Products")" asp-area="Catalog" asp-controller="Products" asp-action="Index">
-                    <svg class="icon"><use href="#i-box" /></svg><span class="nav-text">@Loc["Nav_Products"]</span>
+                    <svg class="icon"><use href="#i-box" /></svg><span class="nav-text">@T("Nav_Products")</span>
                 </a>
                 <a class="nav-link @NavActive("Catalog", "Categories")" asp-area="Catalog" asp-controller="Categories" asp-action="Index">
-                    <svg class="icon"><use href="#i-tag" /></svg><span class="nav-text">@Loc["Nav_Categories"]</span>
+                    <svg class="icon"><use href="#i-tag" /></svg><span class="nav-text">@T("Nav_Categories")</span>
                 </a>
 
-                <span class="group-label" aria-hidden="true">@Loc["Group_Inventory"]</span>
+                <span class="group-label" aria-hidden="true">@T("Group_Inventory")</span>
                 <a class="nav-link @NavActive("Inventory", "Warehouses")" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index">
-                    <svg class="icon"><use href="#i-store" /></svg><span class="nav-text">@Loc["Nav_Warehouses"]</span>
+                    <svg class="icon"><use href="#i-store" /></svg><span class="nav-text">@T("Nav_Warehouses")</span>
                 </a>
                 <a class="nav-link @NavActive("Inventory", "Batches")" asp-area="Inventory" asp-controller="Batches" asp-action="Index">
-                    <svg class="icon"><use href="#i-layers" /></svg><span class="nav-text">@Loc["Nav_Batches"]</span>
+                    <svg class="icon"><use href="#i-layers" /></svg><span class="nav-text">@T("Nav_Batches")</span>
                 </a>
                 <a class="nav-link @NavActive("Inventory", "Stock", "Movements")" asp-area="Inventory" asp-controller="Stock" asp-action="Movements">
-                    <svg class="icon"><use href="#i-swap" /></svg><span class="nav-text">@Loc["Nav_Movements"]</span>
+                    <svg class="icon"><use href="#i-swap" /></svg><span class="nav-text">@T("Nav_Movements")</span>
                 </a>
 
                 <details class="nav-group@(NavGroupActive("Inventory", "Reports") ? " is-open" : "")">
-                    <summary title="@Loc["Nav_Reports"]" aria-label="@Loc["Nav_Reports"]">
-                        @Loc["Nav_Reports"]
+                    <summary title="@T("Nav_Reports")" aria-label="@T("Nav_Reports")">
+                        @T("Nav_Reports")
                         <svg class="icon chev"><use href="#i-chevron-down" /></svg>
                     </summary>
                     <div class="nav">
                         <a class="nav-link @NavActive("Inventory", "Reports", "Index")" asp-area="Inventory" asp-controller="Reports" asp-action="Index">
-                            <span class="nav-text">@Loc["Nav_ReportsOverview"]</span>
+                            <span class="nav-text">@T("Nav_ReportsOverview")</span>
                         </a>
                         <a class="nav-link @NavActive("Inventory", "Reports", "Balance")" asp-area="Inventory" asp-controller="Reports" asp-action="Balance">
-                            <span class="nav-text">@Loc["Nav_Balance"]</span>
+                            <span class="nav-text">@T("Nav_Balance")</span>
                         </a>
                         <a class="nav-link @NavActive("Inventory", "Reports", "Movements")" asp-area="Inventory" asp-controller="Reports" asp-action="Movements">
-                            <span class="nav-text">@Loc["Nav_MovementReports"]</span>
+                            <span class="nav-text">@T("Nav_MovementReports")</span>
                         </a>
                         <a class="nav-link @NavActive("Inventory", "Reports", "Products")" asp-area="Inventory" asp-controller="Reports" asp-action="Products">
-                            <span class="nav-text">@Loc["Nav_ZeroStock"]</span>
+                            <span class="nav-text">@T("Nav_ZeroStock")</span>
                         </a>
                         <a class="nav-link @NavActive("Inventory", "Reports", "Warehouses")" asp-area="Inventory" asp-controller="Reports" asp-action="Warehouses">
-                            <span class="nav-text">@Loc["Nav_WarehouseReports"]</span>
+                            <span class="nav-text">@T("Nav_WarehouseReports")</span>
                         </a>
                     </div>
                 </details>
@@ -246,7 +240,7 @@
 
             <div class="aside-foot">
                 <button type="button" class="collapse-btn" data-rail-toggle
-                        aria-label="@Loc["Nav_Collapse"]" title="@Loc["Nav_Collapse"]">
+                        aria-label="@T("Nav_Collapse")" title="@T("Nav_Collapse")">
                     <svg class="icon icon-collapse"><use href="#i-chevrons" /></svg>
                 </button>
             </div>
@@ -257,7 +251,7 @@
         @* ============ Frame ============ *@
         <div class="frame">
             <header class="topbar">
-                <button type="button" class="tool-btn menu-btn" data-nav-toggle aria-label="@Loc["Nav_Open"]">
+                <button type="button" class="tool-btn menu-btn" data-nav-toggle aria-label="@T("Nav_Open")">
                     <svg class="icon"><use href="#i-menu" /></svg>
                 </button>
 
@@ -269,19 +263,19 @@
                 <form class="searchbar" role="search" method="get"
                       asp-area="Catalog" asp-controller="Products" asp-action="SearchByName">
                     <svg class="icon"><use href="#i-search" /></svg>
-                    <input type="search" name="name" autocomplete="off" placeholder="@Loc["Search_Placeholder"]" aria-label="@Loc["Search_Placeholder"]" />
+                    <input type="search" name="name" autocomplete="off" placeholder="@T("Search_Placeholder")" aria-label="@T("Search_Placeholder")" />
                 </form>
 
                 <div class="topbar-side">
                     <a class="lang-chip" asp-controller="Localization" asp-action="SetLanguage"
                        asp-route-culture="@other" asp-route-returnUrl="@returnUrl"
-                       title="@Loc["Lang_ChangeTo"]">
+                       title="@T("Lang_ChangeTo")">
                         <svg class="icon"><use href="#i-globe" /></svg>
                         <span>@otherLabel</span>
                     </a>
                     <button type="button" class="tool-btn" data-theme-toggle
-                            data-aria-label-light="@Loc["Theme_Light"]" data-aria-label-dark="@Loc["Theme_Dark"]"
-                            aria-label="@Loc["Theme_Dark"]">
+                            data-aria-label-light="@T("Theme_Light")" data-aria-label-dark="@T("Theme_Dark")"
+                            aria-label="@T("Theme_Dark")">
                         <svg class="icon theme-ic theme-ic-sun"><use href="#i-sun" /></svg>
                         <svg class="icon theme-ic theme-ic-moon"><use href="#i-moon" /></svg>
                     </button>
@@ -294,9 +288,9 @@
             </main>
 
             <footer class="footer">
-                <span>@Loc["Footer_Copy"]</span>
+                <span>© Stocka</span>
                 <span class="spacer"></span>
-                <span>@Loc["Footer_Note"]</span>
+                <span>@T("Footer_Note")</span>
             </footer>
         </div>
     </div>

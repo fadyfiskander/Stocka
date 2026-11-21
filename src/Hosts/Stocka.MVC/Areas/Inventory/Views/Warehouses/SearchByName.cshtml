@@ -1,10 +1,12 @@
 @model IEnumerable<WarehouseDto>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = Loc.T("Warehouses_SearchTitle");
+    string T(string key) => Loc.T(key);
 }
 
 <div class="container-fluid py-4">
-    <h2>Search Warehouses by Name</h2>
+    <h2>@T("Warehouses_SearchHeading")</h2>
     @if (ViewBag.NotFound != null)
     {
         <div class="alert alert-warning">@ViewBag.NotFound</div>
@@ -16,10 +18,10 @@
 
     <form method="get" class="row g-2 mb-4" asp-area="Inventory" asp-controller="Warehouses" asp-action="SearchByName">
         <div class="col-md-6">
-            <input type="text" class="form-control" name="name" placeholder="Warehouse name (contains)" value="@Context.Request.Query["name"]" />
+            <input type="text" class="form-control" name="name" placeholder="@T("Warehouses_SearchPlaceholder")" value="@Context.Request.Query["name"]" />
         </div>
         <div class="col-auto">
-            <button type="submit" class="btn btn-primary">Search</button>
+            <button type="submit" class="btn btn-primary">@T("Common_Search")</button>
         </div>
     </form>
 
@@ -29,7 +31,7 @@
             <div class="card-body p-0">
                 <table class="table-hover mb-0 table align-middle">
                     <thead class="table-light">
-                        <tr><th class="ps-4">Name</th><th>Location</th><th>Status</th><th class="pe-4"></th></tr>
+                        <tr><th class="ps-4">@T("Common_Name")</th><th>@T("Common_Location")</th><th>@T("Common_Status")</th><th class="pe-4"></th></tr>
                     </thead>
                     <tbody>
                         @foreach (var warehouse in Model)
@@ -37,9 +39,9 @@
                             <tr>
                                 <td class="ps-4 fw-semibold">@warehouse.Name</td>
                                 <td>@warehouse.Location</td>
-                                <td><span class="badge text-bg-@(warehouse.IsActive ? "success" : "secondary")">@(warehouse.IsActive ? "Active" : "Inactive")</span></td>
+                                <td><span class="badge text-bg-@(warehouse.IsActive ? "success" : "secondary")">@(warehouse.IsActive ? T("Common_Active") : T("Common_Inactive"))</span></td>
                                 <td class="pe-4 text-end">
-                                    <a class="btn btn-sm btn-outline-primary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Details" asp-route-id="@warehouse.Id">Details</a>
+                                    <a class="btn btn-sm btn-outline-primary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Details" asp-route-id="@warehouse.Id">@T("Common_Details")</a>
                                 </td>
                             </tr>
                         }
@@ -50,6 +52,6 @@
     }
     else if (!string.IsNullOrWhiteSpace(Context.Request.Query["name"]))
     {
-        <div class="text-muted">No warehouses matched the search.</div>
+        <div class="text-muted">@T("Warehouses_SearchEmpty")</div>
     }
 </div>

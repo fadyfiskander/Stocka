@@ -1,6 +1,8 @@
 @model PaginatedResult<BatchDto>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = Loc.T("Batches_Title");
+    string T(string key) => Loc.T(key);
     var productId = (Guid?)ViewBag.ProductId;
     var purchaseItemId = (Guid?)ViewBag.PurchaseItemId;
     var warehouseId = (Guid?)ViewBag.WarehouseId;
@@ -9,18 +11,18 @@
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Batches</h2>
-            <p class="text-muted mb-0">Received stock batches. RemainingQuantity = units not yet allocated to warehouses.</p>
+            <h2 class="mb-1">@T("Batches_Title")</h2>
+            <p class="text-muted mb-0">@T("Batches_Sub")</p>
         </div>
-        <a class="btn btn-primary" asp-area="Inventory" asp-controller="Batches" asp-action="Create">Register Batch</a>
+        <a class="btn btn-primary" asp-area="Inventory" asp-controller="Batches" asp-action="Create">@T("Batches_Register")</a>
     </div>
 
     <form method="get" class="row g-2 mb-3" asp-area="Inventory" asp-controller="Batches" asp-action="Index">
-        <div class="col-md-4"><input type="text" class="form-control" name="productId" placeholder="Product ID (Guid)" value="@productId" /></div>
-        <div class="col-md-4"><input type="text" class="form-control" name="purchaseItemId" placeholder="Purchase item ID (Guid)" value="@purchaseItemId" /></div>
-        <div class="col-md-3"><input type="text" class="form-control" name="warehouseId" placeholder="Warehouse holding stock" value="@warehouseId" /></div>
-        <div class="col-auto"><button type="submit" class="btn btn-outline-primary">Filter</button></div>
-        <div class="col-auto"><a class="btn btn-outline-secondary" asp-area="Inventory" asp-controller="Batches" asp-action="Index">Clear</a></div>
+        <div class="col-md-4"><input type="text" class="form-control" name="productId" placeholder="@T("Batches_FilterProduct")" value="@productId" /></div>
+        <div class="col-md-4"><input type="text" class="form-control" name="purchaseItemId" placeholder="@T("Batches_FilterPurchase")" value="@purchaseItemId" /></div>
+        <div class="col-md-3"><input type="text" class="form-control" name="warehouseId" placeholder="@T("Batches_FilterWarehouse")" value="@warehouseId" /></div>
+        <div class="col-auto"><button type="submit" class="btn btn-outline-primary">@T("Common_Filter")</button></div>
+        <div class="col-auto"><a class="btn btn-outline-secondary" asp-area="Inventory" asp-controller="Batches" asp-action="Index">@T("Common_Clear")</a></div>
     </form>
 
     <div class="card border-0 shadow-sm">
@@ -29,13 +31,13 @@
                 <table class="table-hover mb-0 table align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th class="ps-4">Batch</th>
-                            <th>Product</th>
-                            <th>Initial</th>
-                            <th>Unallocated</th>
-                            <th>Unit cost</th>
-                            <th>Received</th>
-                            <th class="pe-4 text-end">Actions</th>
+                            <th class="ps-4">@T("Common_Batch")</th>
+                            <th>@T("Common_Product")</th>
+                            <th>@T("Batches_Col_Initial")</th>
+                            <th>@T("Batches_Col_Unallocated")</th>
+                            <th>@T("Batches_Col_UnitCost")</th>
+                            <th>@T("Batches_Col_Received")</th>
+                            <th class="pe-4 text-end">@T("Common_Actions")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -51,14 +53,14 @@
                                     <td>@batch.UnitCost.ToString("N2")</td>
                                     <td>@batch.CreatedAt.ToString("yyyy-MM-dd")</td>
                                     <td class="pe-4 text-end">
-                                        <a class="btn btn-sm btn-outline-primary" asp-area="Inventory" asp-controller="Batches" asp-action="Details" asp-route-id="@batch.Id">Details</a>
+                                        <a class="btn btn-sm btn-outline-primary" asp-area="Inventory" asp-controller="Batches" asp-action="Details" asp-route-id="@batch.Id">@T("Common_Details")</a>
                                     </td>
                                 </tr>
                             }
                         }
                         else
                         {
-                            <tr><td colspan="7" class="py-5 text-center text-muted">No batches found.</td></tr>
+                            <tr><td colspan="7" class="py-5 text-center text-muted">@T("Batches_Empty")</td></tr>
                         }
                     </tbody>
                 </table>
@@ -67,12 +69,12 @@
     </div>
 
     <div class="d-flex justify-content-between align-items-center mt-3">
-        <small class="text-muted">Page @Model.Page of @Model.TotalPages (@Model.TotalCount batches)</small>
+        <small class="text-muted">@Loc.F("Batches_PageInfo", Model.Page, Model.TotalPages, Model.TotalCount)</small>
         <div class="btn-group">
             <a asp-area="Inventory" asp-controller="Batches" asp-action="Index" asp-route-productId="@productId" asp-route-purchaseItemId="@purchaseItemId" asp-route-warehouseId="@warehouseId" asp-route-page="@(Model.Page - 1)"
-               class="btn btn-sm btn-outline-secondary @(Model.HasPrevious ? "" : "disabled")">Previous</a>
+               class="btn btn-sm btn-outline-secondary @(Model.HasPrevious ? "" : "disabled")">@T("Common_Previous")</a>
             <a asp-area="Inventory" asp-controller="Batches" asp-action="Index" asp-route-productId="@productId" asp-route-purchaseItemId="@purchaseItemId" asp-route-warehouseId="@warehouseId" asp-route-page="@(Model.Page + 1)"
-               class="btn btn-sm btn-outline-secondary @(Model.HasNext ? "" : "disabled")">Next</a>
+               class="btn btn-sm btn-outline-secondary @(Model.HasNext ? "" : "disabled")">@T("Common_Next")</a>
         </div>
     </div>
 </div>

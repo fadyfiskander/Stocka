@@ -2,6 +2,19 @@
 @using Inventory.Contracts.DTOs.StockMovement
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = Loc.T("Batches_DetailsTitle");
+    string T(string key) => Loc.T(key);
+    string MoveType(int t) => Loc.T(t switch
+    {
+        0 => "Move_PurchaseIn",
+        1 => "Move_SaleOut",
+        2 => "Move_TransferIn",
+        3 => "Move_TransferOut",
+        4 => "Move_AdjustmentIn",
+        5 => "Move_AdjustmentOut",
+        6 => "Move_OrderReturn",
+        _ => "Move_PurchaseIn"
+    });
     var movements = (IEnumerable<StockMovementDto>?)ViewBag.Movements;
     var warehouses = (PaginatedResult<WarehouseDto>?)ViewBag.ActiveWarehouses;
 }
@@ -24,40 +37,40 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Batch Details</h2>
+            <h2 class="mb-1">@T("Batches_DetailsTitle")</h2>
             <p class="text-muted mb-0">
-                Product @Model.ProductId &middot; Purchase item @Model.PurchaseItemId
-                @(Model.IsExhausted ? " &middot; fully allocated" : string.Empty)
+                @T("Common_Product") @Model.ProductId &middot; @T("Batches_PurchaseItemId") @Model.PurchaseItemId
+                @(Model.IsExhausted ? T("Batches_FullyAllocated") : string.Empty)
             </p>
         </div>
-        <a class="btn btn-outline-primary" asp-area="Inventory" asp-controller="Batches" asp-action="Index">Back to batches</a>
+        <a class="btn btn-outline-primary" asp-area="Inventory" asp-controller="Batches" asp-action="Index">@T("Batches_BackToList")</a>
     </div>
 
     <div class="row g-4 mb-4">
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white"><strong>Quantities (distinct concepts)</strong></div>
+                <div class="card-header bg-white"><strong>@T("Batches_QuantitiesTitle")</strong></div>
                 <div class="card-body">
                     <dl class="row mb-0">
-                        <dt class="col-sm-6">Initial received</dt><dd class="col-sm-6">@Model.InitialQuantity</dd>
-                        <dt class="col-sm-6">Unallocated (RemainingQuantity)</dt><dd class="col-sm-6">@Model.RemainingQuantity</dd>
-                        <dt class="col-sm-6">Ever allocated</dt><dd class="col-sm-6">@Model.AllocatedQuantity</dd>
-                        <dt class="col-sm-6">Currently in warehouses</dt><dd class="col-sm-6">@Model.QuantityInWarehouses</dd>
+                        <dt class="col-sm-6">@T("Batches_InitialReceived")</dt><dd class="col-sm-6">@Model.InitialQuantity</dd>
+                        <dt class="col-sm-6">@T("Batches_UnallocatedRemaining")</dt><dd class="col-sm-6">@Model.RemainingQuantity</dd>
+                        <dt class="col-sm-6">@T("Batches_EverAllocated")</dt><dd class="col-sm-6">@Model.AllocatedQuantity</dd>
+                        <dt class="col-sm-6">@T("Batches_InWarehouses")</dt><dd class="col-sm-6">@Model.QuantityInWarehouses</dd>
                     </dl>
                 </div>
             </div>
         </div>
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white"><strong>Cost (recorded batch unit cost)</strong></div>
+                <div class="card-header bg-white"><strong>@T("Batches_CostTitle")</strong></div>
                 <div class="card-body">
                     <dl class="row mb-0">
-                        <dt class="col-sm-6">Unit cost</dt><dd class="col-sm-6">@Model.UnitCost.ToString("N2")</dd>
-                        <dt class="col-sm-6">Initial total cost</dt><dd class="col-sm-6">@Model.InitialTotalCost.ToString("N2")</dd>
-                        <dt class="col-sm-6">Unallocated value</dt><dd class="col-sm-6">@Model.RemainingValue.ToString("N2")</dd>
-                        <dt class="col-sm-6">Received at</dt><dd class="col-sm-6">@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm") UTC</dd>
+                        <dt class="col-sm-6">@T("Batches_UnitCost")</dt><dd class="col-sm-6">@Model.UnitCost.ToString("N2")</dd>
+                        <dt class="col-sm-6">@T("Batches_InitialTotalCost")</dt><dd class="col-sm-6">@Model.InitialTotalCost.ToString("N2")</dd>
+                        <dt class="col-sm-6">@T("Batches_RemainingValue")</dt><dd class="col-sm-6">@Model.RemainingValue.ToString("N2")</dd>
+                        <dt class="col-sm-6">@T("Batches_ReceivedAt")</dt><dd class="col-sm-6">@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm") UTC</dd>
                     </dl>
-                    <small class="text-muted">Traceable recorded costs only â€” no FIFO / weighted-average valuation policy is approved yet.</small>
+                    <small class="text-muted">@T("Batches_CostNote")</small>
                 </div>
             </div>
         </div>
@@ -66,14 +79,14 @@
     <div class="row g-4 mb-4">
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white"><strong>Allocate stock to a warehouse</strong></div>
+                <div class="card-header bg-white"><strong>@T("Batches_AllocateTitle")</strong></div>
                 <div class="card-body">
                     <form asp-area="Inventory" asp-controller="Stock" asp-action="Allocate" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
                         <input type="hidden" name="BatchId" value="@Model.Id" />
                         <div class="row g-2 align-items-end">
                             <div class="col-sm-7">
-                                <label class="form-label">Warehouse</label>
+                                <label class="form-label">@T("Common_Warehouse")</label>
                                 <select name="WarehouseId" class="form-select" required>
                                     @foreach (var w in warehouses?.Items ?? Enumerable.Empty<WarehouseDto>())
                                     {
@@ -82,26 +95,26 @@
                                 </select>
                             </div>
                             <div class="col-sm-3">
-                                <label class="form-label">Quantity</label>
+                                <label class="form-label">@T("Common_Quantity")</label>
                                 <input type="number" name="Quantity" class="form-control" min="1" max="@Model.RemainingQuantity" required />
                             </div>
-                            <div class="col-sm-2"><button type="submit" class="btn btn-primary w-100">Allocate</button></div>
+                            <div class="col-sm-2"><button type="submit" class="btn btn-primary w-100">@T("Batches_Allocate")</button></div>
                         </div>
-                        <small class="text-muted">Max @(Model.RemainingQuantity) unallocated units. Placement records a PurchaseIn movement.</small>
+                        <small class="text-muted">@Loc.F("Batches_AllocateNote", Model.RemainingQuantity)</small>
                     </form>
                 </div>
             </div>
         </div>
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white"><strong>Transfer between warehouses</strong></div>
+                <div class="card-header bg-white"><strong>@T("Batches_TransferTitle")</strong></div>
                 <div class="card-body">
                     <form asp-area="Inventory" asp-controller="Stock" asp-action="Transfer" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
                         <input type="hidden" name="BatchId" value="@Model.Id" />
                         <div class="row g-2 align-items-end">
                             <div class="col-sm-5">
-                                <label class="form-label">Source</label>
+                                <label class="form-label">@T("Batches_Source")</label>
                                 <select name="SourceWarehouseId" class="form-select" required>
                                     @foreach (var w in warehouses?.Items ?? Enumerable.Empty<WarehouseDto>())
                                     {
@@ -110,7 +123,7 @@
                                 </select>
                             </div>
                             <div class="col-sm-5">
-                                <label class="form-label">Destination</label>
+                                <label class="form-label">@T("Batches_Destination")</label>
                                 <select name="DestinationWarehouseId" class="form-select" required>
                                     @foreach (var w in warehouses?.Items ?? Enumerable.Empty<WarehouseDto>())
                                     {
@@ -119,12 +132,12 @@
                                 </select>
                             </div>
                             <div class="col-sm-2">
-                                <label class="form-label">Quantity</label>
+                                <label class="form-label">@T("Common_Quantity")</label>
                                 <input type="number" name="Quantity" class="form-control" min="1" required />
                             </div>
                         </div>
-                        <div class="mt-2"><input type="text" name="Reason" class="form-control" placeholder="Reason (optional), max 300 chars" maxlength="300" /></div>
-                        <small class="text-muted">Both legs (out + in) commit together as one operation.</small>
+                        <div class="mt-2"><input type="text" name="Reason" class="form-control" placeholder="@T("Batches_ReasonOptional")" maxlength="300" /></div>
+                        <small class="text-muted">@T("Batches_TransferNote")</small>
                     </form>
                 </div>
             </div>
@@ -134,46 +147,45 @@
     <div class="row g-4 mb-4">
         <div class="col-md-6">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white"><strong>Record sale (out)</strong></div>
+                <div class="card-header bg-white"><strong>@T("Batches_SaleTitle")</strong></div>
                 <div class="card-body">
                     <form asp-area="Inventory" asp-controller="Stock" asp-action="Sale" method="post">
                         <input type="hidden" name="BatchId" value="@Model.Id" />
                         <div class="row g-2 align-items-end">
-                            <div class="col-sm-4"><input type="number" name="Quantity" class="form-control" min="1" placeholder="Quantity" required /></div>
-                            <div class="col-sm-5"><input type="text" name="OrderReferenceId" class="form-control" placeholder="Order reference (optional Guid)" /></div>
-                            <div class="col-sm-3"><button type="submit" class="btn btn-warning w-100">Sale out</button></div>
+                            <div class="col-sm-4"><input type="number" name="Quantity" class="form-control" min="1" placeholder="@T("Common_Quantity")" required /></div>
+                            <div class="col-sm-5"><input type="text" name="OrderReferenceId" class="form-control" placeholder="@T("Batches_OrderRef")" /></div>
+                            <div class="col-sm-3"><button type="submit" class="btn btn-warning w-100">@T("Batches_SaleOut")</button></div>
                         </div>
-                        <div class="mt-2"><input type="text" name="Reason" class="form-control" placeholder="Reason (optional)" maxlength="300" /></div>
+                        <div class="mt-2"><input type="text" name="Reason" class="form-control" placeholder="@T("Common_Reason")" maxlength="300" /></div>
                     </form>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white"><strong>Record customer return (in)</strong></div>
+                <div class="card-header bg-white"><strong>@T("Batches_ReturnTitle")</strong></div>
                 <div class="card-body">
                     <form asp-area="Inventory" asp-controller="Stock" asp-action="Return" method="post">
                         <input type="hidden" name="BatchId" value="@Model.Id" />
                         <div class="row g-2 align-items-end">
-                            <div class="col-sm-4"><input type="number" name="Quantity" class="form-control" min="1" placeholder="Quantity" required /></div>
-                            <div class="col-sm-5"><input type="text" name="OrderReferenceId" class="form-control" placeholder="Original order (optional Guid)" /></div>
-                            <div class="col-sm-3"><button type="submit" class="btn btn-success w-100">Return in</button></div>
+                            <div class="col-sm-4"><input type="number" name="Quantity" class="form-control" min="1" placeholder="@T("Common_Quantity")" required /></div>
+                            <div class="col-sm-5"><input type="text" name="OrderReferenceId" class="form-control" placeholder="@T("Batches_OriginalOrder")" /></div>
+                            <div class="col-sm-3"><button type="submit" class="btn btn-success w-100">@T("Batches_ReturnIn")</button></div>
                         </div>
-                        <div class="mt-2"><input type="text" name="Reason" class="form-control" placeholder="Reason (optional)" maxlength="300" /></div>
+                        <div class="mt-2"><input type="text" name="Reason" class="form-control" placeholder="@T("Common_Reason")" maxlength="300" /></div>
                     </form>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white"><strong>Physical count adjustment</strong></div>
+                <div class="card-header bg-white"><strong>@T("Batches_AdjustTitle")</strong></div>
                 <div class="card-body">
                     <form asp-area="Inventory" asp-controller="Stock" asp-action="Adjust" method="post">
                         <input type="hidden" name="BatchId" value="@Model.Id" />
                         <div class="row g-2 align-items-end">
-                            <div class="col-sm-5"><input type="number" name="WarehouseId" class="form-control" placeholder="Warehouse (store first)" hidden /></div>
                             <div class="col-sm-4">
-                                <label class="form-label">Warehouse</label>
+                                <label class="form-label">@T("Common_Warehouse")</label>
                                 <select name="WarehouseId" class="form-select" required>
                                     @foreach (var w in warehouses?.Items ?? Enumerable.Empty<WarehouseDto>())
                                     {
@@ -181,22 +193,22 @@
                                     }
                                 </select>
                             </div>
-                            <div class="col-sm-3"><input type="number" name="CountedQuantity" class="form-control" min="0" placeholder="Counted" required /></div>
+                            <div class="col-sm-3"><input type="number" name="CountedQuantity" class="form-control" min="0" placeholder="@T("Batches_Counted")" required /></div>
                         </div>
-                        <div class="mt-2"><input type="text" name="Reason" class="form-control" placeholder="Reason (required for adjustments)" maxlength="300" required /></div>
+                        <div class="mt-2"><input type="text" name="Reason" class="form-control" placeholder="@T("Batches_AdjustReason")" maxlength="300" required /></div>
                     </form>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white"><strong>Damaged stock write-off</strong></div>
+                <div class="card-header bg-white"><strong>@T("Batches_DamageTitle")</strong></div>
                 <div class="card-body">
                     <form asp-area="Inventory" asp-controller="Stock" asp-action="Damage" method="post">
                         <input type="hidden" name="BatchId" value="@Model.Id" />
                         <div class="row g-2 align-items-end">
                             <div class="col-sm-4">
-                                <label class="form-label">Warehouse</label>
+                                <label class="form-label">@T("Common_Warehouse")</label>
                                 <select name="WarehouseId" class="form-select" required>
                                     @foreach (var w in warehouses?.Items ?? Enumerable.Empty<WarehouseDto>())
                                     {
@@ -204,11 +216,11 @@
                                     }
                                 </select>
                             </div>
-                            <div class="col-sm-3"><input type="number" name="Quantity" class="form-control" min="1" placeholder="Quantity" required /></div>
-                            <div class="col-sm-3"><input type="text" name="ReferenceId" class="form-control" placeholder="Ref (optional Guid)" /></div>
-                            <div class="col-sm-2"><button type="submit" class="btn btn-danger w-100">Write off</button></div>
+                            <div class="col-sm-3"><input type="number" name="Quantity" class="form-control" min="1" placeholder="@T("Common_Quantity")" required /></div>
+                            <div class="col-sm-3"><input type="text" name="ReferenceId" class="form-control" placeholder="@T("Batches_Ref")" /></div>
+                            <div class="col-sm-2"><button type="submit" class="btn btn-danger w-100">@T("Batches_WriteOff")</button></div>
                         </div>
-                        <div class="mt-2"><input type="text" name="Reason" class="form-control" placeholder="Damage description (required)" maxlength="300" required /></div>
+                        <div class="mt-2"><input type="text" name="Reason" class="form-control" placeholder="@T("Batches_DamageReason")" maxlength="300" required /></div>
                     </form>
                 </div>
             </div>
@@ -216,19 +228,19 @@
     </div>
 
     <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white"><strong>Movement history (audit trail)</strong></div>
+        <div class="card-header bg-white"><strong>@T("Batches_MovementHistory")</strong></div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table-hover mb-0 table align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th class="ps-4">Date (UTC)</th>
-                            <th>Type</th>
-                            <th>Quantity</th>
-                            <th>Warehouse</th>
-                            <th>Reference</th>
-                            <th>Reason</th>
-                            <th class="pe-4 text-end">Correct</th>
+                            <th class="ps-4">@T("Common_Date")</th>
+                            <th>@T("Common_Type")</th>
+                            <th>@T("Common_Quantity")</th>
+                            <th>@T("Common_Warehouse")</th>
+                            <th>@T("Common_Reference")</th>
+                            <th>@T("Common_Reason")</th>
+                            <th class="pe-4 text-end">@T("Batches_Col_Correct")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -236,15 +248,10 @@
                         {
                             @foreach (var m in movements)
                             {
-                                var typeNames = new Dictionary<int, string>
-                                {
-                                    { 0, "PurchaseIn" }, { 1, "SaleOut" }, { 2, "TransferIn" }, { 3, "TransferOut" },
-                                    { 4, "AdjustmentIn" }, { 5, "AdjustmentOut" }, { 6, "OrderReturn" }
-                                };
                                 var transferLeg = m.MovementType == 2 || m.MovementType == 3;
                                 <tr>
                                     <td class="ps-4">@m.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
-                                    <td><span class="badge text-bg-@(m.MovementType == 0 || m.MovementType == 2 || m.MovementType == 4 || m.MovementType == 6 ? "success" : "danger")">@typeNames[m.MovementType]</span></td>
+                                    <td><span class="badge text-bg-@(m.MovementType == 0 || m.MovementType == 2 || m.MovementType == 4 || m.MovementType == 6 ? "success" : "danger")">@MoveType(m.MovementType)</span></td>
                                     <td>@m.Quantity</td>
                                     <td><small>@m.WarehouseId</small></td>
                                     <td><small>@(m.ReferenceId?.ToString() ?? "-")</small></td>
@@ -254,13 +261,13 @@
                                         {
                                             <form asp-area="Inventory" asp-controller="Stock" asp-action="ReverseMovement" asp-route-id="@m.Id" method="post" class="d-inline-flex gap-1">
                                                 <input type="hidden" name="batchId" value="@Model.Id" />
-                                                <input type="text" name="reason" class="form-control form-control-sm" style="max-width: 170px;" placeholder="Correction reason" required maxlength="290" />
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Appends an opposite, auditable correction movement">Reverse</button>
+                                                <input type="text" name="reason" class="form-control form-control-sm" style="max-width: 170px;" placeholder="@T("Batches_CorrectionReason")" required maxlength="290" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="@T("Batches_ReverseTitle")">@T("Batches_Reverse")</button>
                                             </form>
                                         }
                                         else
                                         {
-                                            <small class="text-muted">counter-transfer required</small>
+                                            <small class="text-muted">@T("Batches_CounterTransfer")</small>
                                         }
                                     </td>
                                 </tr>
@@ -268,7 +275,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="7" class="py-5 text-center text-muted">No movements recorded for this batch yet.</td></tr>
+                            <tr><td colspan="7" class="py-5 text-center text-muted">@T("Batches_NoMovements")</td></tr>
                         }
                     </tbody>
                 </table>

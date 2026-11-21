@@ -1,15 +1,15 @@
 @model UpdateCategoryCommand
 @{
-    ViewData["Title"] = "Edit Category";
+    ViewData["Title"] = Loc.T("Categories_EditTitle");
     Layout = "~/Views/Shared/_Layout.cshtml";
+    string T(string key) => Loc.T(key);
 }
 
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-6">
             <div class="mb-4">
-                <h2 class="mb-1">Edit Category</h2>
-                <p class="text-muted mb-0">UseCase: UpdateCategoryCommand</p>
+                <h2 class="mb-1">@T("Categories_EditTitle")</h2>
             </div>
 
             <div class="card border-0 shadow-sm">
@@ -20,20 +20,20 @@
                         <input type="hidden" asp-for="CategoryId" />
 
                         <div class="mb-3">
-                            <label class="form-label text-muted small">Category ID</label>
+                            <label class="form-label text-muted small">@T("Categories_Id")</label>
                             <div class="font-monospace small text-muted">@Model.CategoryId</div>
                         </div>
 
                         <div class="mb-4">
-                            <label asp-for="Name" class="form-label">Category Name</label>
-                            <input asp-for="Name" class="form-control" placeholder="Enter new category name" />
+                            <label asp-for="Name" class="form-label">@T("Categories_Name")</label>
+                            <input asp-for="Name" class="form-control" placeholder="@T("Categories_NameEditPlaceholder")" />
                             <span asp-validation-for="Name" class="text-danger small"></span>
                         </div>
 
                         <div class="d-flex justify-content-end gap-2">
-                            <a asp-area="Catalog" asp-controller="Categories" asp-action="Index" class="btn btn-light">Cancel</a>
-                            <a asp-area="Catalog" asp-controller="Categories" asp-action="Details" asp-route-id="@Model.CategoryId" class="btn btn-outline-secondary">Details</a>
-                            <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                            <a asp-area="Catalog" asp-controller="Categories" asp-action="Index" class="btn btn-light">@T("Common_Cancel")</a>
+                            <a asp-area="Catalog" asp-controller="Categories" asp-action="Details" asp-route-id="@Model.CategoryId" class="btn btn-outline-secondary">@T("Common_Details")</a>
+                            <button type="submit" class="btn btn-primary px-4">@T("Common_SaveChanges")</button>
                         </div>
                     </form>
                 </div>

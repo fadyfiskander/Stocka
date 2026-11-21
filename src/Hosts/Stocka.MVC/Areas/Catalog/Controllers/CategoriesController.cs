@@ -2,6 +2,7 @@ using Catalog.Contracts.DTOs.Category;
 using Catalog.Contracts.UseCases.CategoryCases;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Stocka.MVC.Localization;
 using Stocka.MVC.Models;
 using System.Diagnostics;
 
@@ -25,7 +26,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
-            ViewBag.Title = "Categories";
+            ViewBag.Title = Loc.T("Categories_Title");
             var query = new ListCategoriesQuery { OrganizationId = Guid.Empty };
             var categories = await _categoryCases.ListCategoriesAsync(query);
             return View(categories);
@@ -37,11 +38,11 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         public async Task<IActionResult> Details(Guid id)
         {
             if (id == Guid.Empty)
-                return RedirectToAction(nameof(Error), new { message = "Category ID is required." });
+                return RedirectToAction(nameof(Error), new { message = Loc.T("Msg_CategoryIdRequired") });
 
             try
             {
-                ViewBag.Title = "Category Details";
+                ViewBag.Title = Loc.T("Categories_DetailsTitle");
                 var category = await _categoryCases.RetrieveCategoryAsync(new RetrieveCategoryQuery(id));
                 return View(category);
             }
@@ -62,7 +63,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         [HttpGet("SearchByName")]
         public async Task<IActionResult> SearchByName(string? name)
         {
-            ViewBag.Title = "Search Category";
+            ViewBag.Title = Loc.T("Categories_SearchTitle");
             if (string.IsNullOrWhiteSpace(name))
                 return View(null);
 
@@ -88,7 +89,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         [HttpGet("Create")]
         public IActionResult Create()
         {
-            ViewBag.Title = "Create Category";
+            ViewBag.Title = Loc.T("Categories_CreateTitle");
             return View(new RegisterCategoryCommand());
         }
 
@@ -106,11 +107,11 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
                 var result = await _categoryCases.RegisterCategoryAsync(command);
                 if (result is null)
                 {
-                    ModelState.AddModelError(string.Empty, "Failed to create category.");
+                    ModelState.AddModelError(string.Empty, Loc.T("Msg_CategoryCreateFailed"));
                     return View(command);
                 }
 
-                TempData["Success"] = $"Category '{result.Name}' created successfully.";
+                TempData["Success"] = Loc.F("Msg_CategoryCreated", result.Name);
                 return RedirectToAction(nameof(Details), new { id = result.Id });
             }
             catch (ArgumentNullException ex)
@@ -131,12 +132,12 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         public async Task<IActionResult> Edit(Guid id)
         {
             if (id == Guid.Empty)
-                return RedirectToAction(nameof(Error), new { message = "Category ID is required." });
+                return RedirectToAction(nameof(Error), new { message = Loc.T("Msg_CategoryIdRequired") });
 
             try
             {
                 var category = await _categoryCases.RetrieveCategoryAsync(new RetrieveCategoryQuery(id));
-                ViewBag.Title = "Edit Category";
+                ViewBag.Title = Loc.T("Categories_EditTitle");
                 return View(new UpdateCategoryCommand
                 {
                     CategoryId = category.Id,
@@ -162,7 +163,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
             try
             {
                 var result = await _categoryCases.UpdateCategoryAsync(command);
-                TempData["Success"] = $"Category '{result.Name}' updated successfully.";
+                TempData["Success"] = Loc.F("Msg_CategoryUpdated", result.Name);
                 return RedirectToAction(nameof(Details), new { id = result.Id });
             }
             catch (KeyNotFoundException ex)
@@ -185,14 +186,14 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         {
             if (id == Guid.Empty)
             {
-                TempData["Error"] = "Category ID is required.";
+                TempData["Error"] = Loc.T("Msg_CategoryIdRequired");
                 return RedirectToAction(nameof(Index));
             }
 
             try
             {
                 var result = await _categoryCases.ActivateCategoryAsync(new ActivateCategoryCommand(id));
-                TempData["Success"] = $"Category '{result.Name}' activated.";
+                TempData["Success"] = Loc.F("Msg_CategoryActivated", result.Name);
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is ArgumentException)
             {
@@ -210,14 +211,14 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         {
             if (id == Guid.Empty)
             {
-                TempData["Error"] = "Category ID is required.";
+                TempData["Error"] = Loc.T("Msg_CategoryIdRequired");
                 return RedirectToAction(nameof(Index));
             }
 
             try
             {
                 var result = await _categoryCases.DeactivateCategoryAsync(new DeactivateCategoryCommand(id));
-                TempData["Success"] = $"Category '{result.Name}' deactivated.";
+                TempData["Success"] = Loc.F("Msg_CategoryDeactivated", result.Name);
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is ArgumentException)
             {
@@ -231,7 +232,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error(string? message)
         {
-            ViewBag.ErrorMessage = message ?? "An error occurred.";
+            ViewBag.ErrorMessage = message ?? Loc.T("Msg_GenericError");
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }

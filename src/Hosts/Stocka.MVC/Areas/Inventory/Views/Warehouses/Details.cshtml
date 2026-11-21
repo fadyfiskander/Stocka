@@ -1,47 +1,49 @@
 ﻿@model WarehouseDto
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = Loc.T("Warehouses_DetailsTitle");
+    string T(string key) => Loc.T(key);
     var inventory = (PaginatedResult<Inventory.Contracts.DTOs.Reports.WarehouseInventoryItemDto>?)ViewBag.Inventory;
 }
 
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">@Model.Name <span class="badge text-bg-@(Model.IsActive ? "success" : "secondary")">@(Model.IsActive ? "Active" : "Inactive")</span></h2>
-            <p class="text-muted mb-0">@Model.Location &middot; @(Model.Type == 0 ? "Shop" : "Storage") &middot; @ViewBag.TotalUnits current units (raw unit count)</p>
+            <h2 class="mb-1">@Model.Name <span class="badge text-bg-@(Model.IsActive ? "success" : "secondary")">@(Model.IsActive ? T("Common_Active") : T("Common_Inactive"))</span></h2>
+            <p class="text-muted mb-0">@Model.Location &middot; @(Model.Type == 0 ? T("Warehouses_Type_Shop") : T("Warehouses_Type_Storage")) &middot; @Loc.F("Warehouses_DetailsSub", ViewBag.TotalUnits)</p>
         </div>
         <div class="d-flex gap-2">
-            <a class="btn btn-outline-secondary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
-            <a class="btn btn-outline-secondary" asp-area="Inventory" asp-controller="Stock" asp-action="Movements" asp-route-warehouseId="@Model.Id">Movements</a>
-            <a class="btn btn-outline-primary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index">Back to list</a>
+            <a class="btn btn-outline-secondary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Edit" asp-route-id="@Model.Id">@T("Common_Edit")</a>
+            <a class="btn btn-outline-secondary" asp-area="Inventory" asp-controller="Stock" asp-action="Movements" asp-route-warehouseId="@Model.Id">@T("Warehouses_Movements")</a>
+            <a class="btn btn-outline-primary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index">@T("Common_BackToList")</a>
         </div>
     </div>
 
     <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white"><strong>Warehouse details</strong></div>
+        <div class="card-header bg-white"><strong>@T("Warehouses_DetailsTitle")</strong></div>
         <div class="card-body">
             <dl class="row mb-0">
-                <dt class="col-sm-3">Name</dt><dd class="col-sm-9">@Model.Name</dd>
-                <dt class="col-sm-3">Location</dt><dd class="col-sm-9">@Model.Location</dd>
-                <dt class="col-sm-3">Description</dt><dd class="col-sm-9">@Model.Description</dd>
-                <dt class="col-sm-3">Organization</dt><dd class="col-sm-9">@Model.OrganizationId</dd>
-                <dt class="col-sm-3">Warehouse ID</dt><dd class="col-sm-9">@Model.Id</dd>
+                <dt class="col-sm-3">@T("Common_Name")</dt><dd class="col-sm-9">@Model.Name</dd>
+                <dt class="col-sm-3">@T("Common_Location")</dt><dd class="col-sm-9">@Model.Location</dd>
+                <dt class="col-sm-3">@T("Common_Description")</dt><dd class="col-sm-9">@Model.Description</dd>
+                <dt class="col-sm-3">@T("Common_Organization")</dt><dd class="col-sm-9">@Model.OrganizationId</dd>
+                <dt class="col-sm-3">@T("Warehouses_WarehouseId")</dt><dd class="col-sm-9">@Model.Id</dd>
             </dl>
         </div>
     </div>
 
     <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white"><strong>Inventory (product &amp; batch breakdown)</strong></div>
+        <div class="card-header bg-white"><strong>@T("Warehouses_InventoryTitle")</strong></div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table-hover mb-0 table align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th class="ps-4">Product</th>
-                            <th>Batch</th>
-                            <th>Quantity</th>
-                            <th>Batch unit cost</th>
-                            <th class="pe-4 text-end">Line cost (recorded, no valuation policy)</th>
+                            <th class="ps-4">@T("Common_Product")</th>
+                            <th>@T("Common_Batch")</th>
+                            <th>@T("Common_Quantity")</th>
+                            <th>@T("Warehouses_BatchUnitCost")</th>
+                            <th class="pe-4 text-end">@T("Warehouses_LineCost")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -62,7 +64,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="5" class="py-5 text-center text-muted">No stock placements recorded in this warehouse.</td></tr>
+                            <tr><td colspan="5" class="py-5 text-center text-muted">@T("Warehouses_InventoryEmpty")</td></tr>
                         }
                     </tbody>
                 </table>
@@ -73,12 +75,12 @@
     @if (inventory != null)
     {
         <div class="d-flex justify-content-between align-items-center mt-3">
-            <small class="text-muted">Page @inventory.Page of @inventory.TotalPages (@inventory.TotalCount placements)</small>
+            <small class="text-muted">@Loc.F("Common_PageOf", inventory.Page, inventory.TotalPages) @Loc.F("Warehouses_Placements", inventory.TotalCount)</small>
             <div class="btn-group">
                 <a asp-area="Inventory" asp-controller="Warehouses" asp-action="Details" asp-route-id="@Model.Id" asp-route-inventoryPage="@(inventory.Page - 1)"
-                   class="btn btn-sm btn-outline-secondary @(inventory.HasPrevious ? "" : "disabled")">Previous</a>
+                   class="btn btn-sm btn-outline-secondary @(inventory.HasPrevious ? "" : "disabled")">@T("Common_Previous")</a>
                 <a asp-area="Inventory" asp-controller="Warehouses" asp-action="Details" asp-route-id="@Model.Id" asp-route-inventoryPage="@(inventory.Page + 1)"
-                   class="btn btn-sm btn-outline-secondary @(inventory.HasNext ? "" : "disabled")">Next</a>
+                   class="btn btn-sm btn-outline-secondary @(inventory.HasNext ? "" : "disabled")">@T("Common_Next")</a>
             </div>
         </div>
     }

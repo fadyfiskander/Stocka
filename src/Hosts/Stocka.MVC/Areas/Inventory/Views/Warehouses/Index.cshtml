@@ -1,7 +1,8 @@
 @model PaginatedResult<WarehouseDto>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = "Warehouses";
+    ViewData["Title"] = Loc.T("Warehouses_Title");
+    string T(string key) => Loc.T(key);
 }
 
 <div class="container-fluid py-4">
@@ -22,19 +23,19 @@
 
     <div class="d-flex justify-content-between align-items-center mb-2">
         <div>
-            <h2 class="mb-1">Warehouses</h2>
-            <p class="text-muted mb-0">Storage locations of the current organization.</p>
+            <h2 class="mb-1">@T("Warehouses_Title")</h2>
+            <p class="text-muted mb-0">@T("Warehouses_Sub")</p>
         </div>
         <div class="d-flex gap-2">
-            <a class="btn btn-outline-secondary" asp-area="Inventory" asp-controller="Warehouses" asp-action="SearchByName">Search by Name</a>
-            <a class="btn btn-primary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Create">Register Warehouse</a>
+            <a class="btn btn-outline-secondary" asp-area="Inventory" asp-controller="Warehouses" asp-action="SearchByName">@T("Products_SearchByName")</a>
+            <a class="btn btn-primary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Create">@T("Warehouses_Register")</a>
         </div>
     </div>
 
     <div class="btn-group mb-3" role="group">
-        <a class="btn btn-sm btn-outline-secondary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index">All (@Model.TotalCount)</a>
-        <a class="btn btn-sm btn-outline-success" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index" asp-route-isActive="true">Active</a>
-        <a class="btn btn-sm btn-outline-secondary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index" asp-route-isActive="false">Inactive</a>
+        <a class="btn btn-sm btn-outline-secondary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index">@Loc.F("Warehouses_All", Model.TotalCount)</a>
+        <a class="btn btn-sm btn-outline-success" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index" asp-route-isActive="true">@T("Common_Active")</a>
+        <a class="btn btn-sm btn-outline-secondary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index" asp-route-isActive="false">@T("Common_Inactive")</a>
     </div>
 
     <div class="card border-0 shadow-sm">
@@ -43,11 +44,11 @@
                 <table class="table-hover mb-0 table align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th class="ps-4">Name</th>
-                            <th>Location</th>
-                            <th>Type</th>
-                            <th>Status</th>
-                            <th class="pe-4 text-end">Actions</th>
+                            <th class="ps-4">@T("Common_Name")</th>
+                            <th>@T("Common_Location")</th>
+                            <th>@T("Common_Type")</th>
+                            <th>@T("Common_Status")</th>
+                            <th class="pe-4 text-end">@T("Common_Actions")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -61,31 +62,31 @@
                                         <small class="text-muted">@warehouse.Id</small>
                                     </td>
                                     <td>@warehouse.Location</td>
-                                    <td>@(warehouse.Type == 0 ? "Shop" : "Storage")</td>
+                                    <td>@(warehouse.Type == 0 ? T("Warehouses_Type_Shop") : T("Warehouses_Type_Storage"))</td>
                                     <td>
                                         @if (warehouse.IsActive)
                                         {
-                                            <span class="badge text-bg-success">Active</span>
+                                            <span class="badge text-bg-success">@T("Common_Active")</span>
                                         }
                                         else
                                         {
-                                            <span class="badge text-bg-secondary">Inactive</span>
+                                            <span class="badge text-bg-secondary">@T("Common_Inactive")</span>
                                         }
                                     </td>
                                     <td class="pe-4 text-end">
                                         <div class="btn-group" role="group">
-                                            <a class="btn btn-sm btn-outline-primary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Details" asp-route-id="@warehouse.Id">Details</a>
-                                            <a class="btn btn-sm btn-outline-secondary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Edit" asp-route-id="@warehouse.Id">Edit</a>
+                                            <a class="btn btn-sm btn-outline-primary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Details" asp-route-id="@warehouse.Id">@T("Common_Details")</a>
+                                            <a class="btn btn-sm btn-outline-secondary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Edit" asp-route-id="@warehouse.Id">@T("Common_Edit")</a>
                                             @if (warehouse.IsActive)
                                             {
                                                 <form asp-area="Inventory" asp-controller="Warehouses" asp-action="Deactivate" asp-route-id="@warehouse.Id" method="post" class="d-inline">
-                                                    <button type="submit" class="btn btn-sm btn-outline-warning">Deactivate</button>
+                                                    <button type="submit" class="btn btn-sm btn-outline-warning">@T("Common_Deactivate")</button>
                                                 </form>
                                             }
                                             else
                                             {
                                                 <form asp-area="Inventory" asp-controller="Warehouses" asp-action="Activate" asp-route-id="@warehouse.Id" method="post" class="d-inline">
-                                                    <button type="submit" class="btn btn-sm btn-outline-success">Activate</button>
+                                                    <button type="submit" class="btn btn-sm btn-outline-success">@T("Common_Activate")</button>
                                                 </form>
                                             }
                                         </div>
@@ -95,7 +96,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="5" class="py-5 text-center text-muted">No warehouses found.</td></tr>
+                            <tr><td colspan="5" class="py-5 text-center text-muted">@T("Warehouses_Empty")</td></tr>
                         }
                     </tbody>
                 </table>
@@ -104,12 +105,12 @@
     </div>
 
     <div class="d-flex justify-content-between align-items-center mt-3">
-        <small class="text-muted">Page @Model.Page of @Model.TotalPages (@Model.TotalCount warehouses)</small>
+        <small class="text-muted">@Loc.F("Common_PageOf", Model.Page, Model.TotalPages) (@Model.TotalCount)</small>
         <div class="btn-group">
             <a asp-area="Inventory" asp-controller="Warehouses" asp-action="Index" asp-route-page="@(Model.Page - 1)"
-               class="btn btn-sm btn-outline-secondary @(Model.HasPrevious ? "" : "disabled")">Previous</a>
+               class="btn btn-sm btn-outline-secondary @(Model.HasPrevious ? "" : "disabled")">@T("Common_Previous")</a>
             <a asp-area="Inventory" asp-controller="Warehouses" asp-action="Index" asp-route-page="@(Model.Page + 1)"
-               class="btn btn-sm btn-outline-secondary @(Model.HasNext ? "" : "disabled")">Next</a>
+               class="btn btn-sm btn-outline-secondary @(Model.HasNext ? "" : "disabled")">@T("Common_Next")</a>
         </div>
     </div>
 </div>

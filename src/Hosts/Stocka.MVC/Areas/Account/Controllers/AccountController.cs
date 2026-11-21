@@ -146,7 +146,7 @@ namespace Stocka.MVC.Areas.Account.Controllers
             {
                 ModelState.AddModelError(
                     string.Empty,
-                    "Invalid email or password."
+                    Stocka.MVC.Localization.Loc.T("Login_InvalidCredentials")
                 );
 
                 return View(model);
@@ -175,7 +175,7 @@ namespace Stocka.MVC.Areas.Account.Controllers
         [HttpGet("AccessDenied")]
         public IActionResult AccessDenied()
         {
-            ViewBag.Title = "Access Denied";
+            ViewBag.Title = Stocka.MVC.Localization.Loc.T("Denied_Title");
             return View();
         }
 

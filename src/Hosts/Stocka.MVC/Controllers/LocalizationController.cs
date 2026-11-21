@@ -13,7 +13,15 @@ public sealed class LocalizationController : Controller
         Response.Cookies.Append(
             CookieRequestCultureProvider.DefaultCookieName,
             CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
-            new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1), IsEssential = true });
+            new CookieOptions
+            {
+                // Path must be "/" — without it the cookie is scoped to /Localization
+                // and never reaches the rest of the app, so the switch looks dead.
+                Path = "/",
+                Expires = DateTimeOffset.UtcNow.AddYears(1),
+                IsEssential = true,
+                SameSite = SameSiteMode.Lax
+            });
 
         return LocalRedirect(Url.IsLocalUrl(returnUrl) ? returnUrl! : "/");
     }

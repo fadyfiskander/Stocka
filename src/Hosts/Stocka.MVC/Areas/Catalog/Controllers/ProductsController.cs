@@ -4,6 +4,7 @@ using Catalog.Contracts.UseCases.ProductCases;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Stocka.MVC.Localization;
 using Stocka.MVC.Models;
 using System.Diagnostics;
 
@@ -29,7 +30,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
-            ViewBag.Title = "Products";
+            ViewBag.Title = Loc.T("Products_Title");
             var products = await _productCases.ListProductsAsync(new ListProductsQuery { OrganizationId = null });
 
             if (products == null || !products.Any())
@@ -51,7 +52,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
 
             try
             {
-                ViewBag.Title = "Product Details";
+                ViewBag.Title = Loc.T("Products_DetailsTitle");
                 var product = await _productCases.RetrieveProductAsync(new RetrieveProductQuery(id));
                 return View(product);
             }
@@ -59,8 +60,8 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
             {
                 return RedirectToAction(nameof(Handler), new
                 {
-                    HandlerText = "We're sorry, but the product you're looking for isn't available right now. It might have been moved, deleted, or the link could be incorrect.",
-                    Title = "Product Not Found"
+                    HandlerText = Loc.T("Msg_ProductUnavailable"),
+                    Title = Loc.T("Msg_ProductUnavailableTitle")
                 });
             }
         }
@@ -70,7 +71,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         [HttpGet("SearchByName")]
         public async Task<IActionResult> SearchByName(string? name)
         {
-            ViewBag.Title = "Search Product";
+            ViewBag.Title = Loc.T("Products_SearchTitle");
             if (string.IsNullOrWhiteSpace(name))
                 return View(null);
 
@@ -97,7 +98,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         public async Task<IActionResult> Create()
         {
             await PopulateCategoriesAsync();
-            ViewBag.Title = "Create Product";
+            ViewBag.Title = Loc.T("Products_CreateTitle");
             return View(new RegisterProductCommand());
         }
 
@@ -119,11 +120,11 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
                 if (createdProduct is null)
                 {
                     await PopulateCategoriesAsync();
-                    ModelState.AddModelError(string.Empty, "Failed to create product.");
+                    ModelState.AddModelError(string.Empty, Loc.T("Msg_ProductCreateFailed"));
                     return View(command);
                 }
 
-                TempData["Success"] = $"Product '{createdProduct.Name}' created successfully.";
+                TempData["Success"] = Loc.F("Msg_ProductCreated", createdProduct.Name);
                 return RedirectToAction(nameof(Details), new { id = createdProduct.Id });
             }
             catch (Exception ex) when (ex is ArgumentNullException || ex is ArgumentException || ex is ArgumentOutOfRangeException || ex is KeyNotFoundException)
@@ -145,7 +146,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
             try
             {
                 var product = await _productCases.RetrieveProductAsync(new RetrieveProductQuery(id));
-                ViewBag.Title = "Edit Product";
+                ViewBag.Title = Loc.T("Products_EditTitle");
 
                 await PopulateCategoriesAsync();
                 return View(new UpdateProductCommand
@@ -160,7 +161,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
             }
             catch (Exception ex) when (ex is KeyNotFoundException or AggregateException)
             {
-                return RedirectToAction(nameof(Handler), new { HandlerText = "Product not found.", Title = "Not Found" });
+                return RedirectToAction(nameof(Handler), new { HandlerText = Loc.T("Msg_ProductNotFound"), Title = Loc.T("Msg_NotFoundTitle") });
             }
         }
 
@@ -179,7 +180,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
             try
             {
                 var result = await _productCases.UpdateProductAsync(command);
-                TempData["Success"] = $"Product '{result.Name}' updated successfully.";
+                TempData["Success"] = Loc.F("Msg_ProductUpdated", result.Name);
                 return RedirectToAction(nameof(Details), new { id = result.Id });
             }
             catch (KeyNotFoundException ex)
@@ -204,14 +205,14 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         {
             if (id == Guid.Empty)
             {
-                TempData["Error"] = "Product ID is required.";
+                TempData["Error"] = Loc.T("Msg_ProductIdRequired");
                 return RedirectToAction(nameof(Index));
             }
 
             try
             {
                 var result = await _productCases.ActivateProductAsync(new ActivateProductCommand(id));
-                TempData["Success"] = $"Product '{result.Name}' activated.";
+                TempData["Success"] = Loc.F("Msg_ProductActivated", result.Name);
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is ArgumentException)
             {
@@ -229,14 +230,14 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         {
             if (id == Guid.Empty)
             {
-                TempData["Error"] = "Product ID is required.";
+                TempData["Error"] = Loc.T("Msg_ProductIdRequired");
                 return RedirectToAction(nameof(Index));
             }
 
             try
             {
                 var result = await _productCases.DeactivateProductAsync(new DeactivateProductCommand(id));
-                TempData["Success"] = $"Product '{result.Name}' deactivated.";
+                TempData["Success"] = Loc.F("Msg_ProductDeactivated", result.Name);
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is ArgumentException)
             {

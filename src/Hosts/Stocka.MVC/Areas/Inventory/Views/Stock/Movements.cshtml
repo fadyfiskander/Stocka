@@ -1,36 +1,48 @@
 ﻿@model PaginatedResult<Inventory.Contracts.DTOs.StockMovement.StockMovementDto>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = Loc.T("StockMovements_Title");
+    string T(string key) => Loc.T(key);
+    string MoveType(int t) => Loc.T(t switch
+    {
+        0 => "Move_PurchaseIn",
+        1 => "Move_SaleOut",
+        2 => "Move_TransferIn",
+        3 => "Move_TransferOut",
+        4 => "Move_AdjustmentIn",
+        5 => "Move_AdjustmentOut",
+        6 => "Move_OrderReturn",
+        _ => "Move_PurchaseIn"
+    });
+    int[] typeIds = { 0, 1, 2, 3, 4, 5, 6 };
     var warehouseId = (Guid?)ViewBag.WarehouseId;
     var batchId = (Guid?)ViewBag.BatchId;
     var productId = (Guid?)ViewBag.ProductId;
     var from = (DateTime?)ViewBag.From;
     var to = (DateTime?)ViewBag.To;
     var types = (int?[]?)ViewBag.Types ?? Array.Empty<int?>();
-    string[] typeNames = { "PurchaseIn", "SaleOut", "TransferIn", "TransferOut", "AdjustmentIn", "AdjustmentOut", "OrderReturn" };
 }
 
 <div class="container-fluid py-4">
-    <h2 class="mb-1">Stock Movements</h2>
-    <p class="text-muted mb-3">Movement audit trail. Filters, pagination and aggregation run in the database.</p>
+    <h2 class="mb-1">@T("StockMovements_Title")</h2>
+    <p class="text-muted mb-3">@T("StockMovements_Sub")</p>
 
     <form method="get" class="row g-2 mb-3" asp-area="Inventory" asp-controller="Stock" asp-action="Movements">
-        <div class="col-md-3"><input type="text" class="form-control" name="warehouseId" placeholder="Warehouse (Guid)" value="@warehouseId" /></div>
-        <div class="col-md-3"><input type="text" class="form-control" name="productId" placeholder="Product (Guid)" value="@productId" /></div>
-        <div class="col-md-3"><input type="text" class="form-control" name="batchId" placeholder="Batch (Guid)" value="@batchId" /></div>
+        <div class="col-md-3"><input type="text" class="form-control" name="warehouseId" placeholder="@T("StockMovements_FilterWarehouse")" value="@warehouseId" /></div>
+        <div class="col-md-3"><input type="text" class="form-control" name="productId" placeholder="@T("StockMovements_FilterProduct")" value="@productId" /></div>
+        <div class="col-md-3"><input type="text" class="form-control" name="batchId" placeholder="@T("StockMovements_FilterBatch")" value="@batchId" /></div>
         <div class="col-md-2"><input type="date" class="form-control" name="from" value="@(from?.ToString("yyyy-MM-dd"))" /></div>
         <div class="col-md-2"><input type="date" class="form-control" name="to" value="@(to?.ToString("yyyy-MM-dd"))" /></div>
         <div class="col-12 d-flex gap-3 align-items-center flex-wrap">
-            @for (var i = 0; i < typeNames.Length; i++)
+            @foreach (var id in typeIds)
             {
-                var id = i;
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" name="types" value="@id" id="type-@id" checked="@(types.Contains(id))" />
-                    <label class="form-check-label" for="type-@id">@typeNames[i]</label>
+                    <label class="form-check-label" for="type-@id">@MoveType(id)</label>
                 </div>
             }
-            <button type="submit" class="btn btn-sm btn-outline-primary">Apply filters</button>
-            <a class="btn btn-sm btn-outline-secondary" asp-area="Inventory" asp-controller="Stock" asp-action="Movements">Clear</a>
+            <button type="submit" class="btn btn-sm btn-outline-primary">@T("StockMovements_ApplyFilters")</button>
+            <a class="btn btn-sm btn-outline-secondary" asp-area="Inventory" asp-controller="Stock" asp-action="Movements">@T("Common_Clear")</a>
         </div>
     </form>
 
@@ -40,14 +52,14 @@
                 <table class="table-hover mb-0 table align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th class="ps-4">Date (UTC)</th>
-                            <th>Type</th>
-                            <th>Quantity</th>
-                            <th>Product</th>
-                            <th>Batch</th>
-                            <th>Warehouse</th>
-                            <th>Reference</th>
-                            <th>Reason</th>
+                            <th class="ps-4">@T("Common_Date")</th>
+                            <th>@T("Common_Type")</th>
+                            <th>@T("Common_Quantity")</th>
+                            <th>@T("Common_Product")</th>
+                            <th>@T("Common_Batch")</th>
+                            <th>@T("Common_Warehouse")</th>
+                            <th>@T("Common_Reference")</th>
+                            <th>@T("Common_Reason")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -57,7 +69,7 @@
                             {
                                 <tr>
                                     <td class="ps-4">@m.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
-                                    <td><span class="badge text-bg-@(m.MovementType == 0 || m.MovementType == 2 || m.MovementType == 4 || m.MovementType == 6 ? "success" : "danger")">@typeNames[m.MovementType]</span></td>
+                                    <td><span class="badge text-bg-@(m.MovementType == 0 || m.MovementType == 2 || m.MovementType == 4 || m.MovementType == 6 ? "success" : "danger")">@MoveType(m.MovementType)</span></td>
                                     <td>@m.Quantity</td>
                                     <td><small>@m.ProductId</small></td>
                                     <td><a asp-area="Inventory" asp-controller="Batches" asp-action="Details" asp-route-id="@m.BatchId"><small>@m.BatchId</small></a></td>
@@ -69,7 +81,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="8" class="py-5 text-center text-muted">No movements match the filters.</td></tr>
+                            <tr><td colspan="8" class="py-5 text-center text-muted">@T("StockMovements_Empty")</td></tr>
                         }
                     </tbody>
                 </table>
@@ -80,16 +92,16 @@
     @if (string.IsNullOrWhiteSpace(Context.Request.Query["batchId"]))
     {
         <div class="d-flex justify-content-between align-items-center mt-3">
-            <small class="text-muted">Page @Model.Page of @Model.TotalPages (@Model.TotalCount movements)</small>
+            <small class="text-muted">@Loc.F("StockMovements_PageInfo", Model.Page, Model.TotalPages, Model.TotalCount)</small>
             <div class="btn-group">
                 <a asp-area="Inventory" asp-controller="Stock" asp-action="Movements"
                    asp-route-warehouseId="@warehouseId" asp-route-batchId="@batchId" asp-route-productId="@productId"
                    asp-route-from="@from" asp-route-to="@to" asp-route-page="@(Model.Page - 1)"
-                   class="btn btn-sm btn-outline-secondary @(Model.HasPrevious ? "" : "disabled")">Previous</a>
+                   class="btn btn-sm btn-outline-secondary @(Model.HasPrevious ? "" : "disabled")">@T("Common_Previous")</a>
                 <a asp-area="Inventory" asp-controller="Stock" asp-action="Movements"
                    asp-route-warehouseId="@warehouseId" asp-route-batchId="@batchId" asp-route-productId="@productId"
                    asp-route-from="@from" asp-route-to="@to" asp-route-page="@(Model.Page + 1)"
-                   class="btn btn-sm btn-outline-secondary @(Model.HasNext ? "" : "disabled")">Next</a>
+                   class="btn btn-sm btn-outline-secondary @(Model.HasNext ? "" : "disabled")">@T("Common_Next")</a>
             </div>
         </div>
     }

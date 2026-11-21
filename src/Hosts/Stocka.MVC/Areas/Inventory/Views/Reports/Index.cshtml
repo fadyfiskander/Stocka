@@ -1,34 +1,46 @@
 ﻿@model Inventory.Contracts.DTOs.Reports.InventorySummaryDto
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = Loc.T("Reports_Title");
+    string T(string key) => Loc.T(key);
+    string MoveType(int t) => Loc.T(t switch
+    {
+        0 => "Move_PurchaseIn",
+        1 => "Move_SaleOut",
+        2 => "Move_TransferIn",
+        3 => "Move_TransferOut",
+        4 => "Move_AdjustmentIn",
+        5 => "Move_AdjustmentOut",
+        6 => "Move_OrderReturn",
+        _ => "Move_PurchaseIn"
+    });
     var totals = (IEnumerable<MovementTypeTotalsDto>?)ViewBag.MovementTotals;
-    string[] typeNames = { "PurchaseIn", "SaleOut", "TransferIn", "TransferOut", "AdjustmentIn", "AdjustmentOut", "OrderReturn" };
 }
 
 <div class="container-fluid py-4">
-    <h2 class="mb-1">Inventory Reports</h2>
-    <p class="text-muted mb-4">Organization-scoped rollup, generated @Model.GeneratedAtUtc.ToString("yyyy-MM-dd HH:mm") UTC.</p>
+    <h2 class="mb-1">@T("Reports_Title")</h2>
+    <p class="text-muted mb-4">@Loc.F("Reports_Sub", Model.GeneratedAtUtc.ToString("yyyy-MM-dd HH:mm"))</p>
 
     <div class="row g-3 mb-4">
-        <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">Warehouses</h6><h3 class="mb-0">@Model.TotalWarehouses <small class="fs-6 text-success">(@Model.ActiveWarehouses active)</small></h3></div></div></div>
-        <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">Batches</h6><h3 class="mb-0">@Model.TotalBatches <small class="fs-6 text-secondary">(@Model.ExhaustedBatches exhausted)</small></h3></div></div></div>
-        <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">Units in warehouses</h6><h3 class="mb-0">@Model.UnitsInWarehouses</h3><small class="text-muted">raw unit count, not capacity</small></div></div></div>
-        <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">Total unallocated</h6><h3 class="mb-0">@Model.UnallocatedUnits</h3><small class="text-muted">units never placed</small></div></div></div>
-        <div class="col-md-6"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">Total inventory cost (recorded batch unit costs)</h6><h3 class="mb-0">@Model.TotalInventoryCost.ToString("N2")</h3><small class="text-muted">No FIFO / weighted-average valuation policy approved â€” traceable cost data only.</small></div></div></div>
+        <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">@T("Reports_TotalWarehouses")</h6><h3 class="mb-0">@Model.TotalWarehouses <small class="fs-6 text-success">@Loc.F("Reports_ActiveCount", Model.ActiveWarehouses)</small></h3></div></div></div>
+        <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">@T("Reports_TotalBatches")</h6><h3 class="mb-0">@Model.TotalBatches <small class="fs-6 text-secondary">@Loc.F("Reports_ExhaustedCount", Model.ExhaustedBatches)</small></h3></div></div></div>
+        <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">@T("Reports_UnitsInWarehouses")</h6><h3 class="mb-0">@Model.UnitsInWarehouses</h3><small class="text-muted">@T("Reports_RawUnitCount")</small></div></div></div>
+        <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">@T("Reports_TotalUnallocated")</h6><h3 class="mb-0">@Model.UnallocatedUnits</h3><small class="text-muted">@T("Reports_NeverPlaced")</small></div></div></div>
+        <div class="col-md-6"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">@T("Reports_TotalCost")</h6><h3 class="mb-0">@Model.TotalInventoryCost.ToString("N2")</h3><small class="text-muted">@T("Reports_NoValuation")</small></div></div></div>
     </div>
 
     <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white"><strong>Movement totals by type (all time)</strong></div>
+        <div class="card-header bg-white"><strong>@T("Reports_MovementTotals")</strong></div>
         <div class="card-body p-0">
             <table class="table-hover mb-0 table align-middle">
-                <thead class="table-light"><tr><th class="ps-4">Type</th><th>Movements</th><th>Total units</th><th>Net signed</th></tr></thead>
+                <thead class="table-light"><tr><th class="ps-4">@T("Common_Type")</th><th>@T("Reports_Col_Movements")</th><th>@T("Reports_Col_TotalUnits")</th><th>@T("Reports_Col_NetSigned")</th></tr></thead>
                 <tbody>
                     @if (totals != null && totals.Any())
                     {
                         @foreach (var t in totals)
                         {
                             <tr>
-                                <td class="ps-4"><span class="badge text-bg-@(t.MovementType == 0 || t.MovementType == 2 || t.MovementType == 4 || t.MovementType == 6 ? "success" : "danger")">@typeNames[t.MovementType]</span></td>
+                                <td class="ps-4"><span class="badge text-bg-@(t.MovementType == 0 || t.MovementType == 2 || t.MovementType == 4 || t.MovementType == 6 ? "success" : "danger")">@MoveType(t.MovementType)</span></td>
                                 <td>@t.MovementCount</td>
                                 <td>@t.TotalQuantity</td>
                                 <td>@t.SignedQuantity</td>
@@ -37,7 +49,7 @@
                     }
                     else
                     {
-                        <tr><td colspan="4" class="py-4 text-center text-muted">No movements recorded.</td></tr>
+                        <tr><td colspan="4" class="py-4 text-center text-muted">@T("Reports_NoMovements")</td></tr>
                     }
                 </tbody>
             </table>
@@ -45,10 +57,10 @@
     </div>
 
     <div class="d-flex gap-2 flex-wrap">
-        <a class="btn btn-outline-primary" asp-area="Inventory" asp-controller="Reports" asp-action="Warehouses">Warehouse reports</a>
-        <a class="btn btn-outline-primary" asp-area="Inventory" asp-controller="Reports" asp-action="Products">Zero-stock products</a>
-        <a class="btn btn-outline-primary" asp-area="Inventory" asp-controller="Reports" asp-action="Movements">Movement reports</a>
-        <a class="btn btn-outline-primary" asp-area="Inventory" asp-controller="Reports" asp-action="Balance">Historical balance</a>
+        <a class="btn btn-outline-primary" asp-area="Inventory" asp-controller="Reports" asp-action="Warehouses">@T("Reports_WarehouseReports")</a>
+        <a class="btn btn-outline-primary" asp-area="Inventory" asp-controller="Reports" asp-action="Products">@T("Reports_ZeroStockProducts")</a>
+        <a class="btn btn-outline-primary" asp-area="Inventory" asp-controller="Reports" asp-action="Movements">@T("Reports_MovementReports")</a>
+        <a class="btn btn-outline-primary" asp-area="Inventory" asp-controller="Reports" asp-action="Balance">@T("Reports_HistoricalBalance")</a>
     </div>
     <div class="mb-5"></div>
 </div>

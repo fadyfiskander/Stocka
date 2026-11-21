@@ -3,6 +3,7 @@ using Inventory.Contracts.UseCases.BatchCases;
 using Inventory.Contracts.UseCases.WarehouseCases;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Stocka.MVC.Localization;
 
 namespace Stocka.MVC.Areas.Inventory.Controllers
 {
@@ -25,7 +26,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
         [HttpGet("Index")]
         public async Task<IActionResult> Index(Guid? productId, Guid? purchaseItemId, Guid? warehouseId, int page = 1, int pageSize = 20)
         {
-            ViewBag.Title = "Batches";
+            ViewBag.Title = Loc.T("Batches_Title");
             ViewBag.ProductId = productId;
             ViewBag.PurchaseItemId = purchaseItemId;
             ViewBag.WarehouseId = warehouseId;
@@ -46,7 +47,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
         [HttpGet("Create")]
         public IActionResult Create()
         {
-            ViewBag.Title = "Register Batch";
+            ViewBag.Title = Loc.T("Batches_Register");
             return View(new RegisterBatchCommand());
         }
 
@@ -61,7 +62,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
             try
             {
                 var result = await _batchCases.RegisterBatchAsync(command);
-                TempData["Success"] = "Batch registered. Allocate it to a warehouse to make stock available.";
+                TempData["Success"] = Loc.T("Msg_BatchRegistered");
                 return RedirectToAction(nameof(Details), new { id = result.Id });
             }
             catch (ArgumentException ex)
@@ -77,13 +78,13 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
         {
             if (id == Guid.Empty)
             {
-                TempData["Error"] = "Batch ID is required.";
+                TempData["Error"] = Loc.T("Msg_BatchIdRequired");
                 return RedirectToAction(nameof(Index));
             }
 
             try
             {
-                ViewBag.Title = "Batch Details";
+                ViewBag.Title = Loc.T("Batches_DetailsTitle");
                 var batch = await _batchCases.RetrieveBatchAsync(new RetrieveBatchQuery(id));
                 var movements = await _batchCases.RetrieveBatchMovementHistoryAsync(new RetrieveBatchMovementHistoryQuery(id));
                 var activeWarehouses = await _warehouseCases.ListWarehousesAsync(new ListWarehousesQuery { IsActive = true, Page = 1, PageSize = 100 });
@@ -107,7 +108,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
         [HttpGet("Unallocated")]
         public async Task<IActionResult> Unallocated(int page = 1, int pageSize = 20)
         {
-            ViewBag.Title = "Unallocated Batches";
+            ViewBag.Title = Loc.T("Batches_Title");
             var batches = await _batchCases.ListUnallocatedBatchesAsync(new ListUnallocatedBatchesQuery(page, pageSize));
             return View("Index", batches);
         }

@@ -1,6 +1,7 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = Loc.T("Privacy_Title");
+    string T(string key) => Loc.T(key);
 }
 <h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<p>@T("Privacy_Body")</p>

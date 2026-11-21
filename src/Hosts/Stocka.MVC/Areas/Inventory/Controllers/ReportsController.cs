@@ -2,6 +2,7 @@
 using Inventory.Contracts.UseCases.ReportCases;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Stocka.MVC.Localization;
 
 namespace Stocka.MVC.Areas.Inventory.Controllers
 {
@@ -23,7 +24,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
         [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
-            ViewBag.Title = "Inventory Reports";
+            ViewBag.Title = Loc.T("Reports_Title");
             var summary = await _reportCases.GetInventorySummaryAsync(new InventorySummaryQuery());
             var movementTotals = await _reportCases.GetMovementTypeTotalsAsync(new MovementTypeTotalsQuery());
             ViewBag.MovementTotals = movementTotals;
@@ -34,7 +35,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
         [HttpGet("Warehouses")]
         public async Task<IActionResult> Warehouses(string order = "stock", bool asc = false, int page = 1, int pageSize = 20)
         {
-            ViewBag.Title = "Warehouse Inventory Reports";
+            ViewBag.Title = Loc.T("ReportWarehouses_Title");
             ViewBag.Order = order;
             ViewBag.Ascending = asc;
 
@@ -49,7 +50,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
         [HttpGet("Products")]
         public async Task<IActionResult> Products(int page = 1, int pageSize = 20)
         {
-            ViewBag.Title = "Zero-Stock Products";
+            ViewBag.Title = Loc.T("ReportProducts_Title");
             var result = await _reportCases.GetZeroStockProductsAsync(new ZeroStockProductsQuery(page, pageSize));
             return View(result);
         }
@@ -58,7 +59,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
         [HttpGet("Movements")]
         public async Task<IActionResult> Movements(DateTime? from, DateTime? to, int page = 1, int pageSize = 20)
         {
-            ViewBag.Title = "Stock Movement Reports";
+            ViewBag.Title = Loc.T("ReportMovements_Title");
             ViewBag.From = from;
             ViewBag.To = to;
 
@@ -82,7 +83,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
         [HttpGet("Balance")]
         public async Task<IActionResult> Balance(DateTime? asOf, int page = 1, int pageSize = 20)
         {
-            ViewBag.Title = "Historical Balance";
+            ViewBag.Title = Loc.T("Balance_Title");
             ViewBag.AsOf = asOf ?? DateTime.UtcNow;
             var result = await _reportCases.GetHistoricalBalanceAsync(new HistoricalBalanceQuery(ViewBag.AsOf, page, pageSize));
             return View(result);

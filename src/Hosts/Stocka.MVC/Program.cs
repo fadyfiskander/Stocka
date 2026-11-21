@@ -132,25 +132,30 @@ app.StartAsync().GetAwaiter().GetResult();
 var url = app.Services.GetRequiredService<IServer>()
     .Features.Get<IServerAddressesFeature>()!.Addresses.First();
 
-try
+var thread = new Thread(() =>
 {
-    var window = new PhotinoWindow()
-    .SetTitle("Stocka")
-    .SetSize(1280, 800)
-    .Center()
-    .SetDevToolsEnabled(true)
-    .SetContextMenuEnabled(true)
-    .SetBrowserControlInitParameters(
-        "--remote-debugging-port=9222"
-    )
-    .Load(url);
+    try
+    {
+        var window = new PhotinoWindow()
+            .SetTitle("Stocka")
+            .SetSize(1280, 800)
+            .Center()
+            .SetDevToolsEnabled(true)
+            .SetContextMenuEnabled(true)
+            .Load(url);
 
-    window.WaitForClose();
-}
-finally
-{
-    // Window closed => stop the service, no background process left.
-    app.StopAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
-}
+        window.WaitForClose();
+    }
+    finally
+    {
+        app.StopAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
+    }
+});
+
+if (OperatingSystem.IsWindows())
+    thread.SetApartmentState(ApartmentState.STA);
+
+thread.Start();
+thread.Join();
 #endregion
 

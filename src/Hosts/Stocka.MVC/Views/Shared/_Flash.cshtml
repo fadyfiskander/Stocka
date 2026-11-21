@@ -2,12 +2,13 @@
     var success = TempData["Success"]?.ToString();
     var error = TempData["Error"]?.ToString();
     var warning = TempData["Warning"]?.ToString();
+    var close = Loc.T("Common_Close");
 }
 @if (!string.IsNullOrWhiteSpace(success) || !string.IsNullOrWhiteSpace(error) || !string.IsNullOrWhiteSpace(warning))
 {
     <div class="flash-stack" aria-live="polite">
-        @if (!string.IsNullOrWhiteSpace(success)) { <div class="alert alert-success" role="status"><span>@success</span><button class="alert-dismiss" type="button" data-alert-dismiss aria-label="Close">×</button></div> }
-        @if (!string.IsNullOrWhiteSpace(warning)) { <div class="alert alert-warn" role="status"><span>@warning</span><button class="alert-dismiss" type="button" data-alert-dismiss aria-label="Close">×</button></div> }
-        @if (!string.IsNullOrWhiteSpace(error)) { <div class="alert alert-danger" role="alert"><span>@error</span><button class="alert-dismiss" type="button" data-alert-dismiss aria-label="Close">×</button></div> }
+        @if (!string.IsNullOrWhiteSpace(success)) { <div class="alert alert-success" role="status"><span>@success</span><button class="alert-dismiss" type="button" data-alert-dismiss aria-label="@close">×</button></div> }
+        @if (!string.IsNullOrWhiteSpace(warning)) { <div class="alert alert-warn" role="status"><span>@warning</span><button class="alert-dismiss" type="button" data-alert-dismiss aria-label="@close">×</button></div> }
+        @if (!string.IsNullOrWhiteSpace(error)) { <div class="alert alert-danger" role="alert"><span>@error</span><button class="alert-dismiss" type="button" data-alert-dismiss aria-label="@close">×</button></div> }
     </div>
 }

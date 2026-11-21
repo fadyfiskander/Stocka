@@ -1,11 +1,13 @@
 ﻿@model Inventory.Contracts.UseCases.WarehouseCases.RegisterWarehouseCommand
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = Loc.T("Warehouses_CreateTitle");
+    string T(string key) => Loc.T(key);
 }
 
 <div class="container-fluid py-4" style="max-width: 720px;">
-    <h2>Register Warehouse</h2>
-    <p class="text-muted">Creates an active warehouse for the current organization.</p>
+    <h2>@T("Warehouses_CreateTitle")</h2>
+    <p class="text-muted">@T("Warehouses_CreateSub")</p>
 
     <div class="card border-0 shadow-sm">
         <div class="card-body">
@@ -13,31 +15,31 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                 <div class="mb-3">
-                    <label class="form-label" asp-for="Name">Name</label>
+                    <label class="form-label" asp-for="Name">@T("Common_Name")</label>
                     <input class="form-control" asp-for="Name" maxlength="50" />
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label" asp-for="Type">Type</label>
+                    <label class="form-label" asp-for="Type">@T("Common_Type")</label>
                     <select class="form-select" asp-for="Type">
-                        <option value="0">Shop</option>
-                        <option value="1">Storage</option>
+                        <option value="0">@T("Warehouses_Type_Shop")</option>
+                        <option value="1">@T("Warehouses_Type_Storage")</option>
                     </select>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label" asp-for="Location">Location</label>
+                    <label class="form-label" asp-for="Location">@T("Common_Location")</label>
                     <input class="form-control" asp-for="Location" maxlength="100" />
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label" asp-for="Description">Description</label>
+                    <label class="form-label" asp-for="Description">@T("Common_Description")</label>
                     <textarea class="form-control" asp-for="Description" rows="3" maxlength="600"></textarea>
                 </div>
 
                 <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-primary">Register</button>
-                    <a class="btn btn-outline-secondary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index">Cancel</a>
+                    <button type="submit" class="btn btn-primary">@T("Warehouses_RegisterAction")</button>
+                    <a class="btn btn-outline-secondary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index">@T("Common_Cancel")</a>
                 </div>
             </form>
         </div>

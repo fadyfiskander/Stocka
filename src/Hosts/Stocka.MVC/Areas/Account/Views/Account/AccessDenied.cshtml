@@ -1,6 +1,7 @@
 @{
-    ViewData["Title"] = "Access Denied";
+    ViewData["Title"] = Loc.T("Denied_Title");
     Layout = "~/Views/Shared/_Layout.cshtml";
+    string T(string key) => Loc.T(key);
 }
 
 <div class="container py-5">
@@ -9,13 +10,12 @@
             <div class="mb-3">
                 <span class="display-1" aria-hidden="true">🔒</span>
             </div>
-            <h2 class="mb-2">Access Denied</h2>
+            <h2 class="mb-2">@T("Denied_Heading")</h2>
             <p class="text-muted mb-4">
-                You don't have permission to open this page.
-                If you believe this is a mistake, contact your organization administrator.
+                @T("Denied_Text")
             </p>
 
-            <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-primary px-4">Back to Home</a>
+            <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-primary px-4">@T("Denied_BackHome")</a>
         </div>
     </div>
 </div>

@@ -1,13 +1,14 @@
 ﻿@model Inventory.Contracts.UseCases.BatchCases.RegisterBatchCommand
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = Loc.T("Batches_CreateTitle");
+    string T(string key) => Loc.T(key);
 }
 
 <div class="container-fluid py-4" style="max-width: 720px;">
-    <h2>Register Batch (receipt)</h2>
+    <h2>@T("Batches_CreateTitle")</h2>
     <p class="text-muted">
-        Registers stock received from a purchasing document. This does NOT place units into a warehouse &mdash;
-        use <strong>Allocate stock</strong> afterwards to distribute units.
+        @T("Batches_CreateSub")
     </p>
 
     <div class="card border-0 shadow-sm">
@@ -16,29 +17,29 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                 <div class="mb-3">
-                    <label class="form-label" asp-for="ProductId">Product ID (Catalog)</label>
+                    <label class="form-label" asp-for="ProductId">@T("Batches_ProductId")</label>
                     <input class="form-control" asp-for="ProductId" placeholder="00000000-0000-0000-0000-000000000000" />
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label" asp-for="PurchaseItemId">Purchase item ID (Purchasing)</label>
+                    <label class="form-label" asp-for="PurchaseItemId">@T("Batches_PurchaseItemId")</label>
                     <input class="form-control" asp-for="PurchaseItemId" placeholder="00000000-0000-0000-0000-000000000000" />
                 </div>
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label" asp-for="InitialQuantity">Initial quantity</label>
+                        <label class="form-label" asp-for="InitialQuantity">@T("Batches_InitialQty")</label>
                         <input type="number" class="form-control" asp-for="InitialQuantity" min="1" />
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label" asp-for="UnitCost">Unit cost</label>
+                        <label class="form-label" asp-for="UnitCost">@T("Batches_UnitCost")</label>
                         <input type="number" step="0.01" class="form-control" asp-for="UnitCost" min="0.01" />
                     </div>
                 </div>
 
                 <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-primary">Register batch</button>
-                    <a class="btn btn-outline-secondary" asp-area="Inventory" asp-controller="Batches" asp-action="Index">Cancel</a>
+                    <button type="submit" class="btn btn-primary">@T("Batches_RegisterAction")</button>
+                    <a class="btn btn-outline-secondary" asp-area="Inventory" asp-controller="Batches" asp-action="Index">@T("Common_Cancel")</a>
                 </div>
             </form>
         </div>

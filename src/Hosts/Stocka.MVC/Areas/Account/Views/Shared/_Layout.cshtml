@@ -1,8 +1,10 @@
 @{
     var title = ViewData["Title"] as string;
+    var isRtl = Stocka.MVC.Localization.Loc.IsRtl;
+    var htmlLang = Stocka.MVC.Localization.Loc.Language;
 }
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="@htmlLang" dir="@(isRtl ? "rtl" : "ltr")">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -285,6 +287,8 @@
             line-height: 1;
         }
 
+        [dir="rtl"] .auth-submit-arrow { display: inline-block; transform: scaleX(-1); }
+
         .auth-submit:hover,
         .auth-submit:focus-visible {
             background: #145e49;
@@ -397,6 +401,25 @@
         }
     </style>
     @RenderSection("Styles", required: false)
+    @{
+        var i18n = new
+        {
+            required = Stocka.MVC.Localization.Loc.T("Val_Required"),
+            email    = Stocka.MVC.Localization.Loc.T("Val_Email"),
+            url      = Stocka.MVC.Localization.Loc.T("Val_Url"),
+            pattern  = Stocka.MVC.Localization.Loc.T("Val_Pattern"),
+            minlength = Stocka.MVC.Localization.Loc.T("Val_MinLength"),
+            maxlength = Stocka.MVC.Localization.Loc.T("Val_MaxLength"),
+            min      = Stocka.MVC.Localization.Loc.T("Val_Min"),
+            max      = Stocka.MVC.Localization.Loc.T("Val_Max"),
+            step     = Stocka.MVC.Localization.Loc.T("Val_Step"),
+            number   = Stocka.MVC.Localization.Loc.T("Val_Number"),
+            oneIssue = Stocka.MVC.Localization.Loc.T("Val_OneIssue"),
+            manyIssues = Stocka.MVC.Localization.Loc.T("Val_ManyIssues")
+        };
+    }
+    <script type="application/json" id="stocka-i18n">@Json.Serialize(i18n)</script>
+    <script src="~/js/app.js" asp-append-version="true" defer></script>
 </head>
 <body>
     @RenderBody()

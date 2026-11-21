@@ -1,7 +1,8 @@
 @model ProductDto
 @{
-    ViewData["Title"] = "Product Details";
+    ViewData["Title"] = Loc.T("Products_DetailsTitle");
     Layout = "~/Views/Shared/_Layout.cshtml";
+    string T(string key) => Loc.T(key);
 }
 
 <div class="container py-4">
@@ -9,15 +10,15 @@
         <div class="col-lg-8">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h2 class="mb-1">Product Details</h2>
-                    <p class="text-muted mb-0">UseCase: RetrieveProductCommand</p>
+                    <h2 class="mb-1">@T("Products_DetailsTitle")</h2>
+                    <p class="text-muted mb-0">@T("Products_Title")</p>
                 </div>
-                <a asp-area="Catalog" asp-controller="Products" asp-action="Index" class="btn btn-light">Back to List</a>
+                <a asp-area="Catalog" asp-controller="Products" asp-action="Index" class="btn btn-light">@T("Common_BackToList")</a>
             </div>
 
             @if (Model == null)
             {
-                <div class="alert alert-warning">Product not found.</div>
+                <div class="alert alert-warning">@T("Products_NotFound")</div>
             }
             else
             {
@@ -31,46 +32,46 @@
                         }
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label text-muted small mb-1">ID</label>
+                                <label class="form-label text-muted small mb-1">@T("Common_Id")</label>
                                 <div class="fw-semibold font-monospace small">@Model.Id</div>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label text-muted small mb-1">Organization ID</label>
+                                <label class="form-label text-muted small mb-1">@T("Common_OrganizationId")</label>
                                 <div class="fw-semibold font-monospace small">@Model.OrganizationId</div>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label text-muted small mb-1">Name</label>
+                                <label class="form-label text-muted small mb-1">@T("Common_Name")</label>
                                 <div class="fw-semibold fs-5">@Model.Name</div>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label text-muted small mb-1">Category ID</label>
+                                <label class="form-label text-muted small mb-1">@T("Products_CategoryId")</label>
                                 <div class="fw-semibold font-monospace small">@Model.CategoryId</div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label text-muted small mb-1">Barcode</label>
+                                <label class="form-label text-muted small mb-1">@T("Common_Barcode")</label>
                                 <div class="fw-semibold">@Model.Barcode</div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label text-muted small mb-1">Price</label>
+                                <label class="form-label text-muted small mb-1">@T("Common_Price")</label>
                                 <div class="fw-semibold fs-5">@Model.Price.ToString("N2") $</div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label text-muted small mb-1">Status</label>
+                                <label class="form-label text-muted small mb-1">@T("Common_Status")</label>
                                 <div>
                                     @if (Model.IsActive)
                                     {
-                                        <span class="badge text-bg-success fs-6">Active</span>
+                                        <span class="badge text-bg-success fs-6">@T("Common_Active")</span>
                                     }
                                     else
                                     {
-                                        <span class="badge text-bg-secondary fs-6">Inactive</span>
+                                        <span class="badge text-bg-secondary fs-6">@T("Common_Inactive")</span>
                                     }
                                 </div>
                             </div>
                             @if (!string.IsNullOrWhiteSpace(Model.ImagePath))
                             {
                                 <div class="col-12">
-                                    <label class="form-label text-muted small mb-1">Image Path</label>
+                                    <label class="form-label text-muted small mb-1">@T("Products_ImagePath")</label>
                                     <div class="fw-semibold small text-break">@Model.ImagePath</div>
                                 </div>
                             }
@@ -79,17 +80,17 @@
                         <hr class="my-4" />
 
                         <div class="d-flex gap-2 justify-content-end">
-                            <a asp-area="Catalog" asp-controller="Products" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+                            <a asp-area="Catalog" asp-controller="Products" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">@T("Common_Edit")</a>
                             @if (Model.IsActive)
                             {
                                 <form asp-area="Catalog" asp-controller="Products" asp-action="Deactivate" asp-route-id="@Model.Id" method="post">
-                                    <button type="submit" class="btn btn-warning">Deactivate</button>
+                                    <button type="submit" class="btn btn-warning">@T("Common_Deactivate")</button>
                                 </form>
                             }
                             else
                             {
                                 <form asp-area="Catalog" asp-controller="Products" asp-action="Activate" asp-route-id="@Model.Id" method="post">
-                                    <button type="submit" class="btn btn-success">Activate</button>
+                                    <button type="submit" class="btn btn-success">@T("Common_Activate")</button>
                                 </form>
                             }
                         </div>

@@ -4,6 +4,7 @@
 *@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    string T(string key) => Loc.T(key);
 }
 @model List<Person>
 
@@ -11,9 +12,9 @@
     <table class="table-striped table">
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Actions</th>
+                <th>@T("Common_Id")</th>
+                <th>@T("Common_Name")</th>
+                <th>@T("Common_Actions")</th>
             </tr>
         </thead>
         <tbody>
@@ -23,9 +24,9 @@
                     <td>@person.Id</td>
                     <td>@person.Name</td>
                     <td>
-                        <a class="btn btn-info" asp-area="Catalog" asp-controller="Home" asp-action="Details" asp-route-id="@person.Id">Details</a>
-                        <a class="btn btn-primary" asp-area="Catalog" asp-controller="Home" asp-action="Edit" asp-route-id="@person.Id">Edit</a>
-                        <a class="btn btn-danger" asp-area="Catalog" asp-controller="Home" asp-action="Delete" asp-route-id="@person.Id">Delete</a>
+                        <a class="btn btn-info" asp-area="Catalog" asp-controller="Home" asp-action="Details" asp-route-id="@person.Id">@T("Common_Details")</a>
+                        <a class="btn btn-primary" asp-area="Catalog" asp-controller="Home" asp-action="Edit" asp-route-id="@person.Id">@T("Common_Edit")</a>
+                        <a class="btn btn-danger" asp-area="Catalog" asp-controller="Home" asp-action="Delete" asp-route-id="@person.Id">@T("Common_Delete")</a>
                     </td>
                 </tr>
             }

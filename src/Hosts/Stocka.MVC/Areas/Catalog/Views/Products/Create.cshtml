@@ -1,8 +1,9 @@
 ﻿@model RegisterProductCommand
 
 @{
-    ViewData["Title"] = "Create Product";
+    ViewData["Title"] = Loc.T("Products_CreateTitle");
     Layout = "~/Views/Shared/_Layout.cshtml";
+    string T(string key) => Loc.T(key);
 }
 
 <div class="container py-4">
@@ -11,9 +12,9 @@
         <div class="col-lg-8">
 
             <div class="mb-4">
-                <h2 class="mb-1">Create Product</h2>
+                <h2 class="mb-1">@T("Products_CreateTitle")</h2>
                 <p class="text-muted mb-0">
-                    Add a new product to the catalog.
+                    @T("Products_CreateSub")
                 </p>
             </div>
 
@@ -33,12 +34,12 @@
                         <!-- Name -->
                         <div class="mb-3">
                             <label asp-for="Name" class="form-label">
-                                Product Name
+                                @T("Products_Name")
                             </label>
 
                             <input asp-for="Name"
                                    class="form-control"
-                                   placeholder="Enter product name" />
+                                   placeholder="@T("Products_NamePlaceholder")" />
 
                             <span asp-validation-for="Name"
                                   class="text-danger small">
@@ -48,12 +49,12 @@
                         <!-- Barcode -->
                         <div class="mb-3">
                             <label asp-for="Barcode" class="form-label">
-                                Barcode
+                                @T("Common_Barcode")
                             </label>
 
                             <input asp-for="Barcode"
                                    class="form-control"
-                                   placeholder="Enter barcode" />
+                                   placeholder="@T("Products_BarcodePlaceholder")" />
 
                             <span asp-validation-for="Barcode"
                                   class="text-danger small">
@@ -63,7 +64,7 @@
                         <!-- Selling Price -->
                         <div class="mb-3">
                             <label asp-for="SellingPrice" class="form-label">
-                                Selling Price
+                                @T("Products_SellingPrice")
                             </label>
 
                             <div class="input-group">
@@ -87,14 +88,14 @@
                         <!-- Category -->
                         <div class="mb-3">
                             <label asp-for="CategoryId" class="form-label">
-                                Category
+                                @T("Products_Category")
                             </label>
 
                             <select asp-for="CategoryId"
                                     class="form-select"
                                     asp-items="ViewBag.Categories">
                                 <option value="">
-                                    Select category
+                                    @T("Products_SelectCategory")
                                 </option>
                             </select>
 
@@ -110,12 +111,12 @@
                                    asp-controller="Products"
                                    asp-area="Catalog"
                                    class="btn btn-light">
-                                Cancel
+                                @T("Common_Cancel")
                             </a>
 
                             <button type="submit"
                                     class="btn btn-primary px-4">
-                                Create Product
+                                @T("Products_Create")
                             </button>
 
                         </div>
