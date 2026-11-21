@@ -1,5 +1,5 @@
-﻿using Catalog.Domain.Entities;
-using Catalog.Domain.Primitives;
+﻿using Catalog.Domain.Categories;
+using Catalog.Domain.Entities;
 using Catalog.Domain.Primitives.Identifiers;
 using Xunit;
 

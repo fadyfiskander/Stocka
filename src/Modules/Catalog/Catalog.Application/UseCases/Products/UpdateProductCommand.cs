@@ -4,8 +4,8 @@ using Catalog.Application.Repositories.Commands;
 using Catalog.Application.Repositories.Queries.Category;
 using Catalog.Contracts.DTOs.Product;
 using Catalog.Contracts.UseCases.ProductCases;
+using Catalog.Domain.Categories;
 using Catalog.Domain.Entities;
-using Catalog.Domain.Primitives;
 using Catalog.Domain.Primitives.Identifiers;
 using MediatR;
 

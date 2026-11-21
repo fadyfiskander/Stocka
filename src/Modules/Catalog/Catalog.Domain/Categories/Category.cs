@@ -1,8 +1,7 @@
 ﻿using BuildingBlocks.Domain.Bases;
-using Catalog.Domain.Primitives;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Catalog.Domain.Entities;
+namespace Catalog.Domain.Categories;
 
 public partial class Category : AggregateRoot<CategoryId>
 {

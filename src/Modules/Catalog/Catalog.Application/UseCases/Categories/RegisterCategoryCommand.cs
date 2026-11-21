@@ -4,7 +4,7 @@ using Catalog.Application.DTOs.Category;
 using Catalog.Application.Repositories.Commands;
 using Catalog.Contracts.DTOs.Category;
 using Catalog.Contracts.UseCases.CategoryCases;
-using Catalog.Domain.Entities;
+using Catalog.Domain.Categories;
 using MediatR;
 
 namespace Catalog.Application.UseCases.Categories

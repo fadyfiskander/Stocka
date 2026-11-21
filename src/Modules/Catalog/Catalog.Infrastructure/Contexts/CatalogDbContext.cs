@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Domain.Bases;
+using Catalog.Domain.Categories;
 using Catalog.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 

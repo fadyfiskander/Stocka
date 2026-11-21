@@ -1,4 +1,4 @@
-namespace Catalog.Domain.Primitives;
+namespace Catalog.Domain.Categories;
 
 public readonly record struct CategoryId(Guid Value)
 {
