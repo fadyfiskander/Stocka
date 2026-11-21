@@ -1,7 +1,6 @@
 ﻿using BuildingBlocks.Application.Common.Interfaces;
 using Inventory.Domain.Batches;
-using Inventory.Domain.Entities;
-using Inventory.Primitives.Identifiers;
+using Inventory.Domain.Warehouses;
 
 namespace Inventory.Application.Repositories.Commands
 {

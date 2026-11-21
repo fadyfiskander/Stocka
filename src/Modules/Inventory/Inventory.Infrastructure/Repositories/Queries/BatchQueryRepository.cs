@@ -4,7 +4,7 @@ using Inventory.Application.Repositories.Queries;
 using Inventory.Contracts.DTOs.Batch;
 using Inventory.Infrastructure.Repositories.Queries.Bases;
 using Inventory.Domain.Batches;
-using Inventory.Primitives.Identifiers;
+using Inventory.Domain.Warehouses;
 using BuildingBlocks.Application.Common.Models;
 using System.Data;
 

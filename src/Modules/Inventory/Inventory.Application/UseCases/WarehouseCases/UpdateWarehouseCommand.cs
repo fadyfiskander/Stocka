@@ -4,8 +4,7 @@ using Inventory.Application.Repositories.Commands;
 using Inventory.Application.Repositories.Queries;
 using Inventory.Contracts.DTOs.Warehouse;
 using Inventory.Contracts.UseCases.WarehouseCases;
-using Inventory.Domain.Enums;
-using Inventory.Primitives.Identifiers;
+using Inventory.Domain.Warehouses;
 using MediatR;
 
 namespace Inventory.Application.UseCases.WarehouseCases;

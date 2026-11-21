@@ -2,7 +2,7 @@
 using Inventory.Contracts.UseCases.StockCases;
 using Inventory.Domain.Batches;
 using Inventory.Domain.StockMovements;
-using Inventory.Primitives.Identifiers;
+using Inventory.Domain.Warehouses;
 
 namespace Inventory.Application.Validators.StockCases;
 

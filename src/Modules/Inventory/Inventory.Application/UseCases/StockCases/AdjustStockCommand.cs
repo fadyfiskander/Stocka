@@ -5,7 +5,7 @@ using Inventory.Contracts.DTOs.Stock;
 using Inventory.Contracts.UseCases.StockCases;
 using Inventory.Domain.Batches;
 using Inventory.Domain.StockMovements;
-using Inventory.Primitives.Identifiers;
+using Inventory.Domain.Warehouses;
 using MediatR;
 
 namespace Inventory.Application.UseCases.StockCases;

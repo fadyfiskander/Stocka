@@ -3,7 +3,7 @@ using Inventory.Application.Bindings.WarehouseCases;
 using Inventory.Application.Repositories.Queries;
 using Inventory.Contracts.DTOs.Warehouse;
 using Inventory.Contracts.UseCases.WarehouseCases;
-using Inventory.Primitives.Identifiers;
+using Inventory.Domain.Warehouses;
 using MediatR;
 
 namespace Inventory.Application.UseCases.WarehouseCases;

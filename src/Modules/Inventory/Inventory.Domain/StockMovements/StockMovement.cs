@@ -1,7 +1,7 @@
 ﻿using BuildingBlocks.Application.Abstractions;
 using BuildingBlocks.Domain.Bases;
 using Inventory.Domain.Batches;
-using Inventory.Primitives.Identifiers;
+using Inventory.Domain.Warehouses;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Inventory.Domain.StockMovements

@@ -1,11 +1,10 @@
 ﻿using BuildingBlocks.Application.Abstractions;
 using BuildingBlocks.Domain.Bases;
 using Inventory.Domain.Batches;
-using Inventory.Domain.Entities;
-using Inventory.Primitives.Identifiers;
+using Inventory.Domain.Warehouses;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Inventory.Domain.Entities;
+namespace Inventory.Domain.Warehouses;
 
 public partial class WarehouseBatch : Entity<WarehouseBatchId>, IMultiTenantEntity
 {

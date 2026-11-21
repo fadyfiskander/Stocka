@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using Inventory.Contracts.UseCases.WarehouseCases;
-using Inventory.Domain.Enums;
+using Inventory.Domain.Warehouses;
 
 namespace Inventory.Application.Validators.WarehouseCases;
 

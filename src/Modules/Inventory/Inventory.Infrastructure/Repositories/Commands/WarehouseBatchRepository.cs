@@ -1,7 +1,6 @@
 ﻿using Inventory.Application.Repositories.Commands;
 using Inventory.Domain.Batches;
-using Inventory.Domain.Entities;
-using Inventory.Primitives.Identifiers;
+using Inventory.Domain.Warehouses;
 using Inventory.Infrastructure.Persistence;
 using Inventory.Infrastructure.Repositories.Commands.Bases;
 using Microsoft.EntityFrameworkCore;

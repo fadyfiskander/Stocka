@@ -5,7 +5,7 @@ using Inventory.Contracts.DTOs.StockMovement;
 using Inventory.Infrastructure.Repositories.Queries.Bases;
 using Inventory.Domain.Batches;
 using Inventory.Domain.StockMovements;
-using Inventory.Primitives.Identifiers;
+using Inventory.Domain.Warehouses;
 using BuildingBlocks.Application.Common.Models;
 using System.Collections.Generic;
 using System.Data;

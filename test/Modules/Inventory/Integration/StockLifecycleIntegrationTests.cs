@@ -2,7 +2,7 @@
 using Inventory.Contracts.UseCases.StockCases;
 using Inventory.Contracts.UseCases.WarehouseCases;
 using Inventory.Domain.StockMovements;
-using Inventory.Domain.Enums;
+using Inventory.Domain.Warehouses;
 
 namespace Inventory.Integration.Tests;
 
