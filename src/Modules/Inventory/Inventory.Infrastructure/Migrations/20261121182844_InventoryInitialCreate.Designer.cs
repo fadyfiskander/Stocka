@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Inventory.Infrastructure.Migrations
 {
     [DbContext(typeof(InventoryDbContext))]
-    [Migration("20261120202751_InventoryInitialCreate")]
+    [Migration("20261121182844_InventoryInitialCreate")]
     partial class InventoryInitialCreate
     {
         /// <inheritdoc />
@@ -26,7 +26,7 @@ namespace Inventory.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Inventory.Domain.Entities.Batch", b =>
+            modelBuilder.Entity("Inventory.Domain.Batches.Batch", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -70,7 +70,7 @@ namespace Inventory.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Inventory.Domain.Entities.StockMovement", b =>
+            modelBuilder.Entity("Inventory.Domain.StockMovements.StockMovement", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -122,7 +122,7 @@ namespace Inventory.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Inventory.Domain.Entities.Warehouse", b =>
+            modelBuilder.Entity("Inventory.Domain.Warehouses.Warehouse", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -152,10 +152,10 @@ namespace Inventory.Infrastructure.Migrations
                     b.HasIndex("OrganizationId", "Name")
                         .IsUnique();
 
-                    b.ToTable("Warehouse", "Inventory");
+                    b.ToTable("Warehouses", "Inventory");
                 });
 
-            modelBuilder.Entity("Inventory.Domain.Entities.WarehouseBatch", b =>
+            modelBuilder.Entity("Inventory.Domain.Warehouses.WarehouseBatch", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -192,16 +192,16 @@ namespace Inventory.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Inventory.Domain.Entities.StockMovement", b =>
+            modelBuilder.Entity("Inventory.Domain.StockMovements.StockMovement", b =>
                 {
-                    b.HasOne("Inventory.Domain.Entities.Batch", null)
+                    b.HasOne("Inventory.Domain.Batches.Batch", null)
                         .WithMany()
                         .HasForeignKey("BatchId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_StockMovements_Batches_BatchId");
 
-                    b.HasOne("Inventory.Domain.Entities.Warehouse", null)
+                    b.HasOne("Inventory.Domain.Warehouses.Warehouse", null)
                         .WithMany()
                         .HasForeignKey("WarehouseId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -209,16 +209,16 @@ namespace Inventory.Infrastructure.Migrations
                         .HasConstraintName("FK_StockMovements_Warehouses_WarehouseId");
                 });
 
-            modelBuilder.Entity("Inventory.Domain.Entities.WarehouseBatch", b =>
+            modelBuilder.Entity("Inventory.Domain.Warehouses.WarehouseBatch", b =>
                 {
-                    b.HasOne("Inventory.Domain.Entities.Batch", null)
+                    b.HasOne("Inventory.Domain.Batches.Batch", null)
                         .WithMany()
                         .HasForeignKey("BatchId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_WarehouseBatches_Batches_BatchId");
 
-                    b.HasOne("Inventory.Domain.Entities.Warehouse", "Warehouse")
+                    b.HasOne("Inventory.Domain.Warehouses.Warehouse", "Warehouse")
                         .WithMany("WarehouseBatches")
                         .HasForeignKey("WarehouseId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -228,7 +228,7 @@ namespace Inventory.Infrastructure.Migrations
                     b.Navigation("Warehouse");
                 });
 
-            modelBuilder.Entity("Inventory.Domain.Entities.Warehouse", b =>
+            modelBuilder.Entity("Inventory.Domain.Warehouses.Warehouse", b =>
                 {
                     b.Navigation("WarehouseBatches");
                 });
