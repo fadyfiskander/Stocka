@@ -1,6 +1,5 @@
-﻿using Catalog.Domain.Entities;
-using Catalog.Domain.Primitives;
-using Catalog.Domain.Primitives.Identifiers;
+﻿using Catalog.Domain.Categories;
+using Catalog.Domain.Products;
 using Xunit;
 
 namespace Catalog.Domain.Tests.Entities.Products

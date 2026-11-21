@@ -1,5 +1,6 @@
 ﻿using BuildingBlocks.Domain.Bases;
-using Catalog.Domain.Entities;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Products;
 using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Infrastructure.Contexts

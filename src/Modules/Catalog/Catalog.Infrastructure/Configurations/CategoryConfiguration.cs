@@ -1,5 +1,4 @@
-﻿using Catalog.Domain.Entities;
-using Catalog.Domain.Primitives;
+﻿using Catalog.Domain.Categories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;

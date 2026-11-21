@@ -1,4 +1,4 @@
-using Identity.Domain.Customer;
+using Identity.Domain.Customers;
 using Identity.Domain.Parties;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

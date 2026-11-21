@@ -1,6 +1,8 @@
 ﻿using BuildingBlocks.Application.Common.Models;
 using Inventory.Contracts.DTOs.StockMovement;
-using Inventory.Primitives.Identifiers;
+using Inventory.Domain.Batches;
+using Inventory.Domain.StockMovements;
+using Inventory.Domain.Warehouses;
 
 namespace Inventory.Application.Repositories.Queries
 {

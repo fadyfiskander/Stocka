@@ -1,5 +1,5 @@
 using Identity.Application.Repositories.Commands;
-using Identity.Domain.Employee;
+using Identity.Domain.Employees;
 using Identity.Domain.Parties;
 using Identity.Infrastructure.Persistence;
 using Identity.Infrastructure.Repositories.Commands.Bases;

@@ -4,7 +4,7 @@ using Inventory.Contracts.DTOs.Warehouse;
 using Inventory.Contracts.UseCases.BatchCases;
 using Inventory.Contracts.UseCases.StockCases;
 using Inventory.Contracts.UseCases.WarehouseCases;
-using Inventory.Domain.Enums;
+using Inventory.Domain.Warehouses;
 
 namespace Inventory.Integration.Tests;
 

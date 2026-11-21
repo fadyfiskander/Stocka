@@ -1,6 +1,5 @@
 ﻿using BuildingBlocks.Application.Common.Interfaces;
-using Catalog.Domain.Entities;
-using Catalog.Domain.Primitives.Identifiers;
+using Catalog.Domain.Products;
 
 namespace Catalog.Application.Repositories.Commands
 {

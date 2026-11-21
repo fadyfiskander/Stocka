@@ -2,7 +2,7 @@ using BuildingBlocks.Domain.Bases;
 using Identity.Domain.Parties;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Identity.Domain.Employee
+namespace Identity.Domain.Employees
 {
     public class Employee : AggregateRoot<PartyId>
     {

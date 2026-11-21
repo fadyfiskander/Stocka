@@ -2,7 +2,7 @@ using BuildingBlocks.Domain.Bases;
 using Identity.Domain.Parties;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Identity.Domain.Supplier
+namespace Identity.Domain.Suppliers
 {
     public class Supplier : AggregateRoot<PartyId>
     {

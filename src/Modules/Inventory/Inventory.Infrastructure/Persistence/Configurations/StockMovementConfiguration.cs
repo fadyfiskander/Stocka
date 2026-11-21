@@ -1,7 +1,8 @@
+﻿
 
-
-using Inventory.Domain.Entities;
-using Inventory.Primitives.Identifiers;
+using Inventory.Domain.Batches;
+using Inventory.Domain.StockMovements;
+using Inventory.Domain.Warehouses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

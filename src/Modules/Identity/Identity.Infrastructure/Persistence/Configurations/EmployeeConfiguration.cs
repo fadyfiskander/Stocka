@@ -1,4 +1,4 @@
-using Identity.Domain.Employee;
+using Identity.Domain.Employees;
 using Identity.Domain.Parties;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

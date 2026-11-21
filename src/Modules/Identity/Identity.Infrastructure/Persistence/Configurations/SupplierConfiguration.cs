@@ -1,4 +1,4 @@
-using Identity.Domain.Supplier;
+using Identity.Domain.Suppliers;
 using Identity.Domain.Parties;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

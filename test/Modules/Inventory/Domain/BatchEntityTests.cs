@@ -1,4 +1,4 @@
-using Inventory.Domain.Entities;
+﻿using Inventory.Domain.Batches;
 
 namespace Inventory.Domain.Tests.Entities
 {

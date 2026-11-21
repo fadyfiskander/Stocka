@@ -1,9 +1,8 @@
-using BuildingBlocks.Application.Abstractions;
+﻿using BuildingBlocks.Application.Abstractions;
 using Inventory.Application.Bindings.WarehouseCases;
 using Inventory.Application.Repositories.Commands;
 using Inventory.Contracts.DTOs.Warehouse;
-using Inventory.Domain.Entities;
-using Inventory.Domain.Enums;
+using Inventory.Domain.Warehouses;
 using MediatR;
 
 namespace Inventory.Application.UseCases.WarehouseCases;

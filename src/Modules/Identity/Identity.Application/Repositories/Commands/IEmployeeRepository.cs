@@ -1,5 +1,5 @@
 ﻿using BuildingBlocks.Application.Common.Interfaces;
-using Identity.Domain.Employee;
+using Identity.Domain.Employees;
 using Identity.Domain.Parties;
 
 namespace Identity.Application.Repositories.Commands

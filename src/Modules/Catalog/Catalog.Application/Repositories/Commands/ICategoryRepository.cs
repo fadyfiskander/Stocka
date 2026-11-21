@@ -1,6 +1,5 @@
 ﻿using BuildingBlocks.Application.Common.Interfaces;
-using Catalog.Domain.Entities;
-using Catalog.Domain.Primitives;
+using Catalog.Domain.Categories;
 
 namespace Catalog.Application.Repositories.Commands
 {

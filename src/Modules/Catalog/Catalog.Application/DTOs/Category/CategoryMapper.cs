@@ -1,5 +1,5 @@
 using Catalog.Contracts.DTOs.Category;
-using Catalog.Domain.Entities;
+using Catalog.Domain.Categories;
 
 namespace Catalog.Application.DTOs.Category
 {
@@ -8,7 +8,7 @@ namespace Catalog.Application.DTOs.Category
     /// </summary>
     public static class CategoryMapper
     {
-        public static CategoryDto ToDto(this Catalog.Domain.Entities.Category category)
+        public static CategoryDto ToDto(this Catalog.Domain.Categories.Category category)
             => new(
                 category.Id.Value,
                 category.OrganizationId,

@@ -1,10 +1,11 @@
-using BuildingBlocks.Application.Abstractions;
+﻿using BuildingBlocks.Application.Abstractions;
 using BuildingBlocks.Application.Common.Models;
 using Inventory.Application.Bindings.StockCases;
 using Inventory.Application.Repositories.Queries;
 using Inventory.Contracts.DTOs.StockMovement;
 using Inventory.Contracts.UseCases.StockCases;
-using Inventory.Primitives.Identifiers;
+using Inventory.Domain.Batches;
+using Inventory.Domain.Warehouses;
 using MediatR;
 
 namespace Inventory.Application.UseCases.StockCases;

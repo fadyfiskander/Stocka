@@ -45,7 +45,7 @@ namespace Identity.Application.UseCases.Customers
                 throw new ArgumentNullException("organizationId is null, organizationId cannot be null");
 
             var party = Domain.Parties.Party.Create(organizationId.Value, request.FirstName, request.LastName, request.PhoneNumber);
-            var customer = Domain.Customer.Customer.Create(party.Id);
+            var customer = Domain.Customers.Customer.Create(party.Id);
 
             await _partyCommand.AddAsync(party);
             await _customerCommand.AddAsync(customer);

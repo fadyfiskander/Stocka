@@ -1,9 +1,9 @@
-using BuildingBlocks.Application.Abstractions;
+﻿using BuildingBlocks.Application.Abstractions;
 using Inventory.Application.Bindings.BatchCases;
 using Inventory.Application.Repositories.Queries;
 using Inventory.Contracts.DTOs.Batch;
 using Inventory.Contracts.UseCases.BatchCases;
-using Inventory.Primitives.Identifiers;
+using Inventory.Domain.Batches;
 using MediatR;
 
 namespace Inventory.Application.UseCases.BatchCases;

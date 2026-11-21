@@ -1,7 +1,9 @@
-using BuildingBlocks.Application.Abstractions;
+﻿using BuildingBlocks.Application.Abstractions;
 using BuildingBlocks.Domain.Bases;
 using Inventory.Application.Primitives.Events;
-using Inventory.Domain.Entities;
+using Inventory.Domain.Batches;
+using Inventory.Domain.StockMovements;
+using Inventory.Domain.Warehouses;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 

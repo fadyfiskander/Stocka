@@ -3,7 +3,7 @@ using Identity.Domain.Parties;
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Identity.Domain.Customer
+namespace Identity.Domain.Customers
 {
     public class Customer : AggregateRoot<PartyId>
     {

@@ -1,6 +1,6 @@
-using BuildingBlocks.Application.Common.Models;
+﻿using BuildingBlocks.Application.Common.Models;
 using Inventory.Contracts.DTOs.Warehouse;
-using Inventory.Primitives.Identifiers;
+using Inventory.Domain.Warehouses;
 
 namespace Inventory.Application.Repositories.Queries
 {
