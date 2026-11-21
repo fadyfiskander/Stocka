@@ -6,19 +6,19 @@ namespace Inventory.Application.Repositories.Queries
 {
     public interface IWarehouseBatchQueryRepository
     {
-        Task<WarehouseBatchDto?> GetByIdAsync(Guid organizationId, WarehouseBatchId id);
-        Task<IEnumerable<WarehouseBatchDto>> GetAllAsync(Guid organizationId, WarehouseId warehouseId);
-
-        /// <summary>The single warehouse/batch row (unique pair), or null if not yet allocated.</summary>
-        Task<WarehouseBatchDto?> GetByWarehouseAndBatchAsync(Guid organizationId, WarehouseId warehouseId, BatchId batchId);
-
-        /// <summary>All warehouse placements of a batch across warehouses.</summary>
-        Task<IEnumerable<WarehouseBatchDto>> GetByBatchAsync(Guid organizationId, BatchId batchId);
+        Task<IEnumerable<WarehouseBatchDto>> GetAllAsync(
+            WarehouseId warehouseId,
+            CancellationToken cancellationToken = default);
 
         /// <summary>Current quantity of a batch in one warehouse (0 when not allocated).</summary>
-        Task<int> GetQuantityInWarehouseAsync(Guid organizationId, WarehouseId warehouseId, BatchId batchId);
+        Task<int> GetQuantityInWarehouseAsync(
+            WarehouseId warehouseId,
+            BatchId batchId,
+            CancellationToken cancellationToken = default);
 
         /// <summary>Total current units of a batch across all warehouses of the Organization.</summary>
-        Task<int> GetTotalQuantityInWarehousesAsync(Guid organizationId, BatchId batchId);
+        Task<int> GetTotalQuantityInWarehousesAsync(
+            BatchId batchId,
+            CancellationToken cancellationToken = default);
     }
 }
