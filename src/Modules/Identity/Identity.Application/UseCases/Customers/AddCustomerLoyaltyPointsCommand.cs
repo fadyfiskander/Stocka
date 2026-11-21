@@ -37,7 +37,7 @@ internal sealed class AddCustomerLoyaltyPointsCommandHandler
         await _customerRepository.UpdateAsync(customer);
     }
 
-    private async Task<Domain.Customer.Customer> GetCustomerAsync(Guid customerId)
+    private async Task<Domain.Customers.Customer> GetCustomerAsync(Guid customerId)
     {
         var id = PartyId.From(customerId);
         var party = await _partyRepository.GetWithOrganizationsAsync(id);

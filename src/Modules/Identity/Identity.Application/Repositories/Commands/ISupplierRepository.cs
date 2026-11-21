@@ -1,6 +1,6 @@
 using BuildingBlocks.Application.Common.Interfaces;
 using Identity.Domain.Parties;
-using Identity.Domain.Supplier;
+using Identity.Domain.Suppliers;
 
 namespace Identity.Application.Repositories.Commands
 {

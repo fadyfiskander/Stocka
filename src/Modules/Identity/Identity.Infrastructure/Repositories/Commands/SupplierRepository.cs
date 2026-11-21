@@ -1,6 +1,6 @@
 using Identity.Application.Repositories.Commands;
 using Identity.Domain.Parties;
-using Identity.Domain.Supplier;
+using Identity.Domain.Suppliers;
 using Identity.Infrastructure.Persistence;
 using Identity.Infrastructure.Repositories.Commands.Bases;
 
