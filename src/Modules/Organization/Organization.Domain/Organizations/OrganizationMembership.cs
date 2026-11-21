@@ -1,7 +1,6 @@
 ﻿using BuildingBlocks.Domain.Enums;
-using Organization.Domain.Organizations;
 
-namespace Organization.Domain.OrganizationMemberships
+namespace Organization.Domain.Organizations
 {
     public class OrganizationMembership
     {

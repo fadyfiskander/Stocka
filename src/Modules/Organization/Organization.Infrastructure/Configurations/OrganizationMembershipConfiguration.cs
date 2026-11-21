@@ -1,7 +1,6 @@
 using BuildingBlocks.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Organization.Domain.OrganizationMemberships;
 using Organization.Domain.Organizations;
 
 namespace Organization.Infrastructure.Configurations

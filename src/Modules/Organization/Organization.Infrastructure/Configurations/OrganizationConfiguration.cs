@@ -1,7 +1,6 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Organization.Domain.OrganizationMemberships;
 using Organization.Domain.Organizations;
 using OrganizationAggregate = Organization.Domain.Organizations.Organization;
 

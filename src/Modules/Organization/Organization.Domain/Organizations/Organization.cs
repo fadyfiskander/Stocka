@@ -1,6 +1,5 @@
 ﻿using BuildingBlocks.Domain.Bases;
 using BuildingBlocks.Domain.Enums;
-using Organization.Domain.OrganizationMemberships;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 

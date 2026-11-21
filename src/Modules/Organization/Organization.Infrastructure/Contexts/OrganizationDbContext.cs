@@ -2,7 +2,7 @@ using BuildingBlocks.Domain.Bases;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Organization.Application.Primitives.Events;
-using Organization.Domain.OrganizationMemberships;
+using Organization.Domain.Organizations;
 
 namespace Organization.Infrastructure.Contexts
 {
