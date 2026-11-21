@@ -1,6 +1,7 @@
+﻿using Inventory.Domain.Batches;
 using Inventory.Domain.Entities;
-using Inventory.Domain.Enums;
 using Inventory.Primitives.Identifiers;
+using Inventory.Domain.Enums;
 
 namespace Inventory.Domain.Tests.Entities
 {

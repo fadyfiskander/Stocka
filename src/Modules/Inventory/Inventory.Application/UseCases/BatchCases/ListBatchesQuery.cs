@@ -1,4 +1,4 @@
-using BuildingBlocks.Application.Abstractions;
+﻿using BuildingBlocks.Application.Abstractions;
 using BuildingBlocks.Application.Common.Models;
 using Inventory.Application.Bindings.BatchCases;
 using Inventory.Application.Repositories.Queries;

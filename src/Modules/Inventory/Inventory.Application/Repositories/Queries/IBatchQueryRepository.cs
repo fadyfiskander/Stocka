@@ -1,5 +1,6 @@
 ﻿using BuildingBlocks.Application.Common.Models;
 using Inventory.Contracts.DTOs.Batch;
+using Inventory.Domain.Batches;
 using Inventory.Primitives.Identifiers;
 
 namespace Inventory.Application.Repositories.Queries

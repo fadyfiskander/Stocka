@@ -1,9 +1,8 @@
 ﻿using BuildingBlocks.Application.Abstractions;
 using BuildingBlocks.Domain.Bases;
-using Inventory.Primitives.Identifiers;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Inventory.Domain.Entities
+namespace Inventory.Domain.Batches
 {
     public partial class Batch : AggregateRoot<BatchId>, IMultiTenantEntity
     {

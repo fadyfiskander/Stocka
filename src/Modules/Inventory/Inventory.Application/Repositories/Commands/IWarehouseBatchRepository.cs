@@ -1,4 +1,5 @@
-using BuildingBlocks.Application.Common.Interfaces;
+﻿using BuildingBlocks.Application.Common.Interfaces;
+using Inventory.Domain.Batches;
 using Inventory.Domain.Entities;
 using Inventory.Primitives.Identifiers;
 

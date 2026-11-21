@@ -3,6 +3,7 @@ using Inventory.Application.Common.Interfaces;
 using Inventory.Application.Repositories.Queries;
 using Inventory.Contracts.DTOs.WarehouseBatch;
 using Inventory.Infrastructure.Repositories.Queries.Bases;
+using Inventory.Domain.Batches;
 using Inventory.Primitives.Identifiers;
 using System.Collections.Generic;
 using System.Data;

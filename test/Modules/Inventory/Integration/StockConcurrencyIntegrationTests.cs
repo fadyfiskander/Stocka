@@ -1,5 +1,7 @@
 ﻿using Inventory.Contracts.UseCases.StockCases;
+using Inventory.Domain.Batches;
 using Inventory.Domain.Entities;
+using Inventory.Primitives.Identifiers;
 using Inventory.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,8 +45,8 @@ public class StockConcurrencyIntegrationTests
 
         // Prematerialize the warehouse batch in THIS scope's context (identity-resolved later).
         var tracked = await db.Set<WarehouseBatch>().SingleAsync(wb =>
-            wb.WarehouseId == Inventory.Primitives.Identifiers.WarehouseId.From(warehouse)
-            && wb.BatchId == Inventory.Primitives.Identifiers.BatchId.From(batchId));
+            wb.WarehouseId == WarehouseId.From(warehouse)
+            && wb.BatchId == BatchId.From(batchId));
 
         // Another writer commits a change first: quantity 10 -> 9 and the rowversion is bumped.
         await db.Database.ExecuteSqlRawAsync(

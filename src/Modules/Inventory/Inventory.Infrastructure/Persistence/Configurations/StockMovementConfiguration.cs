@@ -1,5 +1,6 @@
+﻿
 
-
+using Inventory.Domain.Batches;
 using Inventory.Domain.Entities;
 using Inventory.Primitives.Identifiers;
 using Microsoft.EntityFrameworkCore;

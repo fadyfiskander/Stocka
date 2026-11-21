@@ -1,5 +1,7 @@
 ﻿using BuildingBlocks.Application.Abstractions;
 using BuildingBlocks.Domain.Bases;
+using Inventory.Domain.Batches;
+using Inventory.Domain.Entities;
 using Inventory.Primitives.Identifiers;
 using System.Diagnostics.CodeAnalysis;
 

@@ -1,4 +1,4 @@
-namespace Inventory.Primitives.Identifiers;
+namespace Inventory.Domain.Batches;
 
 public readonly record struct BatchId(Guid Value)
 {

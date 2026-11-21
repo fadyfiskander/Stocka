@@ -1,4 +1,5 @@
 ﻿using Inventory.Contracts.DTOs.WarehouseBatch;
+using Inventory.Domain.Batches;
 using Inventory.Primitives.Identifiers;
 
 namespace Inventory.Application.Repositories.Queries

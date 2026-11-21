@@ -1,4 +1,4 @@
-using BuildingBlocks.Application.Abstractions;
+﻿using BuildingBlocks.Application.Abstractions;
 using Inventory.Application.Bindings.WarehouseCases;
 using Inventory.Application.Repositories.Queries;
 using Inventory.Contracts.DTOs.Warehouse;
