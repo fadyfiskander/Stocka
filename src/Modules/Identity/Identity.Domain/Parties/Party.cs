@@ -1,5 +1,4 @@
 ﻿using BuildingBlocks.Domain.Bases;
-using Identity.Domain.PartyOrganizations;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Identity.Domain.Parties

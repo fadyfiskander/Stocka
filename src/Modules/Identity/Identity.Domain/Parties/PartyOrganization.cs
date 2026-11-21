@@ -1,6 +1,4 @@
-﻿using Identity.Domain.Parties;
-
-namespace Identity.Domain.PartyOrganizations
+﻿namespace Identity.Domain.Parties
 {
     public class PartyOrganization
     {

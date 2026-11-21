@@ -1,5 +1,4 @@
 using Identity.Domain.Parties;
-using Identity.Domain.PartyOrganizations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

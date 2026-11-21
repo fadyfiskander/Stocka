@@ -1,7 +1,6 @@
 ﻿using Identity.Domain.Customer;
 using Identity.Domain.Employee;
 using Identity.Domain.Parties;
-using Identity.Domain.PartyOrganizations;
 using Identity.Domain.Supplier;
 using Identity.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
