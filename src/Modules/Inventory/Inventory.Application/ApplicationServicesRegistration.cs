@@ -22,10 +22,10 @@ public static class ApplicationServicesRegistration
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehavior<,>));
 
         // Pure contract use-case interfaces (Inventory.Contracts) implemented by pipeline adapters.
-        services.AddTransient<IWarehouseCases, Adapters.WarehouseCases.WarehouseMediatorCases>();
-        services.AddTransient<IStockCases, Adapters.StockCases.StockMediatorCases>();
-        services.AddTransient<IBatchCases, Adapters.BatchCases.BatchMediatorCases>();
-        services.AddTransient<IInventoryReportCases, Adapters.ReportCases.InventoryReportsMediatorCases>();
+        services.AddTransient<IWarehouseCases, Adapters.WarehouseCases.WarehouseCases>();
+        services.AddScoped<IStockCases, Adapters.StockCases.StockCases>();
+        services.AddTransient<IBatchCases, Adapters.BatchCases.BatchCases>();
+        services.AddScoped<IInventoryReportCases, UseCases.ReportCases.InventoryReportCases>();
 
         return services;
     }
