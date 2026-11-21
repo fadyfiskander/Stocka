@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Catalog.Domain.Bases
+namespace Catalog.Domain.Common.Abstractions
 {
     public abstract class ValueObject : IEquatable<ValueObject>
     {

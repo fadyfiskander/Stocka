@@ -1,4 +1,4 @@
-namespace Catalog.Domain.Primitives;
+namespace Catalog.Domain.Common.Abstractions;
 
 public abstract class DomainEvent : IDomainEvent
 {

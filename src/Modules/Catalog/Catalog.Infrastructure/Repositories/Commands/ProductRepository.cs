@@ -1,6 +1,5 @@
 ﻿using Catalog.Application.Repositories.Commands;
-using Catalog.Domain.Entities;
-using Catalog.Domain.Primitives.Identifiers;
+using Catalog.Domain.Products;
 using Catalog.Infrastructure.Contexts;
 using Catalog.Infrastructure.Repositories.Commands.Bases;
 

@@ -1,4 +1,4 @@
-﻿namespace Catalog.Domain.Primitives.Identifiers;
+﻿namespace Catalog.Domain.Products;
 
 public readonly record struct ProductId(Guid Value)
 {

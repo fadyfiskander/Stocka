@@ -1,6 +1,4 @@
-﻿using Catalog.Domain.Primitives;
-
-namespace Catalog.Domain.Bases
+﻿namespace Catalog.Domain.Common.Abstractions
 {
     public abstract class AggregateRoot<TId> : Entity<TId>
     {
