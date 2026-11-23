@@ -7,7 +7,7 @@ namespace Inventory.Infrastructure.Repositories.Queries.Bases
     {
         protected readonly IDbConnection _connection;
 
-        protected const string TableWarehouses = "Inventory.Warehouse";
+        protected const string TableWarehouses = "Inventory.Warehouses";
         protected const string TableBatches = "Inventory.Batches";
         protected const string TableWarehouseBatches = "Inventory.WarehouseBatches";
         protected const string TableStockMovements = "Inventory.StockMovements";

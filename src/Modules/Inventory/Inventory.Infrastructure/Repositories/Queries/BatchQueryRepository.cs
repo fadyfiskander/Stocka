@@ -102,7 +102,7 @@ namespace Inventory.Infrastructure.Repositories.Queries
         public async Task<BatchDto?> GetByIdAsync(Guid organizationId, BatchId id)
         {
             var sql = $"{BaseSelect} WHERE Id = @Id AND OrganizationId = @OrganizationId";
-            return await _connection.QueryFirstOrDefaultAsync<BatchDto>(sql, new { Id = id, OrganizationId = organizationId });
+            return await _connection.QueryFirstOrDefaultAsync<BatchDto>(sql, new { Id = id.Value, OrganizationId = organizationId });
         }
     }
 }
