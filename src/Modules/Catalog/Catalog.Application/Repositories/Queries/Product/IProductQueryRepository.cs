@@ -8,6 +8,7 @@ namespace Catalog.Application.Repositories.Queries.Product
         Task<ProductDto?> GetByIdAsync(Guid id);
         Task<ProductDto?> GetByNameAsync(string name);
         Task<IEnumerable<ProductDto>> GetAllAsync(Guid organizationId);
+        Task<IEnumerable<ProductDto>> GetByIdsAsync(IReadOnlyCollection<Guid> ids, Guid organizationId, CancellationToken cancellationToken = default);
         Task<PaginatedResult<ProductDto>> GetPagedAsync(Guid organizationId, int page, int pageSize);
     }
 }

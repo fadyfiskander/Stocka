@@ -32,5 +32,8 @@ public interface IProductCases
 
     /// <summary>Retrieves the product listing for the current (or explicitly requested) Organization.</summary>
     Task<IEnumerable<ProductDto>> ListProductsAsync(ListProductsQuery query, CancellationToken cancellationToken = default);
+
+    /// <summary>Retrieves a set of products by ID for the current Organization.</summary>
+    Task<IEnumerable<ProductDto>> ListProductsByIdsAsync(ListProductsByIdsQuery query, CancellationToken cancellationToken = default);
     #endregion
 }
