@@ -1,6 +1,6 @@
 using Identity.Contracts.DTOs;
 
-namespace Identity.Infrastructure.Authentication
+namespace Identity.Application.Common.Interfaces
 {
     /// <summary>
     /// Issues JWT security tokens for identity users.
