@@ -20,7 +20,7 @@ namespace Inventory.Infrastructure.Repositories.Queries
         {
         }
 
-        public async Task<PaginatedResult<BatchDto>> GetAllPagedAsync(
+        public async Task<PaginatedResult<BatchProductGuidDto>> GetAllPagedAsync(
             int page,
             int pageSize,
             CancellationToken cancellationToken = default)
@@ -33,7 +33,7 @@ namespace Inventory.Infrastructure.Repositories.Queries
                 cancellationToken);
         }
 
-        public async Task<PaginatedResult<BatchDto>> GetByProductAsync(
+        public async Task<PaginatedResult<BatchProductGuidDto>> GetByProductAsync(
             Guid productId,
             int page,
             int pageSize,
@@ -50,7 +50,7 @@ namespace Inventory.Infrastructure.Repositories.Queries
                 cancellationToken);
         }
 
-        public async Task<PaginatedResult<BatchDto>> GetByPurchaseItemAsync(
+        public async Task<PaginatedResult<BatchProductGuidDto>> GetByPurchaseItemAsync(
             Guid purchaseItemId,
             int page,
             int pageSize,
@@ -67,7 +67,7 @@ namespace Inventory.Infrastructure.Repositories.Queries
                 cancellationToken);
         }
 
-        private async Task<PaginatedResult<BatchDto>> GetPagedCoreAsync(
+        private async Task<PaginatedResult<BatchProductGuidDto>> GetPagedCoreAsync(
             string where,
             object parameters,
             int page,
@@ -99,11 +99,11 @@ namespace Inventory.Infrastructure.Repositories.Queries
                 dp,
                 cancellationToken: cancellationToken);
 
-            var items = await _connection.QueryAsync<BatchDto>(itemsCommand);
-            return new PaginatedResult<BatchDto>(items.ToList(), total, page, pageSize);
+            var items = await _connection.QueryAsync<BatchProductGuidDto>(itemsCommand);
+            return new PaginatedResult<BatchProductGuidDto>(items.ToList(), total, page, pageSize);
         }
 
-        public async Task<IEnumerable<BatchDto>> GetByWarehouseAsync(
+        public async Task<IEnumerable<BatchProductGuidDto>> GetByWarehouseAsync(
             WarehouseId warehouseId,
             CancellationToken cancellationToken = default)
         {
@@ -124,10 +124,10 @@ namespace Inventory.Infrastructure.Repositories.Queries
                 new { WarehouseId = warehouseId.Value, OrganizationId },
                 cancellationToken: cancellationToken);
 
-            return await _connection.QueryAsync<BatchDto>(command);
+            return await _connection.QueryAsync<BatchProductGuidDto>(command);
         }
 
-        public async Task<IEnumerable<BatchDto>> GetUnallocatedAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<BatchProductGuidDto>> GetUnallocatedAsync(CancellationToken cancellationToken = default)
         {
             var sql = $"{BaseSelect} WHERE OrganizationId = @OrganizationId AND RemainingQuantity > 0 ORDER BY CreatedAt DESC";
             var command = new CommandDefinition(
@@ -135,10 +135,10 @@ namespace Inventory.Infrastructure.Repositories.Queries
                 new { OrganizationId },
                 cancellationToken: cancellationToken);
 
-            return await _connection.QueryAsync<BatchDto>(command);
+            return await _connection.QueryAsync<BatchProductGuidDto>(command);
         }
 
-        public async Task<BatchDto?> GetByIdAsync(BatchId id, CancellationToken cancellationToken = default)
+        public async Task<BatchProductGuidDto?> GetByIdAsync(BatchId id, CancellationToken cancellationToken = default)
         {
             var sql = $"{BaseSelect} WHERE Id = @Id AND OrganizationId = @OrganizationId";
             var command = new CommandDefinition(
@@ -146,7 +146,7 @@ namespace Inventory.Infrastructure.Repositories.Queries
                 new { Id = id.Value, OrganizationId },
                 cancellationToken: cancellationToken);
 
-            return await _connection.QueryFirstOrDefaultAsync<BatchDto>(command);
+            return await _connection.QueryFirstOrDefaultAsync<BatchProductGuidDto>(command);
         }
     }
 }

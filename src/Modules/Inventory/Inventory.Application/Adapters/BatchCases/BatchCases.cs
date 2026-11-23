@@ -1,5 +1,6 @@
 using BuildingBlocks.Application.Abstractions;
 using BuildingBlocks.Application.Common.Models;
+using Catalog.Contracts.UseCases.ProductCases;
 using Inventory.Application.Bindings.BatchCases;
 using Inventory.Application.Repositories.Queries;
 using Inventory.Contracts.DTOs.Batch;
@@ -20,7 +21,8 @@ public class BatchCases(
     IMediator mediator, 
     IBatchQueryRepository batchQuery,
     IWarehouseBatchQueryRepository warehouseBatchQuery,
-    IStockMovementQueryRepository stockMovementQuery) : IBatchCases
+    IStockMovementQueryRepository stockMovementQuery,
+    IProductCases productCases) : IBatchCases
 {
     public async Task<BatchDetailsDto> RetrieveBatchAsync(RetrieveBatchQuery query, CancellationToken cancellationToken = default)
     {
@@ -59,16 +61,21 @@ public class BatchCases(
         if (query.WarehouseId.HasValue && query.WarehouseId.Value != Guid.Empty)
         {
             var warehouseBatches = await batchQuery.GetByWarehouseAsync(WarehouseId.From(query.WarehouseId.Value), cancellationToken);
-            return warehouseBatches.ToPaginated(page, pageSize);
+            return await AddProductNamesAsync(warehouseBatches.ToPaginated(page, pageSize), cancellationToken);
         }
 
         if (query.ProductId.HasValue && query.ProductId.Value != Guid.Empty)
-            return await batchQuery.GetByProductAsync(query.ProductId.Value, page, pageSize, cancellationToken);
+            return await AddProductNamesAsync(
+                await batchQuery.GetByProductAsync(query.ProductId.Value, page, pageSize, cancellationToken),
+                cancellationToken);
 
         if (query.PurchaseItemId.HasValue && query.PurchaseItemId.Value != Guid.Empty)
-            return await batchQuery.GetByPurchaseItemAsync(query.PurchaseItemId.Value, page, pageSize, cancellationToken);
+            return await AddProductNamesAsync(
+                await batchQuery.GetByPurchaseItemAsync(query.PurchaseItemId.Value, page, pageSize, cancellationToken),
+                cancellationToken);
 
-        return await batchQuery.GetAllPagedAsync(page, pageSize, cancellationToken);
+        var batches = await batchQuery.GetAllPagedAsync(page, pageSize, cancellationToken);
+        return await AddProductNamesAsync(batches, cancellationToken);
     }
 
     public async Task<PaginatedResult<BatchDto>> ListUnallocatedBatchesAsync(ListUnallocatedBatchesQuery query, CancellationToken cancellationToken = default)
@@ -77,7 +84,7 @@ public class BatchCases(
         var pageSize = Math.Clamp(query.PageSize, 1, 100);
 
         var batches = await batchQuery.GetUnallocatedAsync(cancellationToken);
-        return batches.ToPaginated(page, pageSize);
+        return await AddProductNamesAsync(batches.ToPaginated(page, pageSize), cancellationToken);
     }
 
     public async Task<IEnumerable<StockMovementDto>> RetrieveBatchMovementHistoryAsync(RetrieveBatchMovementHistoryQuery query, CancellationToken cancellationToken = default)
@@ -91,5 +98,32 @@ public class BatchCases(
 
     public Task<BatchDto> RegisterBatchAsync(RegisterBatchCommand command, CancellationToken cancellationToken = default)
         => mediator.Send(new RegisterBatchCommandMediatR(command), cancellationToken);
+
+    private async Task<PaginatedResult<BatchDto>> AddProductNamesAsync(
+        PaginatedResult<BatchProductGuidDto> batches,
+        CancellationToken cancellationToken)
+    {
+        var productIds = batches.Items
+            .Select(batch => batch.ProductId)
+            .Distinct()
+            .ToArray();
+
+        var products = await productCases.ListProductsByIdsAsync(
+            new ListProductsByIdsQuery(productIds),
+            cancellationToken);
+
+        var productNames = products.ToDictionary(product => product.Id, product => product.Name);
+        var items = batches.Items.Select(batch => new BatchDto(
+            batch.Id,
+            productNames.GetValueOrDefault(batch.ProductId, "Product not found."),
+            batch.PurchaseItemId,
+            batch.OrganizationId,
+            batch.InitialQuantity,
+            batch.RemainingQuantity,
+            batch.UnitCost,
+            batch.CreatedAt)).ToList();
+
+        return new PaginatedResult<BatchDto>(items, batches.TotalCount, batches.Page, batches.PageSize);
+    }
 
 }
