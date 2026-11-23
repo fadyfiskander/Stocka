@@ -1,15 +1,12 @@
-﻿using Dapper;
+﻿using BuildingBlocks.Application.Abstractions;
+using BuildingBlocks.Application.Common.Models;
+using Dapper;
 using Inventory.Application.Common.Interfaces;
 using Inventory.Application.Repositories.Queries;
 using Inventory.Contracts.DTOs.StockMovement;
-using Inventory.Infrastructure.Repositories.Queries.Bases;
 using Inventory.Domain.Batches;
-using Inventory.Domain.StockMovements;
 using Inventory.Domain.Warehouses;
-using BuildingBlocks.Application.Common.Models;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
+using Inventory.Infrastructure.Repositories.Queries.Bases;
 using System.Text;
 
 namespace Inventory.Infrastructure.Repositories.Queries
@@ -19,65 +16,82 @@ namespace Inventory.Infrastructure.Repositories.Queries
         private const string BaseSelect =
             "SELECT Id, ProductId, BatchId, WarehouseId, OrganizationId, Quantity, MovementType, ReferenceType, ReferenceId, CreatedAt, Reason FROM " + TableStockMovements;
 
-        public StockMovementQueryRepository(IInventoryDbConnection connection) : base(connection)
+        public StockMovementQueryRepository(IInventoryDbConnection connection, ICurrentUserService currentUser)
+            : base(connection, currentUser)
         {
         }
 
-        public async Task<IEnumerable<StockMovementDto>> GetAllAsync(Guid organizationId, WarehouseId warehouseId)
-        {
-            var sql = $"{BaseSelect} WHERE WarehouseId = @WarehouseId AND OrganizationId = @OrganizationId ORDER BY CreatedAt DESC";
-            return await _connection.QueryAsync<StockMovementDto>(sql, new { WarehouseId = warehouseId.Value, OrganizationId = organizationId });
-        }
-
-        public async Task<IEnumerable<StockMovementDto>> GetByBatchAsync(Guid organizationId, BatchId batchId)
+        public async Task<IEnumerable<StockMovementDto>> GetByBatchAsync(
+            BatchId batchId,
+            CancellationToken cancellationToken = default)
         {
             var sql = $"{BaseSelect} WHERE BatchId = @BatchId AND OrganizationId = @OrganizationId ORDER BY CreatedAt ASC";
-            return await _connection.QueryAsync<StockMovementDto>(sql, new { BatchId = batchId.Value, OrganizationId = organizationId });
+            var command = new CommandDefinition(
+                sql,
+                new { BatchId = batchId.Value, OrganizationId },
+                cancellationToken: cancellationToken);
+
+            return await _connection.QueryAsync<StockMovementDto>(command);
         }
 
-        public async Task<PaginatedResult<StockMovementDto>> GetPagedAsync(Guid organizationId, MovementQueryCriteria criteria)
+        public async Task<PaginatedResult<StockMovementDto>> GetPagedAsync(
+            MovementQueryCriteria criteria,
+            CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var page = Math.Max(1, criteria.Page);
             var pageSize = Math.Clamp(criteria.PageSize, 1, 100);
 
             var where = new StringBuilder(" WHERE OrganizationId = @OrganizationId");
-            var parameters = new Dictionary<string, object?> { ["OrganizationId"] = organizationId };
+            var dp = new DynamicParameters();
+            dp.Add("OrganizationId", OrganizationId);
 
-            AppendFilter(where, parameters, "WarehouseId", criteria.WarehouseId);
-            AppendFilter(where, parameters, "BatchId", criteria.BatchId);
-            AppendFilter(where, parameters, "ProductId", criteria.ProductId);
+            AppendFilter(where, dp, "WarehouseId", criteria.WarehouseId);
+            AppendFilter(where, dp, "BatchId", criteria.BatchId);
+            AppendFilter(where, dp, "ProductId", criteria.ProductId);
 
             if (criteria.MovementTypes is { Count: > 0 })
             {
                 where.Append(" AND MovementType IN @MovementTypes");
-                parameters["MovementTypes"] = criteria.MovementTypes;
+                dp.Add("MovementTypes", criteria.MovementTypes);
             }
 
             if (criteria.DateFromUtc.HasValue)
             {
                 where.Append(" AND CreatedAt >= @DateFromUtc");
-                parameters["DateFromUtc"] = criteria.DateFromUtc.Value;
+                dp.Add("DateFromUtc", criteria.DateFromUtc.Value);
             }
 
             if (criteria.DateToUtc.HasValue)
             {
                 where.Append(" AND CreatedAt <= @DateToUtc");
-                parameters["DateToUtc"] = criteria.DateToUtc.Value;
+                dp.Add("DateToUtc", criteria.DateToUtc.Value);
             }
 
             var countSql = $"SELECT COUNT(*) FROM {TableStockMovements}{where}";
-            var total = await _connection.ExecuteScalarAsync<int>(countSql, parameters);
+            var countCommand = new CommandDefinition(
+                countSql,
+                dp,
+                cancellationToken: cancellationToken);
+
+            var total = await _connection.ExecuteScalarAsync<int>(countCommand);
 
             var offset = (page - 1) * pageSize;
-            parameters["Offset"] = offset;
-            parameters["PageSize"] = pageSize;
-            var sql = $"{BaseSelect}{where} ORDER BY CreatedAt DESC OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
-            var items = await _connection.QueryAsync<StockMovementDto>(sql, parameters);
+            dp.Add("Offset", offset);
+            dp.Add("PageSize", pageSize);
 
+            var sql = $"{BaseSelect}{where} ORDER BY CreatedAt DESC OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+            var itemsCommand = new CommandDefinition(
+                sql,
+                dp,
+                cancellationToken: cancellationToken);
+
+            var items = await _connection.QueryAsync<StockMovementDto>(itemsCommand);
             return new PaginatedResult<StockMovementDto>(items.ToList(), total, page, pageSize);
         }
 
-        private static void AppendFilter(StringBuilder where, Dictionary<string, object?> parameters, string columnName, object? value)
+        private static void AppendFilter(StringBuilder where, DynamicParameters parameters, string columnName, object? value)
         {
             if (value is null) return;
             var guidValue = value switch
@@ -90,13 +104,7 @@ namespace Inventory.Infrastructure.Repositories.Queries
             if (guidValue == Guid.Empty) return;
 
             where.Append($" AND {columnName} = @{columnName}");
-            parameters[columnName] = guidValue;
-        }
-
-        public async Task<StockMovementDto?> GetByIdAsync(Guid organizationId, StockMovementId id)
-        {
-            var sql = $"{BaseSelect} WHERE Id = @Id AND OrganizationId = @OrganizationId";
-            return await _connection.QueryFirstOrDefaultAsync<StockMovementDto>(sql, new { Id = id.Value, OrganizationId = organizationId });
+            parameters.Add(columnName, guidValue);
         }
     }
 }
