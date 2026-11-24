@@ -40,8 +40,7 @@ namespace Inventory.Infrastructure.Persistence.Configurations
             builder.Property(e => e.Type)
                 .IsRequired();
 
-            // The physical table is singular ("Warehouse") — matches InitialCreate migration and Dapper queries.
-            builder.ToTable("Warehouse");
+            builder.ToTable("Warehouses");
 
             builder
                 .Property(w => w.OrganizationId)
