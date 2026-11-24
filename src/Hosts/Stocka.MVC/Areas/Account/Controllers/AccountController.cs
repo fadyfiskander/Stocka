@@ -127,7 +127,7 @@ namespace Stocka.MVC.Areas.Account.Controllers
 
                         AllowRefresh = true,
 
-                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(1)
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
                     };
 
                 // 6. Issue Authentication Cookie.

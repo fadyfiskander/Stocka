@@ -3,50 +3,78 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = Loc.T("ReportProducts_Title");
     string T(string key) => Loc.T(key);
+
+    const string pageBtn = "inline-flex h-8 items-center justify-center rounded-md border border-line bg-surface px-3 text-[12.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline";
+    const string pageOff = "inline-flex h-8 cursor-not-allowed items-center justify-center rounded-md border border-line bg-surface px-3 text-[12.5px] font-medium text-ink-faint opacity-45";
 }
 
-<div class="container-fluid py-4">
-    <h2 class="mb-1">@T("ReportProducts_Title")</h2>
-    <p class="text-muted mb-3">
-        @T("ReportProducts_Sub")
-    </p>
+<section class="grid gap-5">
+    <header class="border-b border-line pb-5">
+        <h1 class="text-[22px] font-bold tracking-[-.015em]">@T("ReportProducts_Title")</h1>
+        <p class="mt-1.5 max-w-[80ch] text-[13.5px] text-ink-soft">@T("ReportProducts_Sub")</p>
+    </header>
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-0">
-            <table class="table-hover mb-0 table align-middle">
-                <thead class="table-light">
-                    <tr><th class="ps-4">@T("Common_Product")</th><th>@T("ReportProducts_Col_Initial")</th><th>@T("Batches_Col_Unallocated")</th><th>@T("Batches_InWarehouses")</th></tr>
+    <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[680px] border-collapse text-[13.5px]">
+                <thead>
+                    <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Product")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@T("ReportProducts_Col_Initial")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@T("Batches_Col_Unallocated")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@T("Batches_InWarehouses")</th>
+                    </tr>
                 </thead>
                 <tbody>
                     @if (Model.Items.Any())
                     {
                         @foreach (var p in Model.Items)
-                         {
-                             <tr>
-                                 <td class="ps-4"><small>@p.ProductId</small></td>
-                                 <td>@p.InitialQuantity</td>
-                                 <td>@p.UnallocatedQuantity</td>
-                                 <td>@p.QuantityInWarehouses</td>
-                             </tr>
-                         }
+                        {
+                            <tr class="border-b border-line last:border-0 hover:bg-sunken/50">
+                                <td class="px-4 py-3"><span class="num break-all font-mono text-[12px] text-ink-soft">@p.ProductId</span></td>
+                                <td class="num px-4 py-3 text-end text-ink-soft">@p.InitialQuantity</td>
+                                <td class="num px-4 py-3 text-end font-semibold @(p.UnallocatedQuantity > 0 ? "text-signal" : "text-ink-soft")">@p.UnallocatedQuantity</td>
+                                <td class="num px-4 py-3 text-end font-bold text-ink">@p.QuantityInWarehouses</td>
+                            </tr>
+                        }
                     }
                     else
                     {
-                        <tr><td colspan="4" class="py-5 text-center text-muted">@T("ReportProducts_Empty")</td></tr>
+                        <tr>
+                            <td colspan="4" class="px-6 py-14 text-center">
+                                <svg class="icon mx-auto !size-8 text-ink-faint"><use href="#i-box" /></svg>
+                                <p class="mt-2 text-[13.5px] text-ink-soft">@T("ReportProducts_Empty")</p>
+                            </td>
+                        </tr>
                     }
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mt-3">
-        <small class="text-muted">@Loc.F("Common_PageOf", Model.Page, Model.TotalPages) (@Model.TotalCount)</small>
-        <div class="btn-group">
-            <a asp-area="Inventory" asp-controller="Reports" asp-action="Products" asp-route-page="@(Model.Page - 1)"
-               class="btn btn-sm btn-outline-secondary @(Model.HasPrevious ? "" : "disabled")">@T("Common_Previous")</a>
-            <a asp-area="Inventory" asp-controller="Reports" asp-action="Products" asp-route-page="@(Model.Page + 1)"
-               class="btn btn-sm btn-outline-secondary @(Model.HasNext ? "" : "disabled")">@T("Common_Next")</a>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <span class="text-[12.5px] text-ink-faint">@Loc.F("Common_PageOf", Model.Page, Model.TotalPages) · <span class="num">@Model.TotalCount</span></span>
+        <div class="flex items-center gap-1.5">
+            @if (Model.HasPrevious)
+            {
+                <a class="@pageBtn" asp-area="Inventory" asp-controller="Reports" asp-action="Products" asp-route-page="@(Model.Page - 1)">
+                    <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@T("Common_Previous")
+                </a>
+            }
+            else
+            {
+                <span class="@pageOff"><svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@T("Common_Previous")</span>
+            }
+            @if (Model.HasNext)
+            {
+                <a class="@pageBtn" asp-area="Inventory" asp-controller="Reports" asp-action="Products" asp-route-page="@(Model.Page + 1)">
+                    @T("Common_Next")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg>
+                </a>
+            }
+            else
+            {
+                <span class="@pageOff">@T("Common_Next")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg></span>
+            }
         </div>
     </div>
-    <div class="mb-5"></div>
-</div>
+</section>

@@ -3,10 +3,39 @@
     string T(string key) => Loc.T(key);
 }
 
-<section class="page">
-    <header class="page-head"><div><h1 class="page-title">@T("Home_Title")</h1><p class="page-sub">@T("Home_Sub")</p></div></header>
-    <div class="grid-2">
-        <article class="card"><div class="card-body"><h2 class="card-title">@T("Home_CatalogTitle")</h2><p class="page-sub">@T("Home_CatalogText")</p><a class="btn btn-primary" asp-area="Catalog" asp-controller="Products" asp-action="Index">@T("Home_CatalogLink")</a></div></article>
-        <article class="card"><div class="card-body"><h2 class="card-title">@T("Home_InventoryTitle")</h2><p class="page-sub">@T("Home_InventoryText")</p><a class="btn btn-ghost" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index">@T("Home_InventoryLink")</a></div></article>
+<section class="grid gap-5">
+    <header class="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
+        <div>
+            <h1 class="text-[26px] font-bold tracking-[-.02em]">@T("Home_Title")</h1>
+            <p class="mt-1.5 text-[13.5px] text-ink-soft">@T("Home_Sub")</p>
+        </div>
+    </header>
+
+    <div class="grid gap-4 md:grid-cols-2">
+        <a class="group/card relative flex flex-col gap-3 overflow-hidden rounded-lg border border-line bg-surface p-5 shadow-card transition hover:border-accent/45 hover:no-underline"
+           asp-area="Catalog" asp-controller="Products" asp-action="Index">
+            <span class="grid size-11 place-items-center rounded-lg bg-accent-tint text-accent">
+                <svg class="icon !size-[22px]"><use href="#i-box" /></svg>
+            </span>
+            <span class="text-[15.5px] font-semibold text-ink">@T("Home_CatalogTitle")</span>
+            <span class="text-[13.5px] leading-relaxed text-ink-soft">@T("Home_CatalogText")</span>
+            <span class="mt-1 inline-flex items-center gap-1.5 text-[13px] font-semibold text-accent">
+                @T("Home_CatalogLink")
+                <svg class="icon !size-[15px] transition-transform group-hover/card:translate-x-0.5 rtl:group-hover/card:-translate-x-0.5"><use href="#i-chevron-end" /></svg>
+            </span>
+        </a>
+
+        <a class="group/card relative flex flex-col gap-3 overflow-hidden rounded-lg border border-line bg-surface p-5 shadow-card transition hover:border-accent/45 hover:no-underline"
+           asp-area="Inventory" asp-controller="Warehouses" asp-action="Index">
+            <span class="grid size-11 place-items-center rounded-lg bg-sunken text-ink-soft">
+                <svg class="icon !size-[22px]"><use href="#i-store" /></svg>
+            </span>
+            <span class="text-[15.5px] font-semibold text-ink">@T("Home_InventoryTitle")</span>
+            <span class="text-[13.5px] leading-relaxed text-ink-soft">@T("Home_InventoryText")</span>
+            <span class="mt-1 inline-flex items-center gap-1.5 text-[13px] font-semibold text-accent">
+                @T("Home_InventoryLink")
+                <svg class="icon !size-[15px] transition-transform group-hover/card:translate-x-0.5 rtl:group-hover/card:-translate-x-0.5"><use href="#i-chevron-end" /></svg>
+            </span>
+        </a>
     </div>
 </section>

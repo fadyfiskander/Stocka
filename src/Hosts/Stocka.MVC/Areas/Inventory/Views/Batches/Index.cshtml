@@ -6,75 +6,110 @@
     var productId = (Guid?)ViewBag.ProductId;
     var purchaseItemId = (Guid?)ViewBag.PurchaseItemId;
     var warehouseId = (Guid?)ViewBag.WarehouseId;
+
+    const string input = "block h-10 w-full rounded-md border border-line bg-surface px-3 text-[13.5px] text-ink outline-none transition placeholder:text-ink-faint hover:border-line-strong focus:border-accent focus:ring-[3px] focus:ring-[var(--focus-ring)]";
+    const string btnPrimary = "inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-accent px-4 text-[13.5px] font-semibold text-on-accent transition-colors hover:bg-accent-hover hover:no-underline";
+    const string rowBtn = "inline-flex h-8 items-center justify-center rounded-md border border-line bg-surface px-2.5 text-[12.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline";
+    const string pageBtn = "inline-flex h-8 items-center justify-center rounded-md border border-line bg-surface px-3 text-[12.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline";
+    const string pageOff = "inline-flex h-8 cursor-not-allowed items-center justify-center rounded-md border border-line bg-surface px-3 text-[12.5px] font-medium text-ink-faint opacity-45";
 }
 
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<section class="grid gap-5">
+    <header class="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
         <div>
-            <h2 class="mb-1">@T("Batches_Title")</h2>
-            <p class="text-muted mb-0">@T("Batches_Sub")</p>
+            <h1 class="text-[22px] font-bold tracking-[-.015em]">@T("Batches_Title")</h1>
+            <p class="mt-1.5 max-w-[80ch] text-[13.5px] text-ink-soft">@T("Batches_Sub")</p>
         </div>
-        <a class="btn btn-primary" asp-area="Inventory" asp-controller="Batches" asp-action="Create">@T("Batches_Register")</a>
-    </div>
+        <a class="@btnPrimary" asp-area="Inventory" asp-controller="Batches" asp-action="Create">
+            <svg class="icon !size-4"><use href="#i-plus" /></svg>@T("Batches_Register")
+        </a>
+    </header>
 
-    <form method="get" class="row g-2 mb-3" asp-area="Inventory" asp-controller="Batches" asp-action="Index">
-        <div class="col-md-4"><input type="text" class="form-control" name="productId" placeholder="@T("Batches_FilterProduct")" value="@productId" /></div>
-        <div class="col-md-4"><input type="text" class="form-control" name="purchaseItemId" placeholder="@T("Batches_FilterPurchase")" value="@purchaseItemId" /></div>
-        <div class="col-md-3"><input type="text" class="form-control" name="warehouseId" placeholder="@T("Batches_FilterWarehouse")" value="@warehouseId" /></div>
-        <div class="col-auto"><button type="submit" class="btn btn-outline-primary">@T("Common_Filter")</button></div>
-        <div class="col-auto"><a class="btn btn-outline-secondary" asp-area="Inventory" asp-controller="Batches" asp-action="Index">@T("Common_Clear")</a></div>
+    <form method="get" asp-area="Inventory" asp-controller="Batches" asp-action="Index"
+          class="rounded-lg border border-line bg-surface p-4 shadow-card">
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto_auto] lg:items-end">
+            <input type="text" name="productId" class="@input num font-mono" placeholder="@T("Batches_FilterProduct")" value="@productId" />
+            <input type="text" name="purchaseItemId" class="@input num font-mono" placeholder="@T("Batches_FilterPurchase")" value="@purchaseItemId" />
+            <input type="text" name="warehouseId" class="@input num font-mono" placeholder="@T("Batches_FilterWarehouse")" value="@warehouseId" />
+            <button type="submit" class="inline-flex h-10 items-center justify-center gap-1.5 rounded-md border border-line bg-surface px-4 text-[13.5px] font-medium text-ink transition-colors hover:bg-sunken">
+                <svg class="icon !size-4"><use href="#i-filter" /></svg>@T("Common_Filter")
+            </button>
+            <a class="inline-flex h-10 items-center justify-center rounded-md px-4 text-[13.5px] font-medium text-ink-soft transition-colors hover:bg-sunken hover:text-ink hover:no-underline"
+               asp-area="Inventory" asp-controller="Batches" asp-action="Index">@T("Common_Clear")</a>
+        </div>
     </form>
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table-hover mb-0 table align-middle">
-                    <thead class="table-light">
+    <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[860px] border-collapse text-[13.5px]">
+                <thead>
+                    <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Batch")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Product")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@T("Batches_Col_Initial")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@T("Batches_Col_Unallocated")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@T("Batches_Col_UnitCost")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Batches_Col_Received")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@T("Common_Actions")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items.Any())
+                    {
+                        @foreach (var batch in Model.Items)
+                        {
+                            <tr class="border-b border-line last:border-0 hover:bg-sunken/50">
+                                <td class="px-4 py-3"><span class="num break-all font-mono text-[12px] text-ink-soft">@batch.Id</span></td>
+                                <td class="px-4 py-3"><span class="num break-all font-mono text-[12px] text-ink-soft">@batch.ProductId</span></td>
+                                <td class="num px-4 py-3 text-end font-semibold text-ink">@batch.InitialQuantity</td>
+                                <td class="num px-4 py-3 text-end font-semibold text-ink">@batch.RemainingQuantity</td>
+                                <td class="num px-4 py-3 text-end text-ink-soft">@batch.UnitCost.ToString("N2")</td>
+                                <td class="num px-4 py-3 font-mono text-[12.5px] text-ink-soft">@batch.CreatedAt.ToString("yyyy-MM-dd")</td>
+                                <td class="px-4 py-3">
+                                    <div class="flex justify-end">
+                                        <a class="@rowBtn" asp-area="Inventory" asp-controller="Batches" asp-action="Details" asp-route-id="@batch.Id">@T("Common_Details")</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
                         <tr>
-                            <th class="ps-4">@T("Common_Batch")</th>
-                            <th>@T("Common_Product")</th>
-                            <th>@T("Batches_Col_Initial")</th>
-                            <th>@T("Batches_Col_Unallocated")</th>
-                            <th>@T("Batches_Col_UnitCost")</th>
-                            <th>@T("Batches_Col_Received")</th>
-                            <th class="pe-4 text-end">@T("Common_Actions")</th>
+                            <td colspan="7" class="px-6 py-14 text-center">
+                                <svg class="icon mx-auto !size-8 text-ink-faint"><use href="#i-layers" /></svg>
+                                <p class="mt-2 text-[13.5px] text-ink-soft">@T("Batches_Empty")</p>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.Items.Any())
-                        {
-                            @foreach (var batch in Model.Items)
-                            {
-                                <tr>
-                                    <td class="ps-4"><small>@batch.Id</small></td>
-                                    <td><small>@batch.ProductId</small></td>
-                                    <td>@batch.InitialQuantity</td>
-                                    <td>@batch.RemainingQuantity</td>
-                                    <td>@batch.UnitCost.ToString("N2")</td>
-                                    <td>@batch.CreatedAt.ToString("yyyy-MM-dd")</td>
-                                    <td class="pe-4 text-end">
-                                        <a class="btn btn-sm btn-outline-primary" asp-area="Inventory" asp-controller="Batches" asp-action="Details" asp-route-id="@batch.Id">@T("Common_Details")</a>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr><td colspan="7" class="py-5 text-center text-muted">@T("Batches_Empty")</td></tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mt-3">
-        <small class="text-muted">@Loc.F("Batches_PageInfo", Model.Page, Model.TotalPages, Model.TotalCount)</small>
-        <div class="btn-group">
-            <a asp-area="Inventory" asp-controller="Batches" asp-action="Index" asp-route-productId="@productId" asp-route-purchaseItemId="@purchaseItemId" asp-route-warehouseId="@warehouseId" asp-route-page="@(Model.Page - 1)"
-               class="btn btn-sm btn-outline-secondary @(Model.HasPrevious ? "" : "disabled")">@T("Common_Previous")</a>
-            <a asp-area="Inventory" asp-controller="Batches" asp-action="Index" asp-route-productId="@productId" asp-route-purchaseItemId="@purchaseItemId" asp-route-warehouseId="@warehouseId" asp-route-page="@(Model.Page + 1)"
-               class="btn btn-sm btn-outline-secondary @(Model.HasNext ? "" : "disabled")">@T("Common_Next")</a>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <span class="text-[12.5px] text-ink-faint">@Loc.F("Batches_PageInfo", Model.Page, Model.TotalPages, Model.TotalCount)</span>
+        <div class="flex items-center gap-1.5">
+            @if (Model.HasPrevious)
+            {
+                <a class="@pageBtn" asp-area="Inventory" asp-controller="Batches" asp-action="Index" asp-route-productId="@productId" asp-route-purchaseItemId="@purchaseItemId" asp-route-warehouseId="@warehouseId" asp-route-page="@(Model.Page - 1)">
+                    <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@T("Common_Previous")
+                </a>
+            }
+            else
+            {
+                <span class="@pageOff"><svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@T("Common_Previous")</span>
+            }
+            @if (Model.HasNext)
+            {
+                <a class="@pageBtn" asp-area="Inventory" asp-controller="Batches" asp-action="Index" asp-route-productId="@productId" asp-route-purchaseItemId="@purchaseItemId" asp-route-warehouseId="@warehouseId" asp-route-page="@(Model.Page + 1)">
+                    @T("Common_Next")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg>
+                </a>
+            }
+            else
+            {
+                <span class="@pageOff">@T("Common_Next")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg></span>
+            }
         </div>
     </div>
-</div>
+</section>

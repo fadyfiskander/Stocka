@@ -6,9 +6,30 @@
 }
 @if (!string.IsNullOrWhiteSpace(success) || !string.IsNullOrWhiteSpace(error) || !string.IsNullOrWhiteSpace(warning))
 {
-    <div class="flash-stack" aria-live="polite">
-        @if (!string.IsNullOrWhiteSpace(success)) { <div class="alert alert-success" role="status"><span>@success</span><button class="alert-dismiss" type="button" data-alert-dismiss aria-label="@close">×</button></div> }
-        @if (!string.IsNullOrWhiteSpace(warning)) { <div class="alert alert-warn" role="status"><span>@warning</span><button class="alert-dismiss" type="button" data-alert-dismiss aria-label="@close">×</button></div> }
-        @if (!string.IsNullOrWhiteSpace(error)) { <div class="alert alert-danger" role="alert"><span>@error</span><button class="alert-dismiss" type="button" data-alert-dismiss aria-label="@close">×</button></div> }
+    <div class="mb-4 grid gap-2" aria-live="polite">
+        @if (!string.IsNullOrWhiteSpace(success))
+        {
+            <div class="alert flex items-start gap-3 rounded-md border border-ok/30 bg-ok-tint px-4 py-3 text-[13.5px] text-ok" role="status">
+                <svg class="icon mt-0.5 !size-[17px]"><use href="#i-check-circle" /></svg>
+                <span class="min-w-0 flex-1">@success</span>
+                <button class="alert-dismiss -me-1 ms-1 shrink-0 cursor-pointer rounded p-1 text-current opacity-60 transition hover:opacity-100" type="button" data-alert-dismiss aria-label="@close">×</button>
+            </div>
+        }
+        @if (!string.IsNullOrWhiteSpace(warning))
+        {
+            <div class="alert flex items-start gap-3 rounded-md border border-warn/30 bg-warn-tint px-4 py-3 text-[13.5px] text-warn" role="status">
+                <svg class="icon mt-0.5 !size-[17px]"><use href="#i-alert" /></svg>
+                <span class="min-w-0 flex-1">@warning</span>
+                <button class="alert-dismiss -me-1 ms-1 shrink-0 cursor-pointer rounded p-1 text-current opacity-60 transition hover:opacity-100" type="button" data-alert-dismiss aria-label="@close">×</button>
+            </div>
+        }
+        @if (!string.IsNullOrWhiteSpace(error))
+        {
+            <div class="alert flex items-start gap-3 rounded-md border border-danger/30 bg-danger-tint px-4 py-3 text-[13.5px] text-danger" role="alert">
+                <svg class="icon mt-0.5 !size-[17px]"><use href="#i-alert" /></svg>
+                <span class="min-w-0 flex-1">@error</span>
+                <button class="alert-dismiss -me-1 ms-1 shrink-0 cursor-pointer rounded p-1 text-current opacity-60 transition hover:opacity-100" type="button" data-alert-dismiss aria-label="@close">×</button>
+            </div>
+        }
     </div>
 }

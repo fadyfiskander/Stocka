@@ -3,113 +3,93 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = Loc.T("Categories_Title");
     string T(string key) => Loc.T(key);
+
+    const string btnGhost = "inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-line bg-surface px-4 text-[13.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline";
+    const string btnPrimary = "inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-accent px-4 text-[13.5px] font-semibold text-on-accent transition-colors hover:bg-accent-hover hover:no-underline";
+    const string rowBtn = "inline-flex h-8 items-center justify-center rounded-md border border-line bg-surface px-2.5 text-[12.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline";
 }
 
-<div class="container-fluid py-4">
-
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["Success"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @TempData["Error"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<section class="grid gap-5">
+    <header class="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
         <div>
-            <h2 class="mb-1">@T("Categories_Title")</h2>
-            <p class="text-muted mb-0">@T("Categories_Sub")</p>
+            <h1 class="text-[22px] font-bold tracking-[-.015em]">@T("Categories_Title")</h1>
+            <p class="mt-1.5 text-[13.5px] text-ink-soft">@T("Categories_Sub")</p>
         </div>
-        <div class="d-flex gap-2">
-            <a class="btn btn-outline-secondary" asp-area="Catalog" asp-controller="Categories" asp-action="SearchByName">@T("Products_SearchByName")</a>
-            <a class="btn btn-primary" asp-area="Catalog" asp-controller="Categories" asp-action="Create">
-                <i class="bi bi-plus-lg me-1"></i> @T("Categories_Add")
+        <div class="flex flex-wrap items-center gap-2">
+            <a class="@btnGhost" asp-area="Catalog" asp-controller="Categories" asp-action="SearchByName">
+                <svg class="icon !size-4"><use href="#i-search" /></svg>@T("Products_SearchByName")
+            </a>
+            <a class="@btnPrimary" asp-area="Catalog" asp-controller="Categories" asp-action="Create">
+                <svg class="icon !size-4"><use href="#i-plus" /></svg>@T("Categories_Add")
             </a>
         </div>
-    </div>
+    </header>
 
-    <!-- Categories Table -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table-hover mb-0 table align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="ps-4">@T("Common_Name")</th>
-                            <th>@T("Common_Status")</th>
-                            <th>@T("Common_Organization")</th>
-                            <th class="pe-4 text-end">@T("Common_Actions")</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model != null && Model.Any())
+    <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[720px] border-collapse text-[13.5px]">
+                <thead>
+                    <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Name")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Status")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Organization")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@T("Common_Actions")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var category in Model)
                         {
-                            @foreach (var category in Model)
-                            {
-                                <tr>
-                                    <td class="ps-4">
-                                        <div class="fw-semibold">@category.Name</div>
-                                        <small class="text-muted">@category.Id</small>
-                                    </td>
-                                    <td>
+                            <tr class="border-b border-line last:border-0 hover:bg-sunken/50">
+                                <td class="px-4 py-3">
+                                    <div class="font-semibold text-ink">@category.Name</div>
+                                    <div class="num mt-0.5 break-all font-mono text-[11.5px] text-ink-faint">@category.Id</div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    @if (category.IsActive)
+                                    {
+                                        <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@T("Common_Active")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@T("Common_Inactive")</span>
+                                    }
+                                </td>
+                                <td class="px-4 py-3"><span class="num break-all font-mono text-[11.5px] text-ink-soft">@category.OrganizationId</span></td>
+                                <td class="px-4 py-3">
+                                    <div class="flex flex-wrap items-center justify-end gap-1.5">
+                                        <a class="@rowBtn" asp-area="Catalog" asp-controller="Categories" asp-action="Details" asp-route-id="@category.Id">@T("Common_Details")</a>
+                                        <a class="@rowBtn" asp-area="Catalog" asp-controller="Categories" asp-action="Edit" asp-route-id="@category.Id">@T("Common_Edit")</a>
                                         @if (category.IsActive)
                                         {
-                                            <span class="badge text-bg-success">@T("Common_Active")</span>
+                                            <form asp-area="Catalog" asp-controller="Categories" asp-action="Deactivate" asp-route-id="@category.Id" method="post" class="inline-flex">
+                                                <button type="submit" class="inline-flex h-8 items-center justify-center rounded-md border border-warn/35 bg-transparent px-2.5 text-[12.5px] font-medium text-warn transition-colors hover:bg-warn-tint">@T("Common_Deactivate")</button>
+                                            </form>
                                         }
                                         else
                                         {
-                                            <span class="badge text-bg-secondary">@T("Common_Inactive")</span>
+                                            <form asp-area="Catalog" asp-controller="Categories" asp-action="Activate" asp-route-id="@category.Id" method="post" class="inline-flex">
+                                                <button type="submit" class="inline-flex h-8 items-center justify-center rounded-md border border-ok/35 bg-transparent px-2.5 text-[12.5px] font-medium text-ok transition-colors hover:bg-ok-tint">@T("Common_Activate")</button>
+                                            </form>
                                         }
-                                    </td>
-                                    <td>
-                                        <small class="text-muted">@category.OrganizationId</small>
-                                    </td>
-                                    <td class="pe-4 text-end">
-                                        <div class="btn-group" role="group">
-                                            <a class="btn btn-sm btn-outline-primary"
-                                               asp-area="Catalog" asp-controller="Categories" asp-action="Details" asp-route-id="@category.Id">@T("Common_Details")</a>
-                                            <a class="btn btn-sm btn-outline-secondary"
-                                               asp-area="Catalog" asp-controller="Categories" asp-action="Edit" asp-route-id="@category.Id">@T("Common_Edit")</a>
-
-                                            @if (category.IsActive)
-                                            {
-                                                <form asp-area="Catalog" asp-controller="Categories" asp-action="Deactivate" asp-route-id="@category.Id" method="post" class="d-inline">
-                                                    <button type="submit" class="btn btn-sm btn-outline-warning">@T("Common_Deactivate")</button>
-                                                </form>
-                                            }
-                                            else
-                                            {
-                                                <form asp-area="Catalog" asp-controller="Categories" asp-action="Activate" asp-route-id="@category.Id" method="post" class="d-inline">
-                                                    <button type="submit" class="btn btn-sm btn-outline-success">@T("Common_Activate")</button>
-                                                </form>
-                                            }
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="4" class="py-5 text-center">
-                                    <div class="text-muted">
-                                        <div class="fs-4 mb-2">@T("Categories_Empty")</div>
-                                        <small>@T("Categories_EmptyHint")</small>
                                     </div>
                                 </td>
                             </tr>
                         }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="px-6 py-14 text-center">
+                                <svg class="icon mx-auto !size-8 text-ink-faint"><use href="#i-tag" /></svg>
+                                <p class="mt-2 text-[14px] font-semibold text-ink">@T("Categories_Empty")</p>
+                                <p class="mx-auto mt-1 max-w-[46ch] text-[12.5px] text-ink-soft">@T("Categories_EmptyHint")</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
-</div>
+</section>

@@ -2,117 +2,247 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = Loc.T("ReportWarehouses_Title");
     string T(string key) => Loc.T(key);
-    var rankedStock = (PaginatedResult<WarehouseStockSummaryDto>?)ViewBag.RankedByStock;
-    var rankedCost = (PaginatedResult<WarehouseStockSummaryDto>?)ViewBag.RankedByCost;
-    var zeroStock = (List<WarehouseStockSummaryDto>?)ViewBag.ZeroStock;
-    var inactiveWithStock = (List<WarehouseStockSummaryDto>?)ViewBag.InactiveWithStock;
+
+    var rankedStock = ((PaginatedResult<WarehouseStockSummaryDto>?)ViewBag.RankedByStock)?.Items?.ToList() ?? new List<WarehouseStockSummaryDto>();
+    var rankedCost = ((PaginatedResult<WarehouseStockSummaryDto>?)ViewBag.RankedByCost)?.Items?.ToList() ?? new List<WarehouseStockSummaryDto>();
+    var zeroStock = (List<WarehouseStockSummaryDto>?)ViewBag.ZeroStock ?? new List<WarehouseStockSummaryDto>();
+    var inactiveWithStock = (List<WarehouseStockSummaryDto>?)ViewBag.InactiveWithStock ?? new List<WarehouseStockSummaryDto>();
     var asc = (bool)ViewBag.Ascending;
+
+    // Current sort column comes from the query string ("stock" by default)
+    var order = Context.Request.Query["order"].ToString();
+    if (order != "cost") order = "stock";
+    var dirText = asc ? T("ReportWarehouses_Asc") : T("ReportWarehouses_Desc");
+    var arrow = asc ? "↑" : "↓";
+
+    // Bars are relative to the biggest value in each list
+    double maxUnitsStock = rankedStock.Count > 0 ? rankedStock.Max(w => Convert.ToDouble(w.TotalUnits)) : 0;
+    double maxUnitsCost = rankedCost.Count > 0 ? rankedCost.Max(w => Convert.ToDouble(w.TotalCost)) : 0;
+    string Bar(object value, double max) =>
+        (max <= 0 ? 0 : Math.Min(100, Math.Max(0, Convert.ToDouble(value) / max * 100)))
+            .ToString("0.#", System.Globalization.CultureInfo.InvariantCulture) + "%";
+
+    // ───── shared class sets (literal tokens) ─────
+    const string card = "min-w-0 overflow-hidden rounded-lg border border-line bg-surface shadow-card";
+    const string cardWarn = "min-w-0 overflow-hidden rounded-lg border border-signal/35 bg-signal-tint/40 shadow-card";
+    const string cardHead = "flex items-center justify-between gap-3 border-b border-line px-4 py-3 text-[13.5px] font-semibold text-ink";
+    const string count = "num rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft";
+    const string th = "whitespace-nowrap px-4 py-2.5 text-start text-[11.5px] font-semibold text-ink-soft";
+    const string td = "px-4 py-3";
+    const string rowHover = "border-b border-line last:border-0 hover:bg-sunken/50";
+    const string empty = "px-6 py-10 text-center text-[13.5px] text-ink-soft";
+    const string segBase = "inline-flex items-center gap-1.5 px-4 py-2 text-[13px] transition-colors";
+    const string segOn = segBase + " bg-sunken font-semibold text-ink";
+    const string segOff = segBase + " text-ink-soft hover:bg-sunken hover:text-ink";
 }
 
-<div class="container-fluid py-4">
-    <h2 class="mb-1">@T("ReportWarehouses_Title")</h2>
-    <p class="text-muted mb-3">
-        @T("ReportWarehouses_Sub")
-    </p>
+<section class="grid gap-5">
 
-    <div class="btn-group mb-3">
-        <a class="btn btn-sm btn-outline-secondary" asp-area="Inventory" asp-controller="Reports" asp-action="Warehouses" asp-route-order="stock" asp-route-asc="@(asc)">@Loc.F("ReportWarehouses_ByStock", (asc ? T("ReportWarehouses_Asc") : T("ReportWarehouses_Desc")))</a>
-        <a class="btn btn-sm btn-outline-secondary" asp-area="Inventory" asp-controller="Reports" asp-action="Warehouses" asp-route-order="cost" asp-route-asc="@(asc)">@Loc.F("ReportWarehouses_ByCost", (asc ? T("ReportWarehouses_Asc") : T("ReportWarehouses_Desc")))</a>
-    </div>
+    @* ───────── Header + sorting ───────── *@
+    <header class="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
+        <div class="min-w-0">
+            <h1 class="text-[22px] font-bold tracking-[-.015em]">@T("ReportWarehouses_Title")</h1>
+            <p class="mt-1.5 max-w-[80ch] text-[13.5px] text-ink-soft">@T("ReportWarehouses_Sub")</p>
+        </div>
 
-    <div class="row g-4">
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white"><strong>@T("ReportWarehouses_RankStock")</strong></div>
-                <div class="card-body p-0">
-                    <table class="table-hover mb-0 table align-middle">
-                        <thead class="table-light"><tr><th class="ps-4">@T("Common_Warehouse")</th><th>@T("ReportWarehouses_Col_Active")</th><th>@T("ReportWarehouses_Col_Units")</th><th class="pe-4 text-end">@T("ReportWarehouses_Col_Products")</th></tr></thead>
-                        <tbody>
-                            @if (rankedStock != null)
-                            {
-                                @foreach (var w in rankedStock.Items)
-                                 {
-                                     <tr><td class="ps-4">@w.Name</td><td>@(w.IsActive ? T("Common_Yes") : T("Common_No"))</td><td>@w.TotalUnits</td><td class="pe-4 text-end">@w.DistinctProducts</td></tr>
-                                 }
-                                 if (!rankedStock.Items.Any())
-                                 {
-                                     <tr><td colspan="4" class="py-4 text-center text-muted">@T("ReportWarehouses_None")</td></tr>
-                                 }
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="inline-flex overflow-hidden rounded-md border border-line bg-surface" role="group">
+            @if (order == "stock")
+            {
+                <a asp-area="Inventory" asp-controller="Reports" asp-action="Warehouses" asp-route-order="stock" asp-route-asc="@(!asc)"
+                   class="@segOn hover:no-underline" aria-current="true">@Loc.F("ReportWarehouses_ByStock", dirText)<span aria-hidden="true">@arrow</span></a>
+                <a asp-area="Inventory" asp-controller="Reports" asp-action="Warehouses" asp-route-order="cost" asp-route-asc="@(asc)"
+                   class="@segOff border-s border-line hover:no-underline">@Loc.F("ReportWarehouses_ByCost", dirText)</a>
+            }
+            else
+            {
+                <a asp-area="Inventory" asp-controller="Reports" asp-action="Warehouses" asp-route-order="stock" asp-route-asc="@(asc)"
+                   class="@segOff hover:no-underline">@Loc.F("ReportWarehouses_ByStock", dirText)</a>
+                <a asp-area="Inventory" asp-controller="Reports" asp-action="Warehouses" asp-route-order="cost" asp-route-asc="@(!asc)"
+                   class="@segOn border-s border-line hover:no-underline" aria-current="true">@Loc.F("ReportWarehouses_ByCost", dirText)<span aria-hidden="true">@arrow</span></a>
+            }
         </div>
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white"><strong>@T("ReportWarehouses_RankCost")</strong></div>
-                <div class="card-body p-0">
-                    <table class="table-hover mb-0 table align-middle">
-                        <thead class="table-light"><tr><th class="ps-4">@T("Common_Warehouse")</th><th>@T("ReportWarehouses_Col_Units")</th><th class="pe-4 text-end">@T("ReportWarehouses_Col_Cost")</th></tr></thead>
-                        <tbody>
-                            @if (rankedCost != null)
-                            {
-                                @foreach (var w in rankedCost.Items)
-                                 {
-                                     <tr><td class="ps-4">@w.Name</td><td>@w.TotalUnits</td><td class="pe-4 text-end">@w.TotalCost.ToString("N2")</td></tr>
-                                 }
-                                 if (!rankedCost.Items.Any())
-                                 {
-                                     <tr><td colspan="3" class="py-4 text-center text-muted">@T("ReportWarehouses_None")</td></tr>
-                                 }
-                            }
-                        </tbody>
-                    </table>
-                </div>
+    </header>
+
+    <div class="grid grid-cols-1 items-start gap-5 lg:grid-cols-2">
+
+        @* ───────── Ranking by stock ───────── *@
+        <section class="@card">
+            <div class="@cardHead">
+                <span class="flex items-center gap-2.5"><svg class="icon !size-[18px] text-accent"><use href="#i-store" /></svg>@T("ReportWarehouses_RankStock")</span>
+                <span class="@count">@rankedStock.Count</span>
             </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white"><strong>@T("ReportWarehouses_Zero")</strong></div>
-                <div class="card-body p-0">
-                    <table class="table-hover mb-0 table align-middle">
-                        <thead class="table-light"><tr><th class="ps-4">@T("Common_Warehouse")</th><th>@T("Common_Status")</th></tr></thead>
-                        <tbody>
-                            @if (zeroStock != null && zeroStock.Any())
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[560px] border-collapse text-[13.5px]">
+                    <thead>
+                        <tr class="border-b border-line-strong bg-sunken/60">
+                            <th class="@th w-10">#</th>
+                            <th class="@th">@T("Common_Warehouse")</th>
+                            <th class="@th">@T("ReportWarehouses_Col_Active")</th>
+                            <th class="@th">@T("ReportWarehouses_Col_Units")</th>
+                            <th class="@th">@T("ReportWarehouses_Col_Products")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (rankedStock.Count > 0)
+                        {
+                            var i = 0;
+                            foreach (var w in rankedStock)
                             {
-                                @foreach (var w in zeroStock)
-                                 {
-                                     <tr><td class="ps-4">@w.Name</td><td><span class="badge text-bg-@(w.IsActive ? "success" : "secondary")">@(w.IsActive ? T("Common_Active") : T("Common_Inactive"))</span></td></tr>
-                                 }
+                                i++;
+                                <tr class="@rowHover">
+                                    <td class="@td num text-ink-faint" dir="ltr">@i</td>
+                                    <td class="@td font-medium text-ink">@w.Name</td>
+                                    <td class="@td">
+                                        @if (w.IsActive)
+                                        {
+                                            <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@T("Common_Yes")</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@T("Common_No")</span>
+                                        }
+                                    </td>
+                                    <td class="@td">
+                                        <span class="num font-semibold text-ink" dir="ltr">@w.TotalUnits</span>
+                                        <div class="mt-1 h-1 w-24 overflow-hidden rounded-full bg-sunken">
+                                            <div class="h-full rounded-full bg-accent" style="width:@Bar(w.TotalUnits, maxUnitsStock)"></div>
+                                        </div>
+                                    </td>
+                                    <td class="@td num text-ink-soft" dir="ltr">@w.DistinctProducts</td>
+                                </tr>
                             }
-                            else
-                            {
-                                <tr><td colspan="2" class="py-4 text-center text-muted">@T("ReportWarehouses_AllHold")</td></tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                        }
+                        else
+                        {
+                            <tr><td colspan="5" class="@empty">@T("ReportWarehouses_None")</td></tr>
+                        }
+                    </tbody>
+                </table>
             </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white"><strong>@T("ReportWarehouses_Inactive")</strong></div>
-                <div class="card-body p-0">
-                    <table class="table-hover mb-0 table align-middle">
-                        <thead class="table-light"><tr><th class="ps-4">@T("Common_Warehouse")</th><th>@T("ReportWarehouses_Col_Units")</th><th class="pe-4 text-end">@T("ReportWarehouses_Col_Cost")</th></tr></thead>
-                        <tbody>
-                            @if (inactiveWithStock != null && inactiveWithStock.Any())
-                            {
-                                @foreach (var w in inactiveWithStock)
-                                 {
-                                     <tr><td class="ps-4 text-warning-emphasis">@w.Name</td><td>@w.TotalUnits</td><td class="pe-4 text-end">@w.TotalCost.ToString("N2")</td></tr>
-                                 }
-                            }
-                            else
-                            {
-                                <tr><td colspan="3" class="py-4 text-center text-muted">@T("ReportWarehouses_NoneInactive")</td></tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+        </section>
+
+        @* ───────── Ranking by cost ───────── *@
+        <section class="@card">
+            <div class="@cardHead">
+                <span class="flex items-center gap-2.5"><svg class="icon !size-[18px] text-accent"><use href="#i-chart" /></svg>@T("ReportWarehouses_RankCost")</span>
+                <span class="@count">@rankedCost.Count</span>
             </div>
-        </div>
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[480px] border-collapse text-[13.5px]">
+                    <thead>
+                        <tr class="border-b border-line-strong bg-sunken/60">
+                            <th class="@th w-10">#</th>
+                            <th class="@th">@T("Common_Warehouse")</th>
+                            <th class="@th">@T("ReportWarehouses_Col_Units")</th>
+                            <th class="@th">@T("ReportWarehouses_Col_Cost")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (rankedCost.Count > 0)
+                        {
+                            var i = 0;
+                            foreach (var w in rankedCost)
+                            {
+                                i++;
+                                <tr class="@rowHover">
+                                    <td class="@td num text-ink-faint" dir="ltr">@i</td>
+                                    <td class="@td font-medium text-ink">@w.Name</td>
+                                    <td class="@td num text-ink-soft" dir="ltr">@w.TotalUnits</td>
+                                    <td class="@td">
+                                        <span class="num font-semibold text-ink" dir="ltr">@w.TotalCost.ToString("N2")</span>
+                                        <div class="mt-1 h-1 w-24 overflow-hidden rounded-full bg-sunken">
+                                            <div class="h-full rounded-full bg-info" style="width:@Bar(w.TotalCost, maxUnitsCost)"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="4" class="@empty">@T("ReportWarehouses_None")</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        @* ───────── Warehouses with zero stock ───────── *@
+        <section class="@card">
+            <div class="@cardHead">
+                <span class="flex items-center gap-2.5"><svg class="icon !size-[18px] text-ink-faint"><use href="#i-box" /></svg>@T("ReportWarehouses_Zero")</span>
+                <span class="@count">@zeroStock.Count</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[380px] border-collapse text-[13.5px]">
+                    <thead>
+                        <tr class="border-b border-line-strong bg-sunken/60">
+                            <th class="@th">@T("Common_Warehouse")</th>
+                            <th class="@th">@T("Common_Status")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (zeroStock.Count > 0)
+                        {
+                            foreach (var w in zeroStock)
+                            {
+                                <tr class="@rowHover">
+                                    <td class="@td font-medium text-ink">@w.Name</td>
+                                    <td class="@td">
+                                        @if (w.IsActive)
+                                        {
+                                            <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@T("Common_Active")</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@T("Common_Inactive")</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="2" class="@empty">@T("ReportWarehouses_AllHold")</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        @* ───────── Inactive warehouses that still hold stock (needs attention) ───────── *@
+        <section class="@(inactiveWithStock.Count > 0 ? cardWarn : card)">
+            <div class="@cardHead">
+                <span class="flex items-center gap-2.5"><svg class="icon !size-[18px] text-signal"><use href="#i-alert" /></svg>@T("ReportWarehouses_Inactive")</span>
+                <span class="@count">@inactiveWithStock.Count</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[480px] border-collapse text-[13.5px]">
+                    <thead>
+                        <tr class="border-b border-line-strong bg-sunken/60">
+                            <th class="@th">@T("Common_Warehouse")</th>
+                            <th class="@th">@T("ReportWarehouses_Col_Units")</th>
+                            <th class="@th">@T("ReportWarehouses_Col_Cost")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (inactiveWithStock.Count > 0)
+                        {
+                            foreach (var w in inactiveWithStock)
+                            {
+                                <tr class="@rowHover">
+                                    <td class="@td font-medium text-signal">@w.Name</td>
+                                    <td class="@td num text-ink-soft" dir="ltr">@w.TotalUnits</td>
+                                    <td class="@td num font-semibold text-ink" dir="ltr">@w.TotalCost.ToString("N2")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="3" class="@empty">@T("ReportWarehouses_NoneInactive")</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </div>
-    <div class="mb-5"></div>
-</div>
+</section>

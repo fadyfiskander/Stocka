@@ -4,18 +4,12 @@
     string T(string key) => Loc.T(key);
 }
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-6 text-center">
-            <div class="mb-3">
-                <span class="display-1" aria-hidden="true">🔒</span>
-            </div>
-            <h2 class="mb-2">@T("Denied_Heading")</h2>
-            <p class="text-muted mb-4">
-                @T("Denied_Text")
-            </p>
-
-            <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-primary px-4">@T("Denied_BackHome")</a>
-        </div>
-    </div>
+<div class="mx-auto max-w-[46ch] py-10 text-center">
+    <span class="mx-auto grid size-16 place-items-center rounded-xl border border-line bg-surface text-ink-faint shadow-card">
+        <svg class="icon !size-[30px]"><use href="#i-archive" /></svg>
+    </span>
+    <h1 class="mt-5 text-[22px] font-bold tracking-[-.015em]">@T("Denied_Heading")</h1>
+    <p class="mx-auto mt-2.5 text-[13.5px] leading-relaxed text-ink-soft">@T("Denied_Text")</p>
+    <a class="mt-6 inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-accent px-5 text-[13.5px] font-semibold text-on-accent transition-colors hover:bg-accent-hover hover:no-underline"
+       asp-area="" asp-controller="Home" asp-action="Index">@T("Denied_BackHome")</a>
 </div>

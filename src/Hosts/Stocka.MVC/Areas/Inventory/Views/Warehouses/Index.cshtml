@@ -3,114 +3,138 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = Loc.T("Warehouses_Title");
     string T(string key) => Loc.T(key);
+    var isActive = Context.Request.Query["isActive"].ToString();
+    bool? activeFilter = isActive switch { "true" => true, "false" => false, _ => (bool?)null };
+
+    const string btnGhost = "inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-line bg-surface px-4 text-[13.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline";
+    const string btnPrimary = "inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-accent px-4 text-[13.5px] font-semibold text-on-accent transition-colors hover:bg-accent-hover hover:no-underline";
+    const string rowBtn = "inline-flex h-8 items-center justify-center rounded-md border border-line bg-surface px-2.5 text-[12.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline";
+    const string pageBtn = "inline-flex h-8 items-center justify-center rounded-md border border-line bg-surface px-3 text-[12.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline";
+    const string pageOff = "inline-flex h-8 cursor-not-allowed items-center justify-center rounded-md border border-line bg-surface px-3 text-[12.5px] font-medium text-ink-faint opacity-45";
+    string seg(bool selected) => selected
+        ? "inline-flex h-8 items-center rounded-full bg-accent-tint px-3.5 text-[12.5px] font-semibold text-accent"
+        : "inline-flex h-8 items-center rounded-full px-3.5 text-[12.5px] font-medium text-ink-soft transition-colors hover:bg-sunken hover:text-ink";
 }
 
-<div class="container-fluid py-4">
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["Success"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @TempData["Error"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-
-    <div class="d-flex justify-content-between align-items-center mb-2">
+<section class="grid gap-5">
+    <header class="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
         <div>
-            <h2 class="mb-1">@T("Warehouses_Title")</h2>
-            <p class="text-muted mb-0">@T("Warehouses_Sub")</p>
+            <h1 class="text-[22px] font-bold tracking-[-.015em]">@T("Warehouses_Title")</h1>
+            <p class="mt-1.5 text-[13.5px] text-ink-soft">@T("Warehouses_Sub")</p>
         </div>
-        <div class="d-flex gap-2">
-            <a class="btn btn-outline-secondary" asp-area="Inventory" asp-controller="Warehouses" asp-action="SearchByName">@T("Products_SearchByName")</a>
-            <a class="btn btn-primary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Create">@T("Warehouses_Register")</a>
+        <div class="flex flex-wrap items-center gap-2">
+            <a class="@btnGhost" asp-area="Inventory" asp-controller="Warehouses" asp-action="SearchByName">
+                <svg class="icon !size-4"><use href="#i-search" /></svg>@T("Products_SearchByName")
+            </a>
+            <a class="@btnPrimary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Create">
+                <svg class="icon !size-4"><use href="#i-plus" /></svg>@T("Warehouses_Register")
+            </a>
         </div>
+    </header>
+
+    <div class="inline-flex w-fit items-center gap-1 rounded-full border border-line bg-surface p-1 shadow-card">
+        <a class="@seg(activeFilter is null)" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index">@Loc.F("Warehouses_All", Model.TotalCount)</a>
+        <a class="@seg(activeFilter == true)" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index" asp-route-isActive="true">@T("Common_Active")</a>
+        <a class="@seg(activeFilter == false)" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index" asp-route-isActive="false">@T("Common_Inactive")</a>
     </div>
 
-    <div class="btn-group mb-3" role="group">
-        <a class="btn btn-sm btn-outline-secondary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index">@Loc.F("Warehouses_All", Model.TotalCount)</a>
-        <a class="btn btn-sm btn-outline-success" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index" asp-route-isActive="true">@T("Common_Active")</a>
-        <a class="btn btn-sm btn-outline-secondary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index" asp-route-isActive="false">@T("Common_Inactive")</a>
-    </div>
-
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table-hover mb-0 table align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="ps-4">@T("Common_Name")</th>
-                            <th>@T("Common_Location")</th>
-                            <th>@T("Common_Type")</th>
-                            <th>@T("Common_Status")</th>
-                            <th class="pe-4 text-end">@T("Common_Actions")</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.Items.Any())
+    <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[760px] border-collapse text-[13.5px]">
+                <thead>
+                    <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Name")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Location")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Type")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Status")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@T("Common_Actions")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items.Any())
+                    {
+                        @foreach (var warehouse in Model.Items)
                         {
-                            @foreach (var warehouse in Model.Items)
-                            {
-                                <tr>
-                                    <td class="ps-4">
-                                        <div class="fw-semibold">@warehouse.Name</div>
-                                        <small class="text-muted">@warehouse.Id</small>
-                                    </td>
-                                    <td>@warehouse.Location</td>
-                                    <td>@(warehouse.Type == 0 ? T("Warehouses_Type_Shop") : T("Warehouses_Type_Storage"))</td>
-                                    <td>
+                            <tr class="border-b border-line last:border-0 hover:bg-sunken/50">
+                                <td class="px-4 py-3">
+                                    <div class="font-semibold text-ink">@warehouse.Name</div>
+                                    <div class="num mt-0.5 break-all font-mono text-[11.5px] text-ink-faint">@warehouse.Id</div>
+                                </td>
+                                <td class="px-4 py-3 text-ink-soft">@warehouse.Location</td>
+                                <td class="px-4 py-3">
+                                    <span class="inline-flex items-center gap-1.5 rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">
+                                        @(warehouse.Type == 0 ? T("Warehouses_Type_Shop") : T("Warehouses_Type_Storage"))
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    @if (warehouse.IsActive)
+                                    {
+                                        <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@T("Common_Active")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@T("Common_Inactive")</span>
+                                    }
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex flex-wrap items-center justify-end gap-1.5">
+                                        <a class="@rowBtn" asp-area="Inventory" asp-controller="Warehouses" asp-action="Details" asp-route-id="@warehouse.Id">@T("Common_Details")</a>
+                                        <a class="@rowBtn" asp-area="Inventory" asp-controller="Warehouses" asp-action="Edit" asp-route-id="@warehouse.Id">@T("Common_Edit")</a>
                                         @if (warehouse.IsActive)
                                         {
-                                            <span class="badge text-bg-success">@T("Common_Active")</span>
+                                            <form asp-area="Inventory" asp-controller="Warehouses" asp-action="Deactivate" asp-route-id="@warehouse.Id" method="post" class="inline-flex">
+                                                <button type="submit" class="inline-flex h-8 items-center justify-center rounded-md border border-warn/35 bg-transparent px-2.5 text-[12.5px] font-medium text-warn transition-colors hover:bg-warn-tint">@T("Common_Deactivate")</button>
+                                            </form>
                                         }
                                         else
                                         {
-                                            <span class="badge text-bg-secondary">@T("Common_Inactive")</span>
+                                            <form asp-area="Inventory" asp-controller="Warehouses" asp-action="Activate" asp-route-id="@warehouse.Id" method="post" class="inline-flex">
+                                                <button type="submit" class="inline-flex h-8 items-center justify-center rounded-md border border-ok/35 bg-transparent px-2.5 text-[12.5px] font-medium text-ok transition-colors hover:bg-ok-tint">@T("Common_Activate")</button>
+                                            </form>
                                         }
-                                    </td>
-                                    <td class="pe-4 text-end">
-                                        <div class="btn-group" role="group">
-                                            <a class="btn btn-sm btn-outline-primary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Details" asp-route-id="@warehouse.Id">@T("Common_Details")</a>
-                                            <a class="btn btn-sm btn-outline-secondary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Edit" asp-route-id="@warehouse.Id">@T("Common_Edit")</a>
-                                            @if (warehouse.IsActive)
-                                            {
-                                                <form asp-area="Inventory" asp-controller="Warehouses" asp-action="Deactivate" asp-route-id="@warehouse.Id" method="post" class="d-inline">
-                                                    <button type="submit" class="btn btn-sm btn-outline-warning">@T("Common_Deactivate")</button>
-                                                </form>
-                                            }
-                                            else
-                                            {
-                                                <form asp-area="Inventory" asp-controller="Warehouses" asp-action="Activate" asp-route-id="@warehouse.Id" method="post" class="d-inline">
-                                                    <button type="submit" class="btn btn-sm btn-outline-success">@T("Common_Activate")</button>
-                                                </form>
-                                            }
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
+                                    </div>
+                                </td>
+                            </tr>
                         }
-                        else
-                        {
-                            <tr><td colspan="5" class="py-5 text-center text-muted">@T("Warehouses_Empty")</td></tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="px-6 py-14 text-center">
+                                <svg class="icon mx-auto !size-8 text-ink-faint"><use href="#i-store" /></svg>
+                                <p class="mt-2 text-[14px] font-semibold text-ink">@T("Warehouses_Empty")</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mt-3">
-        <small class="text-muted">@Loc.F("Common_PageOf", Model.Page, Model.TotalPages) (@Model.TotalCount)</small>
-        <div class="btn-group">
-            <a asp-area="Inventory" asp-controller="Warehouses" asp-action="Index" asp-route-page="@(Model.Page - 1)"
-               class="btn btn-sm btn-outline-secondary @(Model.HasPrevious ? "" : "disabled")">@T("Common_Previous")</a>
-            <a asp-area="Inventory" asp-controller="Warehouses" asp-action="Index" asp-route-page="@(Model.Page + 1)"
-               class="btn btn-sm btn-outline-secondary @(Model.HasNext ? "" : "disabled")">@T("Common_Next")</a>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <span class="text-[12.5px] text-ink-faint">@Loc.F("Common_PageOf", Model.Page, Model.TotalPages) · <span class="num">@Model.TotalCount</span></span>
+        <div class="flex items-center gap-1.5">
+            @if (Model.HasPrevious)
+            {
+                <a class="@pageBtn" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index" asp-route-isActive="@isActive" asp-route-page="@(Model.Page - 1)">
+                    <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@T("Common_Previous")
+                </a>
+            }
+            else
+            {
+                <span class="@pageOff"><svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@T("Common_Previous")</span>
+            }
+
+            @if (Model.HasNext)
+            {
+                <a class="@pageBtn" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index" asp-route-isActive="@isActive" asp-route-page="@(Model.Page + 1)">
+                    @T("Common_Next")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg>
+                </a>
+            }
+            else
+            {
+                <span class="@pageOff">@T("Common_Next")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg></span>
+            }
         </div>
     </div>
-</div>
+</section>
