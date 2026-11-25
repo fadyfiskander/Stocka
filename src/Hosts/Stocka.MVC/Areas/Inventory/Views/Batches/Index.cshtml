@@ -57,7 +57,7 @@
                         @foreach (var batch in Model.Items)
                         {
                             <tr class="border-b border-line last:border-0 hover:bg-sunken/50">
-                                <td class="px-4 py-3"><span class="num font-mono break-all text-[12px] text-ink-soft">@batch.ProductId</span></td>
+                                <td class="px-4 py-3"><span class="num font-mono break-all text-[12px] text-ink-soft">@batch.ProductName</span></td>
                                 <td class="num px-4 py-3 text-end font-semibold text-ink">@batch.InitialQuantity</td>
                                 <td class="num px-4 py-3 text-end font-semibold text-ink">@batch.RemainingQuantity</td>
                                 <td class="num px-4 py-3 text-end text-ink-soft">@batch.UnitCost.ToString("N2")</td>
