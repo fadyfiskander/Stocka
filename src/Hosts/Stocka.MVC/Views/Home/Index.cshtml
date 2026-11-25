@@ -1,13 +1,12 @@
 ﻿@{
-    ViewData["Title"] = Loc.T("Home_Title");
-    string T(string key) => Loc.T(key);
+    ViewData["Title"] = (Loc.IsEn ? "Dashboard" : "لوحة العمل");
 }
 
 <section class="grid gap-5">
     <header class="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
         <div>
-            <h1 class="text-[26px] font-bold tracking-[-.02em]">@T("Home_Title")</h1>
-            <p class="mt-1.5 text-[13.5px] text-ink-soft">@T("Home_Sub")</p>
+            <h1 class="text-[26px] font-bold tracking-[-.02em]">@(Loc.IsEn ? "Dashboard" : "لوحة العمل")</h1>
+            <p class="mt-1.5 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "A quick starting point to manage products, stock and reports." : "نقطة انطلاق سريعة لإدارة الأصناف والمخزون والتقارير.")</p>
         </div>
     </header>
 
@@ -17,10 +16,10 @@
             <span class="grid size-11 place-items-center rounded-lg bg-accent-tint text-accent">
                 <svg class="icon !size-[22px]"><use href="#i-box" /></svg>
             </span>
-            <span class="text-[15.5px] font-semibold text-ink">@T("Home_CatalogTitle")</span>
-            <span class="text-[13.5px] leading-relaxed text-ink-soft">@T("Home_CatalogText")</span>
+            <span class="text-[15.5px] font-semibold text-ink">@(Loc.IsEn ? "Catalog" : "الكتالوج")</span>
+            <span class="text-[13.5px] leading-relaxed text-ink-soft">@(Loc.IsEn ? "Add products and categories, and organize your sales data." : "أضف المنتجات والفئات ونظّم بيانات البيع.")</span>
             <span class="mt-1 inline-flex items-center gap-1.5 text-[13px] font-semibold text-accent">
-                @T("Home_CatalogLink")
+                @(Loc.IsEn ? "View products" : "عرض المنتجات")
                 <svg class="icon !size-[15px] transition-transform group-hover/card:translate-x-0.5 rtl:group-hover/card:-translate-x-0.5"><use href="#i-chevron-end" /></svg>
             </span>
         </a>
@@ -30,10 +29,10 @@
             <span class="grid size-11 place-items-center rounded-lg bg-sunken text-ink-soft">
                 <svg class="icon !size-[22px]"><use href="#i-store" /></svg>
             </span>
-            <span class="text-[15.5px] font-semibold text-ink">@T("Home_InventoryTitle")</span>
-            <span class="text-[13.5px] leading-relaxed text-ink-soft">@T("Home_InventoryText")</span>
+            <span class="text-[15.5px] font-semibold text-ink">@(Loc.IsEn ? "Inventory" : "المخزون")</span>
+            <span class="text-[13.5px] leading-relaxed text-ink-soft">@(Loc.IsEn ? "Review warehouses, batches and stock movements." : "راجع المستودعات والدفعات وحركة المخزون.")</span>
             <span class="mt-1 inline-flex items-center gap-1.5 text-[13px] font-semibold text-accent">
-                @T("Home_InventoryLink")
+                @(Loc.IsEn ? "View warehouses" : "عرض المستودعات")
                 <svg class="icon !size-[15px] transition-transform group-hover/card:translate-x-0.5 rtl:group-hover/card:-translate-x-0.5"><use href="#i-chevron-end" /></svg>
             </span>
         </a>

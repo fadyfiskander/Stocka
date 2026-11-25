@@ -1,8 +1,7 @@
 @model PaginatedResult<ZeroStockProductDto>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = Loc.T("ReportProducts_Title");
-    string T(string key) => Loc.T(key);
+    ViewData["Title"] = (Loc.IsEn ? "Zero-stock products" : "منتجات نفاد المخزون");
 
     const string pageBtn = "inline-flex h-8 items-center justify-center rounded-md border border-line bg-surface px-3 text-[12.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline";
     const string pageOff = "inline-flex h-8 cursor-not-allowed items-center justify-center rounded-md border border-line bg-surface px-3 text-[12.5px] font-medium text-ink-faint opacity-45";
@@ -10,8 +9,8 @@
 
 <section class="grid gap-5">
     <header class="border-b border-line pb-5">
-        <h1 class="text-[22px] font-bold tracking-[-.015em]">@T("ReportProducts_Title")</h1>
-        <p class="mt-1.5 max-w-[80ch] text-[13.5px] text-ink-soft">@T("ReportProducts_Sub")</p>
+        <h1 class="text-[22px] font-bold tracking-[-.015em]">@(Loc.IsEn ? "Zero-stock products" : "منتجات نفاد المخزون")</h1>
+        <p class="mt-1.5 max-w-[80ch] text-[13.5px] text-ink-soft">@(Loc.IsEn ? "Products with recorded batches whose current total units in warehouses is 0. Distinguished from products never present in a warehouse: Unallocated > 0 means received stock still waiting for allocation." : "منتجات لها دفعات مسجّلة وإجمالي وحداتها الحالي في المستودعات = 0. تُميَّز عن المنتجات التي لم تدخل مستودعاً قط: غير المخصَّص > 0 يعني مخزوناً مستلماً بانتظار التخصيص.")</p>
     </header>
 
     <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
@@ -19,10 +18,10 @@
             <table class="w-full min-w-[680px] border-collapse text-[13.5px]">
                 <thead>
                     <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Product")</th>
-                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@T("ReportProducts_Col_Initial")</th>
-                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@T("Batches_Col_Unallocated")</th>
-                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@T("Batches_InWarehouses")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Product" : "المنتج")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Initial (all batches)" : "الأولي (كل الدفعات)")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Unallocated" : "غير مخصَّص")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Currently in warehouses" : "الموجود حالياً بالمستودعات")</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -43,7 +42,7 @@
                         <tr>
                             <td colspan="4" class="px-6 py-14 text-center">
                                 <svg class="icon mx-auto !size-8 text-ink-faint"><use href="#i-box" /></svg>
-                                <p class="mt-2 text-[13.5px] text-ink-soft">@T("ReportProducts_Empty")</p>
+                                <p class="mt-2 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No zero-stock products." : "لا توجد منتجات نفاد مخزون.")</p>
                             </td>
                         </tr>
                     }
@@ -53,27 +52,27 @@
     </div>
 
     <div class="flex flex-wrap items-center justify-between gap-3">
-        <span class="text-[12.5px] text-ink-faint">@Loc.F("Common_PageOf", Model.Page, Model.TotalPages) · <span class="num">@Model.TotalCount</span></span>
+        <span class="text-[12.5px] text-ink-faint">@(Loc.IsEn ? $"Page {Model.Page} of {Model.TotalPages}" : $"صفحة {Model.Page} من {Model.TotalPages}") · <span class="num">@Model.TotalCount</span></span>
         <div class="flex items-center gap-1.5">
             @if (Model.HasPrevious)
             {
                 <a class="@pageBtn" asp-area="Inventory" asp-controller="Reports" asp-action="Products" asp-route-page="@(Model.Page - 1)">
-                    <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@T("Common_Previous")
+                    <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Previous" : "السابق")
                 </a>
             }
             else
             {
-                <span class="@pageOff"><svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@T("Common_Previous")</span>
+                <span class="@pageOff"><svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Previous" : "السابق")</span>
             }
             @if (Model.HasNext)
             {
                 <a class="@pageBtn" asp-area="Inventory" asp-controller="Reports" asp-action="Products" asp-route-page="@(Model.Page + 1)">
-                    @T("Common_Next")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg>
+                    @(Loc.IsEn ? "Next" : "التالي")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg>
                 </a>
             }
             else
             {
-                <span class="@pageOff">@T("Common_Next")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg></span>
+                <span class="@pageOff">@(Loc.IsEn ? "Next" : "التالي")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg></span>
             }
         </div>
     </div>

@@ -30,18 +30,18 @@
     @{
         var i18n = new
         {
-            required = Stocka.MVC.Localization.Loc.T("Val_Required"),
-            email    = Stocka.MVC.Localization.Loc.T("Val_Email"),
-            url      = Stocka.MVC.Localization.Loc.T("Val_Url"),
-            pattern  = Stocka.MVC.Localization.Loc.T("Val_Pattern"),
-            minlength = Stocka.MVC.Localization.Loc.T("Val_MinLength"),
-            maxlength = Stocka.MVC.Localization.Loc.T("Val_MaxLength"),
-            min      = Stocka.MVC.Localization.Loc.T("Val_Min"),
-            max      = Stocka.MVC.Localization.Loc.T("Val_Max"),
-            step     = Stocka.MVC.Localization.Loc.T("Val_Step"),
-            number   = Stocka.MVC.Localization.Loc.T("Val_Number"),
-            oneIssue = Stocka.MVC.Localization.Loc.T("Val_OneIssue"),
-            manyIssues = Stocka.MVC.Localization.Loc.T("Val_ManyIssues")
+            required = (Loc.IsEn ? "This field is required." : "هذا الحقل مطلوب."),
+            email    = (Loc.IsEn ? "Enter a valid email address." : "أدخل بريداً إلكترونياً صحيحاً."),
+            url      = (Loc.IsEn ? "Enter a valid URL." : "أدخل رابطاً صحيحاً."),
+            pattern  = (Loc.IsEn ? "The value is invalid." : "القيمة غير صالحة."),
+            minlength = (Loc.IsEn ? "The value is too short." : "القيمة أقصر من المطلوب."),
+            maxlength = (Loc.IsEn ? "The value is too long." : "القيمة أطول من المسموح."),
+            min      = (Loc.IsEn ? "The value is below the minimum." : "القيمة أقل من الحد الأدنى."),
+            max      = (Loc.IsEn ? "The value exceeds the maximum." : "القيمة أكبر من الحد الأقصى."),
+            step     = (Loc.IsEn ? "Enter a valid step value." : "أدخل قيمة صحيحة."),
+            number   = (Loc.IsEn ? "Enter a valid number." : "أدخل رقماً صحيحاً."),
+            oneIssue = (Loc.IsEn ? "Please fix the following issue:" : "يرجى تصحيح الخطأ التالي:"),
+            manyIssues = (Loc.IsEn ? "Please fix the following issues:" : "يرجى تصحيح الأخطاء التالية:")
         };
     }
     <script type="application/json" id="stocka-i18n">@Json.Serialize(i18n)</script>

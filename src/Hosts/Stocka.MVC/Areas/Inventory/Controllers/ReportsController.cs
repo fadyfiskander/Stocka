@@ -24,7 +24,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
         [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
-            ViewBag.Title = Loc.T("Reports_Title");
+            ViewBag.Title = (Loc.IsEn ? "Inventory reports" : "تقارير المخزون");
             var summary = await _reportCases.GetInventorySummaryAsync(new InventorySummaryQuery());
             var movementTotals = await _reportCases.GetMovementTypeTotalsAsync(new MovementTypeTotalsQuery());
             ViewBag.MovementTotals = movementTotals;
@@ -35,7 +35,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
         [HttpGet("Warehouses")]
         public async Task<IActionResult> Warehouses(string order = "stock", bool asc = false, int page = 1, int pageSize = 20)
         {
-            ViewBag.Title = Loc.T("ReportWarehouses_Title");
+            ViewBag.Title = (Loc.IsEn ? "Warehouse inventory reports" : "تقارير مخزون المستودعات");
             ViewBag.Order = order;
             ViewBag.Ascending = asc;
 
@@ -50,7 +50,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
         [HttpGet("Products")]
         public async Task<IActionResult> Products(int page = 1, int pageSize = 20)
         {
-            ViewBag.Title = Loc.T("ReportProducts_Title");
+            ViewBag.Title = (Loc.IsEn ? "Zero-stock products" : "منتجات نفاد المخزون");
             var result = await _reportCases.GetZeroStockProductsAsync(new ZeroStockProductsQuery(page, pageSize));
             return View(result);
         }
@@ -59,7 +59,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
         [HttpGet("Movements")]
         public async Task<IActionResult> Movements(DateTime? from, DateTime? to, int page = 1, int pageSize = 20)
         {
-            ViewBag.Title = Loc.T("ReportMovements_Title");
+            ViewBag.Title = (Loc.IsEn ? "Stock movement reports" : "تقارير حركات المخزون");
             ViewBag.From = from;
             ViewBag.To = to;
 
@@ -83,7 +83,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
         [HttpGet("Balance")]
         public async Task<IActionResult> Balance(DateTime? asOf, int page = 1, int pageSize = 20)
         {
-            ViewBag.Title = Loc.T("Balance_Title");
+            ViewBag.Title = (Loc.IsEn ? "Historical balance" : "الرصيد التاريخي");
             ViewBag.AsOf = asOf ?? DateTime.UtcNow;
             var result = await _reportCases.GetHistoricalBalanceAsync(new HistoricalBalanceQuery(ViewBag.AsOf, page, pageSize));
             return View(result);

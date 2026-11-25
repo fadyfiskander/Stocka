@@ -1,14 +1,13 @@
 ﻿@using Stocka.MVC.Areas.Catalog.Models
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = Loc.T("Nav_Products");
-    string T(string key) => Loc.T(key);
+    ViewData["Title"] = (Loc.IsEn ? "Products" : "المنتجات");
 }
 @model List<Person>
 
 <section class="grid gap-5">
     <header class="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
-        <h1 class="text-[22px] font-bold tracking-[-.015em]">@T("Common_Name")</h1>
+        <h1 class="text-[22px] font-bold tracking-[-.015em]">@(Loc.IsEn ? "Name" : "الاسم")</h1>
     </header>
 
     <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
@@ -16,9 +15,9 @@
             <table class="w-full min-w-[560px] border-collapse text-[13.5px]">
                 <thead>
                     <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Id")</th>
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Name")</th>
-                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@T("Common_Actions")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "ID" : "المعرّف")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Name" : "الاسم")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Actions" : "الإجراءات")</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -30,9 +29,9 @@
                             <td class="px-4 py-3">
                                 <div class="flex flex-wrap items-center justify-end gap-1.5">
                                     <a class="inline-flex h-8 items-center rounded-md border border-line bg-surface px-3 text-[12.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline"
-                                       asp-area="Catalog" asp-controller="Home" asp-action="Details" asp-route-id="@person.Id">@T("Common_Details")</a>
+                                       asp-area="Catalog" asp-controller="Home" asp-action="Details" asp-route-id="@person.Id">@(Loc.IsEn ? "Details" : "التفاصيل")</a>
                                     <a class="inline-flex h-8 items-center rounded-md bg-accent px-3 text-[12.5px] font-semibold text-on-accent transition-colors hover:bg-accent-hover hover:no-underline"
-                                       asp-area="Catalog" asp-controller="Home" asp-action="Edit" asp-route-id="@person.Id">@T("Common_Edit")</a>
+                                       asp-area="Catalog" asp-controller="Home" asp-action="Edit" asp-route-id="@person.Id">@(Loc.IsEn ? "Edit" : "تعديل")</a>
                                 </div>
                             </td>
                         </tr>

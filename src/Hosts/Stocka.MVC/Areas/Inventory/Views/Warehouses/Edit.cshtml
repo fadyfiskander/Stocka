@@ -1,8 +1,7 @@
 ﻿@model Inventory.Contracts.UseCases.WarehouseCases.UpdateWarehouseCommand
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = Loc.T("Warehouses_EditTitle");
-    string T(string key) => Loc.T(key);
+    ViewData["Title"] = (Loc.IsEn ? "Edit warehouse" : "تعديل مستودع");
 
     const string label = "mb-1.5 block text-[12.5px] font-semibold text-ink-soft";
     const string input = "block h-10 w-full rounded-md border border-line bg-surface px-3 text-[13.5px] text-ink outline-none transition placeholder:text-ink-faint hover:border-line-strong focus:border-accent focus:ring-[3px] focus:ring-[var(--focus-ring)]";
@@ -11,8 +10,8 @@
 
 <div class="mx-auto max-w-[42rem]">
     <header class="mb-5 border-b border-line pb-5">
-        <h1 class="text-[24px] font-bold tracking-[-.02em]">@T("Warehouses_EditTitle")</h1>
-        <p class="mt-1.5 text-[13.5px] text-ink-soft">@T("Warehouses_EditSub")</p>
+        <h1 class="text-[24px] font-bold tracking-[-.02em]">@(Loc.IsEn ? "Edit warehouse" : "تعديل مستودع")</h1>
+        <p class="mt-1.5 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "Only provided fields are updated. Stock and movement history are never touched." : "يتم تحديث الحقول المُقدَّمة فقط. لا يُمس المخزون وسجل الحركات أبداً.")</p>
     </header>
 
     <form asp-area="Inventory" asp-controller="Warehouses" asp-action="Edit" method="post"
@@ -22,28 +21,28 @@
             <input type="hidden" asp-for="WarehouseId" />
 
             <div>
-                <label class="@label" asp-for="Name">@T("Common_Name")</label>
+                <label class="@label" asp-for="Name">@(Loc.IsEn ? "Name" : "الاسم")</label>
                 <input class="@input" asp-for="Name" maxlength="50" />
                 <span asp-validation-for="Name" class="@err"></span>
             </div>
 
             <div>
-                <label class="@label" asp-for="Type">@T("Common_Type")</label>
+                <label class="@label" asp-for="Type">@(Loc.IsEn ? "Type" : "النوع")</label>
                 <select class="@input" asp-for="Type">
-                    <option value="0">@T("Warehouses_Type_Shop")</option>
-                    <option value="1">@T("Warehouses_Type_Storage")</option>
+                    <option value="0">@(Loc.IsEn ? "Shop" : "متجر")</option>
+                    <option value="1">@(Loc.IsEn ? "Storage" : "مخزن")</option>
                 </select>
                 <span asp-validation-for="Type" class="@err"></span>
             </div>
 
             <div>
-                <label class="@label" asp-for="Location">@T("Common_Location")</label>
+                <label class="@label" asp-for="Location">@(Loc.IsEn ? "Location" : "الموقع")</label>
                 <input class="@input" asp-for="Location" maxlength="100" />
                 <span asp-validation-for="Location" class="@err"></span>
             </div>
 
             <div>
-                <label class="@label" asp-for="Description">@T("Common_Description")</label>
+                <label class="@label" asp-for="Description">@(Loc.IsEn ? "Description" : "الوصف")</label>
                 <textarea class="block min-h-[92px] w-full resize-y rounded-md border border-line bg-surface px-3 py-2.5 text-[13.5px] text-ink outline-none transition placeholder:text-ink-faint hover:border-line-strong focus:border-accent focus:ring-[3px] focus:ring-[var(--focus-ring)]"
                           asp-for="Description" rows="3" maxlength="600"></textarea>
                 <span asp-validation-for="Description" class="@err"></span>
@@ -52,9 +51,9 @@
 
         <div class="flex flex-col-reverse gap-2.5 border-t border-line bg-sunken/40 px-5 py-4 sm:flex-row sm:justify-end sm:px-7">
             <a class="inline-flex h-9 items-center justify-center rounded-md border border-line bg-surface px-4 text-[13.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline"
-               asp-area="Inventory" asp-controller="Warehouses" asp-action="Details" asp-route-id="@Model.WarehouseId">@T("Common_Cancel")</a>
+               asp-area="Inventory" asp-controller="Warehouses" asp-action="Details" asp-route-id="@Model.WarehouseId">@(Loc.IsEn ? "Cancel" : "إلغاء")</a>
             <button type="submit" class="inline-flex h-9 items-center justify-center rounded-md bg-accent px-5 text-[13.5px] font-semibold text-on-accent transition-colors hover:bg-accent-hover">
-                @T("Common_SaveChanges")
+                @(Loc.IsEn ? "Save changes" : "حفظ التغييرات")
             </button>
         </div>
     </form>

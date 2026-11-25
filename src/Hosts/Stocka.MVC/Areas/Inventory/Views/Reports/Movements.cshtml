@@ -1,19 +1,18 @@
 ﻿@model IEnumerable<MovementTypeTotalsDto>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = Loc.T("ReportMovements_Title");
-    string T(string key) => Loc.T(key);
-    string MoveType(int t) => Loc.T(t switch
+    ViewData["Title"] = (Loc.IsEn ? "Stock movement reports" : "تقارير حركات المخزون");
+    string MoveType(int t) => t switch
     {
-        0 => "Move_PurchaseIn",
-        1 => "Move_SaleOut",
-        2 => "Move_TransferIn",
-        3 => "Move_TransferOut",
-        4 => "Move_AdjustmentIn",
-        5 => "Move_AdjustmentOut",
-        6 => "Move_OrderReturn",
-        _ => "Move_PurchaseIn"
-    });
+        0 => (Loc.IsEn ? "Purchase in" : "إدخال شراء"),
+        1 => (Loc.IsEn ? "Sale out" : "بيع خارج"),
+        2 => (Loc.IsEn ? "Transfer in" : "تحويل داخل"),
+        3 => (Loc.IsEn ? "Transfer out" : "تحويل خارج"),
+        4 => (Loc.IsEn ? "Adjustment in" : "تسوية داخل"),
+        5 => (Loc.IsEn ? "Adjustment out" : "تسوية خارج"),
+        6 => (Loc.IsEn ? "Order return" : "إرجاع طلب"),
+        _ => (Loc.IsEn ? "Purchase in" : "إدخال شراء")
+    };
     bool IsIncoming(int t) => t == 0 || t == 2 || t == 4 || t == 6;
     var from = (DateTime?)ViewBag.From;
     var to = (DateTime?)ViewBag.To;
@@ -27,22 +26,22 @@
 
 <section class="grid gap-5">
     <header class="border-b border-line pb-5">
-        <h1 class="text-[22px] font-bold tracking-[-.015em]">@T("ReportMovements_Title")</h1>
-        <p class="mt-1.5 max-w-[80ch] text-[13.5px] text-ink-soft">@T("ReportMovements_Sub")</p>
+        <h1 class="text-[22px] font-bold tracking-[-.015em]">@(Loc.IsEn ? "Stock movement reports" : "تقارير حركات المخزون")</h1>
+        <p class="mt-1.5 max-w-[80ch] text-[13.5px] text-ink-soft">@(Loc.IsEn ? "Transfer pairs are reported once (out + in legs aggregated) — no double counting." : "أزواج التحويل تُعرض مرة واحدة (رجل الإدخال والإخراج مجمّعتان) — دون ازدواج.")</p>
     </header>
 
     <form method="get" asp-area="Inventory" asp-controller="Reports" asp-action="Movements"
           class="flex flex-wrap items-end gap-3 rounded-lg border border-line bg-surface p-4 shadow-card">
         <div class="min-w-[180px]">
-            <label for="from" class="mb-1.5 block text-[12.5px] font-semibold text-ink-soft">@T("Common_Date")</label>
+            <label for="from" class="mb-1.5 block text-[12.5px] font-semibold text-ink-soft">@(Loc.IsEn ? "Date (UTC)" : "التاريخ (UTC)")</label>
             <input id="from" type="date" class="@input num font-mono" name="from" value="@(from?.ToString("yyyy-MM-dd"))" />
         </div>
         <div class="min-w-[180px]">
-            <label for="to" class="mb-1.5 block text-[12.5px] font-semibold text-ink-soft">@T("Common_Date")</label>
+            <label for="to" class="mb-1.5 block text-[12.5px] font-semibold text-ink-soft">@(Loc.IsEn ? "Date (UTC)" : "التاريخ (UTC)")</label>
             <input id="to" type="date" class="@input num font-mono" name="to" value="@(to?.ToString("yyyy-MM-dd"))" />
         </div>
         <button type="submit" class="@btnPrimary">
-            <svg class="icon !size-4"><use href="#i-filter" /></svg>@T("Common_Apply")
+            <svg class="icon !size-4"><use href="#i-filter" /></svg>@(Loc.IsEn ? "Apply" : "تطبيق")
         </button>
     </form>
 
@@ -51,19 +50,19 @@
         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <div class="rounded-lg border border-line bg-surface p-4 shadow-card">
                 <div class="flex items-center gap-1.5 text-[11.5px] font-semibold text-ink-soft">
-                    <svg class="icon !size-[15px] text-ok"><use href="#i-arrow-down" /></svg>@T("ReportMovements_Inbound")
+                    <svg class="icon !size-[15px] text-ok"><use href="#i-arrow-down" /></svg>@(Loc.IsEn ? "Inbound units (net)" : "وحدات داخلة (صافي)")
                 </div>
                 <div class="num mt-1.5 text-[26px] font-bold tracking-[-.02em] text-ok">@inboundOutbound.InboundUnits</div>
             </div>
             <div class="rounded-lg border border-line bg-surface p-4 shadow-card">
                 <div class="flex items-center gap-1.5 text-[11.5px] font-semibold text-ink-soft">
-                    <svg class="icon !size-[15px] text-danger"><use href="#i-arrow-up" /></svg>@T("ReportMovements_Outbound")
+                    <svg class="icon !size-[15px] text-danger"><use href="#i-arrow-up" /></svg>@(Loc.IsEn ? "Outbound units (net)" : "وحدات خارجة (صافي)")
                 </div>
                 <div class="num mt-1.5 text-[26px] font-bold tracking-[-.02em] text-danger">@inboundOutbound.OutboundUnits</div>
             </div>
             <div class="rounded-lg border border-line bg-surface p-4 shadow-card sm:col-span-2 lg:col-span-1">
-                <div class="text-[11.5px] font-semibold text-ink-soft">@T("Common_Date")</div>
-                <div class="num mt-1.5 text-[13.5px] text-ink-soft">@Loc.F("ReportMovements_Range", inboundOutbound.DateFromUtc.ToString("yyyy-MM-dd"), inboundOutbound.DateToUtc.ToString("yyyy-MM-dd"))</div>
+                <div class="text-[11.5px] font-semibold text-ink-soft">@(Loc.IsEn ? "Date (UTC)" : "التاريخ (UTC)")</div>
+                <div class="num mt-1.5 text-[13.5px] text-ink-soft">@(Loc.IsEn ? $"Date range {inboundOutbound.DateFromUtc.ToString("yyyy-MM-dd")} → {inboundOutbound.DateToUtc.ToString("yyyy-MM-dd")}. Transfer legs excluded (internal movements); see transfer history below." : $"نطاق التاريخ {inboundOutbound.DateFromUtc.ToString("yyyy-MM-dd")} ← {inboundOutbound.DateToUtc.ToString("yyyy-MM-dd")}. رجل التحويل مستثناة (حركات داخلية)؛ انظر سجل التحويلات أدناه.")</div>
             </div>
         </div>
     }
@@ -71,16 +70,16 @@
     <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
         <div class="flex items-center gap-2.5 border-b border-line px-5 py-3">
             <svg class="icon !size-[18px] text-accent"><use href="#i-chart" /></svg>
-            <span class="text-[14px] font-semibold text-ink">@T("ReportMovements_TotalsByType")</span>
+            <span class="text-[14px] font-semibold text-ink">@(Loc.IsEn ? "Totals by movement type" : "الإجماليات حسب نوع الحركة")</span>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full min-w-[560px] border-collapse text-[13.5px]">
                 <thead>
                     <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Type")</th>
-                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@T("Reports_Col_Movements")</th>
-                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@T("ReportMovements_Col_Units")</th>
-                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@T("Reports_Col_NetSigned")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Type" : "النوع")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Movements" : "الحركات")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Units" : "الوحدات")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Net signed" : "الصافي بالإشارة")</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -107,7 +106,7 @@
                     }
                     else
                     {
-                        <tr><td colspan="4" class="px-6 py-10 text-center text-[13.5px] text-ink-soft">@T("ReportMovements_NoneInRange")</td></tr>
+                        <tr><td colspan="4" class="px-6 py-10 text-center text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No movements in this range." : "لا توجد حركات في هذا النطاق.")</td></tr>
                     }
                 </tbody>
             </table>
@@ -117,17 +116,17 @@
     <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
         <div class="flex items-center gap-2.5 border-b border-line px-5 py-3">
             <svg class="icon !size-[18px] text-info"><use href="#i-swap" /></svg>
-            <span class="text-[14px] font-semibold text-ink">@T("ReportMovements_TransferHistory")</span>
+            <span class="text-[14px] font-semibold text-ink">@(Loc.IsEn ? "Transfer history (source → destination)" : "سجل التحويلات (المصدر ← الوجهة)")</span>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full min-w-[720px] border-collapse text-[13.5px]">
                 <thead>
                     <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Date")</th>
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("ReportMovements_Col_TransferRef")</th>
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Batches_Source")</th>
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Batches_Destination")</th>
-                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@T("Common_Quantity")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Date (UTC)" : "التاريخ (UTC)")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Transfer ref" : "مرجع التحويل")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Source" : "المصدر")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Destination" : "الوجهة")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Quantity" : "الكمية")</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -145,7 +144,7 @@
                         }
                         if (!transfers.Items.Any())
                         {
-                            <tr><td colspan="5" class="px-6 py-10 text-center text-[13.5px] text-ink-soft">@T("ReportMovements_NoTransfers")</td></tr>
+                            <tr><td colspan="5" class="px-6 py-10 text-center text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No transfers recorded." : "لا توجد تحويلات مسجّلة.")</td></tr>
                         }
                     }
                 </tbody>
@@ -156,17 +155,17 @@
     <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
         <div class="flex items-center gap-2.5 border-b border-line px-5 py-3">
             <svg class="icon !size-[18px] text-signal"><use href="#i-undo" /></svg>
-            <span class="text-[14px] font-semibold text-ink">@T("ReportMovements_Adjustments")</span>
+            <span class="text-[14px] font-semibold text-ink">@(Loc.IsEn ? "Adjustments, damage & reversals (with recorded reasons)" : "التسويات والتلف وعمليات العكس (مع الأسباب المسجّلة)")</span>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full min-w-[720px] border-collapse text-[13.5px]">
                 <thead>
                     <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Date")</th>
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Type")</th>
-                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@T("Common_Quantity")</th>
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Reason")</th>
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Reference")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Date (UTC)" : "التاريخ (UTC)")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Type" : "النوع")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Quantity" : "الكمية")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Reason" : "السبب")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Reference" : "المرجع")</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -193,7 +192,7 @@
                         }
                         if (!adjustments.Items.Any())
                         {
-                            <tr><td colspan="5" class="px-6 py-10 text-center text-[13.5px] text-ink-soft">@T("ReportMovements_NoAdjustments")</td></tr>
+                            <tr><td colspan="5" class="px-6 py-10 text-center text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No adjustments, write-offs or reversals recorded." : "لا توجد تسويات أو أشطاب أو عمليات عكس مسجّلة.")</td></tr>
                         }
                     }
                 </tbody>

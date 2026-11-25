@@ -1,7 +1,6 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = Loc.T("ReportWarehouses_Title");
-    string T(string key) => Loc.T(key);
+    ViewData["Title"] = (Loc.IsEn ? "Warehouse inventory reports" : "تقارير مخزون المستودعات");
 
     var rankedStock = ((PaginatedResult<WarehouseStockSummaryDto>?)ViewBag.RankedByStock)?.Items?.ToList() ?? new List<WarehouseStockSummaryDto>();
     var rankedCost = ((PaginatedResult<WarehouseStockSummaryDto>?)ViewBag.RankedByCost)?.Items?.ToList() ?? new List<WarehouseStockSummaryDto>();
@@ -12,7 +11,7 @@
     // Current sort column comes from the query string ("stock" by default)
     var order = Context.Request.Query["order"].ToString();
     if (order != "cost") order = "stock";
-    var dirText = asc ? T("ReportWarehouses_Asc") : T("ReportWarehouses_Desc");
+    var dirText = asc ? (Loc.IsEn ? "asc" : "تصاعدي") : (Loc.IsEn ? "desc" : "تنازلي");
     var arrow = asc ? "↑" : "↓";
 
     // Bars are relative to the biggest value in each list
@@ -41,24 +40,24 @@
     @* ───────── Header + sorting ───────── *@
     <header class="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
         <div class="min-w-0">
-            <h1 class="text-[22px] font-bold tracking-[-.015em]">@T("ReportWarehouses_Title")</h1>
-            <p class="mt-1.5 max-w-[80ch] text-[13.5px] text-ink-soft">@T("ReportWarehouses_Sub")</p>
+            <h1 class="text-[22px] font-bold tracking-[-.015em]">@(Loc.IsEn ? "Warehouse inventory reports" : "تقارير مخزون المستودعات")</h1>
+            <p class="mt-1.5 max-w-[80ch] text-[13.5px] text-ink-soft">@(Loc.IsEn ? "TotalUnits is a raw unit count across products with different units of measure — NOT a normalized measure of warehouse capacity. Cost = recorded batch unit costs (no approved valuation policy)." : "إجمالي الوحدات عدد خام عبر منتجات بوحدات قياس مختلفة — وليس مقياساً مُوحَّداً لسعة المستودع. التكلفة = تكاليف وحدات الدفعات المسجّلة (بلا سياسة تقييم معتمدة).")</p>
         </div>
 
         <div class="inline-flex overflow-hidden rounded-md border border-line bg-surface" role="group">
             @if (order == "stock")
             {
                 <a asp-area="Inventory" asp-controller="Reports" asp-action="Warehouses" asp-route-order="stock" asp-route-asc="@(!asc)"
-                   class="@segOn hover:no-underline" aria-current="true">@Loc.F("ReportWarehouses_ByStock", dirText)<span aria-hidden="true">@arrow</span></a>
+                   class="@segOn hover:no-underline" aria-current="true">@(Loc.IsEn ? $"Stock {dirText}" : $"المخزون {dirText}")<span aria-hidden="true">@arrow</span></a>
                 <a asp-area="Inventory" asp-controller="Reports" asp-action="Warehouses" asp-route-order="cost" asp-route-asc="@(asc)"
-                   class="@segOff border-s border-line hover:no-underline">@Loc.F("ReportWarehouses_ByCost", dirText)</a>
+                   class="@segOff border-s border-line hover:no-underline">@(Loc.IsEn ? $"Cost {dirText}" : $"التكلفة {dirText}")</a>
             }
             else
             {
                 <a asp-area="Inventory" asp-controller="Reports" asp-action="Warehouses" asp-route-order="stock" asp-route-asc="@(asc)"
-                   class="@segOff hover:no-underline">@Loc.F("ReportWarehouses_ByStock", dirText)</a>
+                   class="@segOff hover:no-underline">@(Loc.IsEn ? $"Stock {dirText}" : $"المخزون {dirText}")</a>
                 <a asp-area="Inventory" asp-controller="Reports" asp-action="Warehouses" asp-route-order="cost" asp-route-asc="@(!asc)"
-                   class="@segOn border-s border-line hover:no-underline" aria-current="true">@Loc.F("ReportWarehouses_ByCost", dirText)<span aria-hidden="true">@arrow</span></a>
+                   class="@segOn border-s border-line hover:no-underline" aria-current="true">@(Loc.IsEn ? $"Cost {dirText}" : $"التكلفة {dirText}")<span aria-hidden="true">@arrow</span></a>
             }
         </div>
     </header>
@@ -68,7 +67,7 @@
         @* ───────── Ranking by stock ───────── *@
         <section class="@card">
             <div class="@cardHead">
-                <span class="flex items-center gap-2.5"><svg class="icon !size-[18px] text-accent"><use href="#i-store" /></svg>@T("ReportWarehouses_RankStock")</span>
+                <span class="flex items-center gap-2.5"><svg class="icon !size-[18px] text-accent"><use href="#i-store" /></svg>@(Loc.IsEn ? "Ranked by total stock" : "الأعلى حسب إجمالي المخزون")</span>
                 <span class="@count">@rankedStock.Count</span>
             </div>
             <div class="overflow-x-auto">
@@ -76,10 +75,10 @@
                     <thead>
                         <tr class="border-b border-line-strong bg-sunken/60">
                             <th class="@th w-10">#</th>
-                            <th class="@th">@T("Common_Warehouse")</th>
-                            <th class="@th">@T("ReportWarehouses_Col_Active")</th>
-                            <th class="@th">@T("ReportWarehouses_Col_Units")</th>
-                            <th class="@th">@T("ReportWarehouses_Col_Products")</th>
+                            <th class="@th">@(Loc.IsEn ? "Warehouse" : "المستودع")</th>
+                            <th class="@th">@(Loc.IsEn ? "Active" : "نشط")</th>
+                            <th class="@th">@(Loc.IsEn ? "Units" : "الوحدات")</th>
+                            <th class="@th">@(Loc.IsEn ? "Products" : "المنتجات")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -95,11 +94,11 @@
                                     <td class="@td">
                                         @if (w.IsActive)
                                         {
-                                            <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@T("Common_Yes")</span>
+                                            <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@(Loc.IsEn ? "Yes" : "نعم")</span>
                                         }
                                         else
                                         {
-                                            <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@T("Common_No")</span>
+                                            <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@(Loc.IsEn ? "No" : "لا")</span>
                                         }
                                     </td>
                                     <td class="@td">
@@ -114,7 +113,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="5" class="@empty">@T("ReportWarehouses_None")</td></tr>
+                            <tr><td colspan="5" class="@empty">@(Loc.IsEn ? "No warehouses." : "لا توجد مستودعات.")</td></tr>
                         }
                     </tbody>
                 </table>
@@ -124,7 +123,7 @@
         @* ───────── Ranking by cost ───────── *@
         <section class="@card">
             <div class="@cardHead">
-                <span class="flex items-center gap-2.5"><svg class="icon !size-[18px] text-accent"><use href="#i-chart" /></svg>@T("ReportWarehouses_RankCost")</span>
+                <span class="flex items-center gap-2.5"><svg class="icon !size-[18px] text-accent"><use href="#i-chart" /></svg>@(Loc.IsEn ? "Ranked by inventory cost (recorded)" : "الأعلى حسب تكلفة المخزون (مسجّلة)")</span>
                 <span class="@count">@rankedCost.Count</span>
             </div>
             <div class="overflow-x-auto">
@@ -132,9 +131,9 @@
                     <thead>
                         <tr class="border-b border-line-strong bg-sunken/60">
                             <th class="@th w-10">#</th>
-                            <th class="@th">@T("Common_Warehouse")</th>
-                            <th class="@th">@T("ReportWarehouses_Col_Units")</th>
-                            <th class="@th">@T("ReportWarehouses_Col_Cost")</th>
+                            <th class="@th">@(Loc.IsEn ? "Warehouse" : "المستودع")</th>
+                            <th class="@th">@(Loc.IsEn ? "Units" : "الوحدات")</th>
+                            <th class="@th">@(Loc.IsEn ? "Cost" : "التكلفة")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -159,7 +158,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="4" class="@empty">@T("ReportWarehouses_None")</td></tr>
+                            <tr><td colspan="4" class="@empty">@(Loc.IsEn ? "No warehouses." : "لا توجد مستودعات.")</td></tr>
                         }
                     </tbody>
                 </table>
@@ -169,15 +168,15 @@
         @* ───────── Warehouses with zero stock ───────── *@
         <section class="@card">
             <div class="@cardHead">
-                <span class="flex items-center gap-2.5"><svg class="icon !size-[18px] text-ink-faint"><use href="#i-box" /></svg>@T("ReportWarehouses_Zero")</span>
+                <span class="flex items-center gap-2.5"><svg class="icon !size-[18px] text-ink-faint"><use href="#i-box" /></svg>@(Loc.IsEn ? "Warehouses with no stock" : "مستودعات بلا مخزون")</span>
                 <span class="@count">@zeroStock.Count</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full min-w-[380px] border-collapse text-[13.5px]">
                     <thead>
                         <tr class="border-b border-line-strong bg-sunken/60">
-                            <th class="@th">@T("Common_Warehouse")</th>
-                            <th class="@th">@T("Common_Status")</th>
+                            <th class="@th">@(Loc.IsEn ? "Warehouse" : "المستودع")</th>
+                            <th class="@th">@(Loc.IsEn ? "Status" : "الحالة")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -190,11 +189,11 @@
                                     <td class="@td">
                                         @if (w.IsActive)
                                         {
-                                            <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@T("Common_Active")</span>
+                                            <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@(Loc.IsEn ? "Active" : "نشط")</span>
                                         }
                                         else
                                         {
-                                            <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@T("Common_Inactive")</span>
+                                            <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@(Loc.IsEn ? "Inactive" : "غير نشط")</span>
                                         }
                                     </td>
                                 </tr>
@@ -202,7 +201,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="2" class="@empty">@T("ReportWarehouses_AllHold")</td></tr>
+                            <tr><td colspan="2" class="@empty">@(Loc.IsEn ? "Every warehouse currently holds stock." : "كل مستودع يحمل مخزوناً حالياً.")</td></tr>
                         }
                     </tbody>
                 </table>
@@ -212,16 +211,16 @@
         @* ───────── Inactive warehouses that still hold stock (needs attention) ───────── *@
         <section class="@(inactiveWithStock.Count > 0 ? cardWarn : card)">
             <div class="@cardHead">
-                <span class="flex items-center gap-2.5"><svg class="icon !size-[18px] text-signal"><use href="#i-alert" /></svg>@T("ReportWarehouses_Inactive")</span>
+                <span class="flex items-center gap-2.5"><svg class="icon !size-[18px] text-signal"><use href="#i-alert" /></svg>@(Loc.IsEn ? "Inactive warehouses containing stock (control)" : "مستودعات غير نشطة تحمل مخزوناً (رقابة)")</span>
                 <span class="@count">@inactiveWithStock.Count</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full min-w-[480px] border-collapse text-[13.5px]">
                     <thead>
                         <tr class="border-b border-line-strong bg-sunken/60">
-                            <th class="@th">@T("Common_Warehouse")</th>
-                            <th class="@th">@T("ReportWarehouses_Col_Units")</th>
-                            <th class="@th">@T("ReportWarehouses_Col_Cost")</th>
+                            <th class="@th">@(Loc.IsEn ? "Warehouse" : "المستودع")</th>
+                            <th class="@th">@(Loc.IsEn ? "Units" : "الوحدات")</th>
+                            <th class="@th">@(Loc.IsEn ? "Cost" : "التكلفة")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -238,7 +237,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="3" class="@empty">@T("ReportWarehouses_NoneInactive")</td></tr>
+                            <tr><td colspan="3" class="@empty">@(Loc.IsEn ? "None — no inactive warehouse holds stock." : "لا شيء — لا يوجد مستودع غير نشط يحمل مخزوناً.")</td></tr>
                         }
                     </tbody>
                 </table>

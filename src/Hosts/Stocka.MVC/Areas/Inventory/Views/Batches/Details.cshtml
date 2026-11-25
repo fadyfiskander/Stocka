@@ -2,29 +2,20 @@
 @using Inventory.Contracts.DTOs.StockMovement
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = Loc.T("Batches_DetailsTitle");
-
-    // Translate with a built-in fallback when a key is missing (Loc returns the key itself)
-    bool isAr = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
-    string T(string key, string? ar = null, string? en = null)
-    {
-        var v = Loc.T(key);
-        if (en != null && v == key) return isAr ? (ar ?? en) : en;
-        return v;
-    }
+    ViewData["Title"] = (Loc.IsEn ? "Batch details" : "تفاصيل الدفعة");
 
     // 0 PurchaseIn, 1 SaleOut, 2 TransferIn, 3 TransferOut, 4 AdjustmentIn, 5 AdjustmentOut, 6 OrderReturn
-    string MoveType(int t) => Loc.T(t switch
+    string MoveType(int t) => t switch
     {
-        0 => "Move_PurchaseIn",
-        1 => "Move_SaleOut",
-        2 => "Move_TransferIn",
-        3 => "Move_TransferOut",
-        4 => "Move_AdjustmentIn",
-        5 => "Move_AdjustmentOut",
-        6 => "Move_OrderReturn",
-        _ => "Move_PurchaseIn"
-    });
+        0 => (Loc.IsEn ? "Purchase in" : "إدخال شراء"),
+        1 => (Loc.IsEn ? "Sale out" : "بيع خارج"),
+        2 => (Loc.IsEn ? "Transfer in" : "تحويل داخل"),
+        3 => (Loc.IsEn ? "Transfer out" : "تحويل خارج"),
+        4 => (Loc.IsEn ? "Adjustment in" : "تسوية داخل"),
+        5 => (Loc.IsEn ? "Adjustment out" : "تسوية خارج"),
+        6 => (Loc.IsEn ? "Order return" : "إرجاع طلب"),
+        _ => (Loc.IsEn ? "Purchase in" : "إدخال شراء")
+    };
     bool IsIncoming(int t) => t == 0 || t == 2 || t == 4 || t == 6;
 
     var movements = ((IEnumerable<StockMovementDto>?)ViewBag.Movements)?.ToList() ?? new List<StockMovementDto>();
@@ -47,7 +38,7 @@
     double Pct(object v) => initial <= 0 ? 0 : Math.Min(100, Math.Max(0, Convert.ToDouble(v) / initial * 100));
     string W(double p) => Math.Round(p, 1).ToString(System.Globalization.CultureInfo.InvariantCulture) + "%";
 
-    string selectText = T("Common_Select", "اختر…", "Select…");
+    string selectText = (Loc.IsEn ? "Select…" : "اختر…");
 
     // ───── shared Tailwind class sets (literal tokens so the scanner sees them) ─────
     const string card = "min-w-0 overflow-hidden rounded-lg border border-line bg-surface shadow-card";
@@ -69,20 +60,20 @@
     <header class="mb-5 flex flex-wrap items-start justify-between gap-4 border-b border-line pb-5">
         <div class="min-w-0">
             <h1 class="flex flex-wrap items-center gap-3 text-[22px] font-bold tracking-[-.015em]">
-                @T("Batches_DetailsTitle")
+                @(Loc.IsEn ? "Batch details" : "تفاصيل الدفعة")
                 @if (Model.IsExhausted)
                 {
-                    <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@T("Batches_FullyAllocated")</span>
+                    <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@(Loc.IsEn ? " · fully allocated" : " · مخصَّصة بالكامل")</span>
                 }
             </h1>
             <div class="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-[12.5px] text-ink-faint">
-                <span>@T("Common_Product"): <code class="num break-all font-mono text-ink-soft">@Model.ProductId</code></span>
-                <span>@T("Batches_PurchaseItemId"): <code class="num break-all font-mono text-ink-soft">@Model.PurchaseItemId</code></span>
+                <span>@(Loc.IsEn ? "Product" : "المنتج"): <code class="num break-all font-mono text-ink-soft">@Model.ProductId</code></span>
+                <span>@(Loc.IsEn ? "Purchase item ID (Purchasing)" : "معرّف بند الشراء (المشتريات)"): <code class="num break-all font-mono text-ink-soft">@Model.PurchaseItemId</code></span>
             </div>
         </div>
         <a asp-area="Inventory" asp-controller="Batches" asp-action="Index"
            class="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-line bg-surface px-4 text-[13.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline">
-            <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@T("Batches_BackToList")
+            <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Back to batches" : "العودة للدفعات")
         </a>
     </header>
 
@@ -92,15 +83,15 @@
         <div class="grid min-w-0 gap-5">
 
             <section class="@card">
-                <div class="@cardHead">@T("Batches_Actions", "العمليات", "Operations")</div>
+                <div class="@cardHead">@(Loc.IsEn ? "Operations" : "العمليات")</div>
 
                 <div class="flex flex-wrap gap-1.5 border-b border-line px-4 py-3" role="tablist">
-                    <button type="button" role="tab" aria-selected="true" data-pane="pane-allocate" class="@tab"><span class="size-2 rounded-full bg-accent"></span>@T("Batches_AllocateTitle")</button>
-                    <button type="button" role="tab" aria-selected="false" data-pane="pane-transfer" class="@tab"><span class="size-2 rounded-full bg-info"></span>@T("Batches_TransferTitle")</button>
-                    <button type="button" role="tab" aria-selected="false" data-pane="pane-sale" class="@tab"><span class="size-2 rounded-full bg-signal"></span>@T("Batches_SaleTitle")</button>
-                    <button type="button" role="tab" aria-selected="false" data-pane="pane-return" class="@tab"><span class="size-2 rounded-full bg-ok"></span>@T("Batches_ReturnTitle")</button>
-                    <button type="button" role="tab" aria-selected="false" data-pane="pane-adjust" class="@tab"><span class="size-2 rounded-full bg-ink-faint"></span>@T("Batches_AdjustTitle")</button>
-                    <button type="button" role="tab" aria-selected="false" data-pane="pane-damage" class="@tab"><span class="size-2 rounded-full bg-danger"></span>@T("Batches_DamageTitle")</button>
+                    <button type="button" role="tab" aria-selected="true" data-pane="pane-allocate" class="@tab"><span class="size-2 rounded-full bg-accent"></span>@(Loc.IsEn ? "Allocate stock to a warehouse" : "تخصيص مخزون لمستودع")</button>
+                    <button type="button" role="tab" aria-selected="false" data-pane="pane-transfer" class="@tab"><span class="size-2 rounded-full bg-info"></span>@(Loc.IsEn ? "Transfer between warehouses" : "تحويل بين المستودعات")</button>
+                    <button type="button" role="tab" aria-selected="false" data-pane="pane-sale" class="@tab"><span class="size-2 rounded-full bg-signal"></span>@(Loc.IsEn ? "Record sale (out)" : "تسجيل بيع (خروج)")</button>
+                    <button type="button" role="tab" aria-selected="false" data-pane="pane-return" class="@tab"><span class="size-2 rounded-full bg-ok"></span>@(Loc.IsEn ? "Record customer return (in)" : "تسجيل إرجاع عميل (دخول)")</button>
+                    <button type="button" role="tab" aria-selected="false" data-pane="pane-adjust" class="@tab"><span class="size-2 rounded-full bg-ink-faint"></span>@(Loc.IsEn ? "Physical count adjustment" : "تسوية الجرد الفعلي")</button>
+                    <button type="button" role="tab" aria-selected="false" data-pane="pane-damage" class="@tab"><span class="size-2 rounded-full bg-danger"></span>@(Loc.IsEn ? "Damaged stock write-off" : "شطب المخزون التالف")</button>
                 </div>
 
                 <div class="p-4">
@@ -112,18 +103,18 @@
                             <input type="hidden" name="BatchId" value="@Model.Id" />
                             <fieldset disabled="@(Model.RemainingQuantity <= 0)" class="col-span-12 m-0 grid min-w-0 grid-cols-12 gap-4 border-0 p-0 disabled:opacity-50">
                                 <div class="col-span-12 sm:col-span-8">
-                                    <label class="@label">@T("Common_Warehouse")</label>
+                                    <label class="@label">@(Loc.IsEn ? "Warehouse" : "المستودع")</label>
                                     <select name="WarehouseId" class="@select" asp-items="whWithLocation" required>
                                         <option value="">@selectText</option>
                                     </select>
                                 </div>
                                 <div class="col-span-12 sm:col-span-4">
-                                    <label class="@label">@T("Common_Quantity")</label>
+                                    <label class="@label">@(Loc.IsEn ? "Quantity" : "الكمية")</label>
                                     <input type="number" name="Quantity" class="@input num" min="1" max="@Model.RemainingQuantity" required />
                                 </div>
                                 <div class="@actionsBetween">
-                                    <small class="@note">@Loc.F("Batches_AllocateNote", Model.RemainingQuantity)</small>
-                                    <button type="submit" class="@btn bg-accent text-on-accent hover:bg-accent-hover">@T("Batches_Allocate")</button>
+                                    <small class="@note">@(Loc.IsEn ? $"Max {Model.RemainingQuantity} unallocated units. Placement records a PurchaseIn movement." : $"حد أقصى {Model.RemainingQuantity} وحدة غير مخصَّصة. التخزين يسجّل حركة إدخال شراء.")</small>
+                                    <button type="submit" class="@btn bg-accent text-on-accent hover:bg-accent-hover">@(Loc.IsEn ? "Allocate" : "تخصيص")</button>
                                 </div>
                             </fieldset>
                         </form>
@@ -135,28 +126,28 @@
                             <div asp-validation-summary="ModelOnly" class="col-span-12 text-[12.5px] text-danger empty:hidden"></div>
                             <input type="hidden" name="BatchId" value="@Model.Id" />
                             <div class="col-span-12 sm:col-span-6">
-                                <label class="@label">@T("Batches_Source")</label>
+                                <label class="@label">@(Loc.IsEn ? "Source" : "المصدر")</label>
                                 <select name="SourceWarehouseId" class="@select" asp-items="whPlain" required>
                                     <option value="">@selectText</option>
                                 </select>
                             </div>
                             <div class="col-span-12 sm:col-span-6">
-                                <label class="@label">@T("Batches_Destination")</label>
+                                <label class="@label">@(Loc.IsEn ? "Destination" : "الوجهة")</label>
                                 <select name="DestinationWarehouseId" class="@select" asp-items="whPlain" required>
                                     <option value="">@selectText</option>
                                 </select>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
-                                <label class="@label">@T("Common_Quantity")</label>
+                                <label class="@label">@(Loc.IsEn ? "Quantity" : "الكمية")</label>
                                 <input type="number" name="Quantity" class="@input num" min="1" required />
                             </div>
                             <div class="col-span-12 sm:col-span-8">
-                                <label class="@label">@T("Batches_ReasonOptional")</label>
+                                <label class="@label">@(Loc.IsEn ? "Reason (optional), max 300 chars" : "السبب (اختياري)، بحد أقصى 300 حرف")</label>
                                 <input type="text" name="Reason" class="@input" maxlength="300" />
                             </div>
                             <div class="@actionsBetween">
-                                <small class="@note">@T("Batches_TransferNote")</small>
-                                <button type="submit" class="@btn border-info/25 bg-info-tint text-info hover:bg-info/15">@T("Batches_Transfer", "تحويل", "Transfer")</button>
+                                <small class="@note">@(Loc.IsEn ? "Both legs (out + in) commit together as one operation." : "الرجلان (خروج + دخول) تُسجَّلان معاً كعملية واحدة.")</small>
+                                <button type="submit" class="@btn border-info/25 bg-info-tint text-info hover:bg-info/15">@(Loc.IsEn ? "Transfer" : "تحويل")</button>
                             </div>
                         </form>
                     </div>
@@ -166,19 +157,19 @@
                         <form asp-area="Inventory" asp-controller="Stock" asp-action="Sale" method="post" class="js-once @formGrid">
                             <input type="hidden" name="BatchId" value="@Model.Id" />
                             <div class="col-span-12 sm:col-span-4">
-                                <label class="@label">@T("Common_Quantity")</label>
+                                <label class="@label">@(Loc.IsEn ? "Quantity" : "الكمية")</label>
                                 <input type="number" name="Quantity" class="@input num" min="1" required />
                             </div>
                             <div class="col-span-12 sm:col-span-8">
-                                <label class="@label">@T("Batches_OrderRef")</label>
+                                <label class="@label">@(Loc.IsEn ? "Order reference (optional Guid)" : "مرجع الطلب (Guid اختياري)")</label>
                                 <input type="text" name="OrderReferenceId" class="@input" />
                             </div>
                             <div class="col-span-12">
-                                <label class="@label">@T("Common_Reason")</label>
+                                <label class="@label">@(Loc.IsEn ? "Reason" : "السبب")</label>
                                 <input type="text" name="Reason" class="@input" maxlength="300" />
                             </div>
                             <div class="@actionsEnd">
-                                <button type="submit" class="@btn border-signal/25 bg-signal-tint text-signal hover:bg-signal/15">@T("Batches_SaleOut")</button>
+                                <button type="submit" class="@btn border-signal/25 bg-signal-tint text-signal hover:bg-signal/15">@(Loc.IsEn ? "Sale out" : "بيع خارج")</button>
                             </div>
                         </form>
                     </div>
@@ -188,19 +179,19 @@
                         <form asp-area="Inventory" asp-controller="Stock" asp-action="Return" method="post" class="js-once @formGrid">
                             <input type="hidden" name="BatchId" value="@Model.Id" />
                             <div class="col-span-12 sm:col-span-4">
-                                <label class="@label">@T("Common_Quantity")</label>
+                                <label class="@label">@(Loc.IsEn ? "Quantity" : "الكمية")</label>
                                 <input type="number" name="Quantity" class="@input num" min="1" required />
                             </div>
                             <div class="col-span-12 sm:col-span-8">
-                                <label class="@label">@T("Batches_OriginalOrder")</label>
+                                <label class="@label">@(Loc.IsEn ? "Original order (optional Guid)" : "الطلب الأصلي (Guid اختياري)")</label>
                                 <input type="text" name="OrderReferenceId" class="@input" />
                             </div>
                             <div class="col-span-12">
-                                <label class="@label">@T("Common_Reason")</label>
+                                <label class="@label">@(Loc.IsEn ? "Reason" : "السبب")</label>
                                 <input type="text" name="Reason" class="@input" maxlength="300" />
                             </div>
                             <div class="@actionsEnd">
-                                <button type="submit" class="@btn border-ok/25 bg-ok-tint text-ok hover:bg-ok/15">@T("Batches_ReturnIn")</button>
+                                <button type="submit" class="@btn border-ok/25 bg-ok-tint text-ok hover:bg-ok/15">@(Loc.IsEn ? "Return in" : "إرجاع داخل")</button>
                             </div>
                         </form>
                     </div>
@@ -210,21 +201,21 @@
                         <form asp-area="Inventory" asp-controller="Stock" asp-action="Adjust" method="post" class="js-once @formGrid">
                             <input type="hidden" name="BatchId" value="@Model.Id" />
                             <div class="col-span-12 sm:col-span-8">
-                                <label class="@label">@T("Common_Warehouse")</label>
+                                <label class="@label">@(Loc.IsEn ? "Warehouse" : "المستودع")</label>
                                 <select name="WarehouseId" class="@select" asp-items="whPlain" required>
                                     <option value="">@selectText</option>
                                 </select>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
-                                <label class="@label">@T("Batches_Counted")</label>
+                                <label class="@label">@(Loc.IsEn ? "Counted" : "المعدود")</label>
                                 <input type="number" name="CountedQuantity" class="@input num" min="0" required />
                             </div>
                             <div class="col-span-12">
-                                <label class="@label">@T("Batches_AdjustReason")</label>
+                                <label class="@label">@(Loc.IsEn ? "Reason (required for adjustments)" : "السبب (مطلوب للتسويات)")</label>
                                 <input type="text" name="Reason" class="@input" maxlength="300" required />
                             </div>
                             <div class="@actionsEnd">
-                                <button type="submit" class="@btn border-line bg-sunken text-ink-soft hover:bg-line hover:text-ink">@T("Batches_Adjust", "حفظ الجرد", "Save count")</button>
+                                <button type="submit" class="@btn border-line bg-sunken text-ink-soft hover:bg-line hover:text-ink">@(Loc.IsEn ? "Save count" : "حفظ الجرد")</button>
                             </div>
                         </form>
                     </div>
@@ -234,25 +225,25 @@
                         <form asp-area="Inventory" asp-controller="Stock" asp-action="Damage" method="post" class="js-once @formGrid">
                             <input type="hidden" name="BatchId" value="@Model.Id" />
                             <div class="col-span-12 sm:col-span-6">
-                                <label class="@label">@T("Common_Warehouse")</label>
+                                <label class="@label">@(Loc.IsEn ? "Warehouse" : "المستودع")</label>
                                 <select name="WarehouseId" class="@select" asp-items="whPlain" required>
                                     <option value="">@selectText</option>
                                 </select>
                             </div>
                             <div class="col-span-12 sm:col-span-3">
-                                <label class="@label">@T("Common_Quantity")</label>
+                                <label class="@label">@(Loc.IsEn ? "Quantity" : "الكمية")</label>
                                 <input type="number" name="Quantity" class="@input num" min="1" required />
                             </div>
                             <div class="col-span-12 sm:col-span-3">
-                                <label class="@label">@T("Batches_Ref")</label>
+                                <label class="@label">@(Loc.IsEn ? "Ref (optional Guid)" : "مرجع (Guid اختياري)")</label>
                                 <input type="text" name="ReferenceId" class="@input" />
                             </div>
                             <div class="col-span-12">
-                                <label class="@label">@T("Batches_DamageReason")</label>
+                                <label class="@label">@(Loc.IsEn ? "Damage description (required)" : "وصف التلف (مطلوب)")</label>
                                 <input type="text" name="Reason" class="@input" maxlength="300" required />
                             </div>
                             <div class="@actionsEnd">
-                                <button type="submit" class="@btn border-danger/25 bg-danger-tint text-danger hover:bg-danger/15">@T("Batches_WriteOff")</button>
+                                <button type="submit" class="@btn border-danger/25 bg-danger-tint text-danger hover:bg-danger/15">@(Loc.IsEn ? "Write off" : "شطب")</button>
                             </div>
                         </form>
                     </div>
@@ -262,20 +253,20 @@
             @* ───────── Movement history ───────── *@
             <section class="@card">
                 <div class="@cardHead">
-                    <span>@T("Batches_MovementHistory")</span>
+                    <span>@(Loc.IsEn ? "Movement history (audit trail)" : "سجل الحركات (مسار التدقيق)")</span>
                     <span class="num rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@movements.Count</span>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full min-w-[860px] border-collapse text-[13.5px]">
                         <thead>
                             <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
-                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Date")</th>
-                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Type")</th>
-                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Quantity")</th>
-                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Warehouse")</th>
-                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Reference")</th>
-                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Reason")</th>
-                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@T("Batches_Col_Correct")</th>
+                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Date (UTC)" : "التاريخ (UTC)")</th>
+                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Type" : "النوع")</th>
+                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Quantity" : "الكمية")</th>
+                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Warehouse" : "المستودع")</th>
+                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Reference" : "المرجع")</th>
+                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Reason" : "السبب")</th>
+                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Correct" : "تصحيح")</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -316,14 +307,14 @@
                                                 <button type="button"
                                                         data-reverse-url="@Url.Action("ReverseMovement", "Stock", new { area = "Inventory", id = m.Id })"
                                                         data-summary="@MoveType(m.MovementType) (@m.Quantity)"
-                                                        title="@T("Batches_ReverseTitle")"
+                                                        title="@(Loc.IsEn ? "Appends an opposite, auditable correction movement" : "يضيف حركة تصحيح معاكسة قابلة للتدقيق")"
                                                         class="inline-flex h-8 items-center rounded-md border border-danger/35 bg-transparent px-2.5 text-[12px] font-medium text-danger transition-colors hover:bg-danger-tint">
-                                                    @T("Batches_Reverse")
+                                                    @(Loc.IsEn ? "Reverse" : "عكس")
                                                 </button>
                                             }
                                             else
                                             {
-                                                <small class="@note">@T("Batches_CounterTransfer")</small>
+                                                <small class="@note">@(Loc.IsEn ? "counter-transfer required" : "مطلوب تحويل مقابل")</small>
                                             }
                                         </td>
                                     </tr>
@@ -331,7 +322,7 @@
                             }
                             else
                             {
-                                <tr><td colspan="7" class="px-4 py-12 text-center text-[13.5px] text-ink-soft">@T("Batches_NoMovements")</td></tr>
+                                <tr><td colspan="7" class="px-4 py-12 text-center text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No movements recorded for this batch yet." : "لا توجد حركات مسجّلة لهذه الدفعة بعد.")</td></tr>
                             }
                         </tbody>
                     </table>
@@ -343,61 +334,61 @@
         <aside class="order-first grid min-w-0 gap-5 xl:order-none">
 
             <section class="@card">
-                <div class="@cardHead">@T("Batches_QuantitiesTitle")</div>
+                <div class="@cardHead">@(Loc.IsEn ? "Quantities (distinct concepts)" : "الكميات (مفاهيم متمايزة)")</div>
                 <div class="p-4">
                     <div class="mb-4 grid grid-cols-2 gap-x-4 gap-y-4">
                         <div>
-                            <div class="text-[11.5px] text-ink-faint">@T("Batches_InitialReceived")</div>
+                            <div class="text-[11.5px] text-ink-faint">@(Loc.IsEn ? "Initial received" : "المستلم أولاً")</div>
                             <div class="text-[24px] font-bold leading-tight tracking-[-.02em] text-ink"><span class="num" dir="ltr">@Model.InitialQuantity</span></div>
                         </div>
                         <div>
-                            <div class="text-[11.5px] text-ink-faint">@T("Batches_UnallocatedRemaining")</div>
+                            <div class="text-[11.5px] text-ink-faint">@(Loc.IsEn ? "Unallocated (RemainingQuantity)" : "غير مخصَّص (الكمية المتبقية)")</div>
                             <div class="text-[24px] font-bold leading-tight tracking-[-.02em] text-signal"><span class="num" dir="ltr">@Model.RemainingQuantity</span></div>
                         </div>
                         <div>
-                            <div class="text-[11.5px] text-ink-faint">@T("Batches_InWarehouses")</div>
+                            <div class="text-[11.5px] text-ink-faint">@(Loc.IsEn ? "Currently in warehouses" : "الموجود حالياً بالمستودعات")</div>
                             <div class="text-[24px] font-bold leading-tight tracking-[-.02em] text-ok"><span class="num" dir="ltr">@Model.QuantityInWarehouses</span></div>
                         </div>
                         <div>
-                            <div class="text-[11.5px] text-ink-faint">@T("Batches_EverAllocated")</div>
+                            <div class="text-[11.5px] text-ink-faint">@(Loc.IsEn ? "Ever allocated" : "إجمالي المخصَّص سابقاً")</div>
                             <div class="text-[24px] font-bold leading-tight tracking-[-.02em] text-ink"><span class="num" dir="ltr">@Model.AllocatedQuantity</span></div>
                         </div>
                     </div>
 
                     <div class="flex h-2 overflow-hidden rounded-full bg-sunken" role="img"
-                         aria-label="@T("Batches_UnallocatedRemaining") / @T("Batches_InWarehouses")">
+                         aria-label="@(Loc.IsEn ? "Unallocated (RemainingQuantity)" : "غير مخصَّص (الكمية المتبقية)") / @(Loc.IsEn ? "Currently in warehouses" : "الموجود حالياً بالمستودعات")">
                         <span class="block h-full bg-signal" style="width:@W(Pct(Model.RemainingQuantity))"></span>
                         <span class="block h-full bg-ok" style="width:@W(Pct(Model.QuantityInWarehouses))"></span>
                     </div>
                     <div class="mt-2.5 flex flex-wrap gap-x-4 gap-y-1 text-[11.5px] text-ink-faint">
-                        <span class="inline-flex items-center gap-1.5"><i class="size-2 rounded-full bg-signal"></i>@T("Batches_UnallocatedRemaining")</span>
-                        <span class="inline-flex items-center gap-1.5"><i class="size-2 rounded-full bg-ok"></i>@T("Batches_InWarehouses")</span>
+                        <span class="inline-flex items-center gap-1.5"><i class="size-2 rounded-full bg-signal"></i>@(Loc.IsEn ? "Unallocated (RemainingQuantity)" : "غير مخصَّص (الكمية المتبقية)")</span>
+                        <span class="inline-flex items-center gap-1.5"><i class="size-2 rounded-full bg-ok"></i>@(Loc.IsEn ? "Currently in warehouses" : "الموجود حالياً بالمستودعات")</span>
                     </div>
                 </div>
             </section>
 
             <section class="@card">
-                <div class="@cardHead">@T("Batches_CostTitle")</div>
+                <div class="@cardHead">@(Loc.IsEn ? "Cost (recorded batch unit cost)" : "التكلفة (تكلفة وحدة الدفعة المسجّلة)")</div>
                 <div class="p-4">
                     <dl class="text-[13.5px]">
                         <div class="flex items-baseline justify-between gap-4 border-b border-line py-2.5">
-                            <dt class="text-ink-soft">@T("Batches_UnitCost")</dt>
+                            <dt class="text-ink-soft">@(Loc.IsEn ? "Unit cost" : "تكلفة الوحدة")</dt>
                             <dd class="num font-semibold text-ink" dir="ltr">@Model.UnitCost.ToString("N2")</dd>
                         </div>
                         <div class="flex items-baseline justify-between gap-4 border-b border-line py-2.5">
-                            <dt class="text-ink-soft">@T("Batches_InitialTotalCost")</dt>
+                            <dt class="text-ink-soft">@(Loc.IsEn ? "Initial total cost" : "إجمالي التكلفة الأولية")</dt>
                             <dd class="num font-semibold text-ink" dir="ltr">@Model.InitialTotalCost.ToString("N2")</dd>
                         </div>
                         <div class="flex items-baseline justify-between gap-4 border-b border-line py-2.5">
-                            <dt class="text-ink-soft">@T("Batches_RemainingValue")</dt>
+                            <dt class="text-ink-soft">@(Loc.IsEn ? "Unallocated value" : "قيمة غير المخصَّص")</dt>
                             <dd class="num font-semibold text-ink" dir="ltr">@Model.RemainingValue.ToString("N2")</dd>
                         </div>
                         <div class="flex items-baseline justify-between gap-4 py-2.5">
-                            <dt class="text-ink-soft">@T("Batches_ReceivedAt")</dt>
+                            <dt class="text-ink-soft">@(Loc.IsEn ? "Received at" : "تاريخ الاستلام")</dt>
                             <dd class="num font-semibold text-ink" dir="ltr">@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm") UTC</dd>
                         </div>
                     </dl>
-                    <small class="@note mt-3 block">@T("Batches_CostNote")</small>
+                    <small class="@note mt-3 block">@(Loc.IsEn ? "Traceable recorded costs only — no FIFO / weighted-average valuation policy is approved yet." : "تكاليف مسجّلة قابلة للتتبع فقط — لا توجد سياسة تقييم FIFO أو متوسط مرجّح معتمدة بعد.")</small>
                 </div>
             </section>
         </aside>
@@ -409,20 +400,20 @@
         <form method="post" id="bdReverseForm" class="js-once" asp-antiforgery="false">
             @Html.AntiForgeryToken()
             <input type="hidden" name="batchId" value="@Model.Id" />
-            <div id="bdReverseTitle" class="border-b border-line px-5 py-4 text-[14px] font-semibold">@T("Batches_ReverseTitle")</div>
+            <div id="bdReverseTitle" class="border-b border-line px-5 py-4 text-[14px] font-semibold">@(Loc.IsEn ? "Appends an opposite, auditable correction movement" : "يضيف حركة تصحيح معاكسة قابلة للتدقيق")</div>
             <div class="grid gap-3.5 p-5">
                 <div id="bdReverseSummary" class="font-semibold"></div>
                 <div>
-                    <label for="bdReverseReason" class="@label">@T("Batches_CorrectionReason")</label>
+                    <label for="bdReverseReason" class="@label">@(Loc.IsEn ? "Correction reason" : "سبب التصحيح")</label>
                     <input type="text" id="bdReverseReason" name="reason" class="@input" required maxlength="290" />
                 </div>
             </div>
             <div class="flex justify-end gap-2.5 border-t border-line px-5 py-4">
                 <button type="button" id="bdReverseCancel"
                         class="@btn border-line bg-surface font-medium text-ink hover:bg-sunken">
-                    @T("Common_Cancel", "إلغاء", "Cancel")
+                    @(Loc.IsEn ? "Cancel" : "إلغاء")
                 </button>
-                <button type="submit" class="@btn border-danger/25 bg-danger-tint text-danger hover:bg-danger/15">@T("Batches_Reverse")</button>
+                <button type="submit" class="@btn border-danger/25 bg-danger-tint text-danger hover:bg-danger/15">@(Loc.IsEn ? "Reverse" : "عكس")</button>
             </div>
         </form>
     </dialog>

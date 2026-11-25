@@ -2,7 +2,7 @@
     var success = TempData["Success"]?.ToString();
     var error = TempData["Error"]?.ToString();
     var warning = TempData["Warning"]?.ToString();
-    var close = Loc.T("Common_Close");
+    var close = (Loc.IsEn ? "Close" : "إغلاق");
 }
 @if (!string.IsNullOrWhiteSpace(success) || !string.IsNullOrWhiteSpace(error) || !string.IsNullOrWhiteSpace(warning))
 {

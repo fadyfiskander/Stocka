@@ -1,8 +1,7 @@
 @model RegisterCategoryCommand
 @{
-    ViewData["Title"] = Loc.T("Categories_CreateTitle");
+    ViewData["Title"] = (Loc.IsEn ? "Create category" : "إنشاء فئة");
     Layout = "~/Views/Shared/_Layout.cshtml";
-    string T(string key) => Loc.T(key);
 
     const string label = "mb-1.5 block text-[12.5px] font-semibold text-ink-soft";
     const string input = "block h-10 w-full rounded-md border border-line bg-surface px-3 text-[13.5px] text-ink outline-none transition placeholder:text-ink-faint hover:border-line-strong focus:border-accent focus:ring-[3px] focus:ring-[var(--focus-ring)]";
@@ -11,7 +10,7 @@
 
 <div class="mx-auto max-w-[38rem]">
     <header class="mb-5 border-b border-line pb-5">
-        <h1 class="text-[24px] font-bold tracking-[-.02em]">@T("Categories_CreateTitle")</h1>
+        <h1 class="text-[24px] font-bold tracking-[-.02em]">@(Loc.IsEn ? "Create category" : "إنشاء فئة")</h1>
     </header>
 
     <form asp-area="Catalog" asp-controller="Categories" asp-action="Create" method="post"
@@ -20,8 +19,8 @@
             <div asp-validation-summary="ModelOnly" class="rounded-md border border-danger/30 bg-danger-tint px-4 py-3 text-[13px] text-danger empty:hidden"></div>
 
             <div>
-                <label asp-for="Name" class="@label">@T("Categories_Name")</label>
-                <input asp-for="Name" class="@input" placeholder="@T("Categories_NamePlaceholder")" />
+                <label asp-for="Name" class="@label">@(Loc.IsEn ? "Category name" : "اسم الفئة")</label>
+                <input asp-for="Name" class="@input" placeholder="@(Loc.IsEn ? "Enter category name" : "أدخل اسم الفئة")" />
                 <span asp-validation-for="Name" class="@err"></span>
             </div>
         </div>
@@ -29,10 +28,10 @@
         <div class="flex flex-col-reverse gap-2.5 border-t border-line bg-sunken/40 px-5 py-4 sm:flex-row sm:justify-end sm:px-7">
             <a asp-area="Catalog" asp-controller="Categories" asp-action="Index"
                class="inline-flex h-9 items-center justify-center rounded-md border border-line bg-surface px-4 text-[13.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline">
-                @T("Common_Cancel")
+                @(Loc.IsEn ? "Cancel" : "إلغاء")
             </a>
             <button type="submit" class="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-accent px-5 text-[13.5px] font-semibold text-on-accent transition-colors hover:bg-accent-hover">
-                <svg class="icon !size-4"><use href="#i-plus" /></svg>@T("Categories_Create")
+                <svg class="icon !size-4"><use href="#i-plus" /></svg>@(Loc.IsEn ? "Create category" : "إنشاء فئة")
             </button>
         </div>
     </form>

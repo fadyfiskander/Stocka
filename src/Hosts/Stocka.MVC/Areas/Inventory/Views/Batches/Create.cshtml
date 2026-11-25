@@ -1,8 +1,7 @@
 ﻿@model Inventory.Contracts.UseCases.BatchCases.RegisterBatchCommand
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = Loc.T("Batches_CreateTitle");
-    string T(string key) => Loc.T(key);
+    ViewData["Title"] = (Loc.IsEn ? "Register batch (receipt)" : "تسجيل دفعة (استلام)");
 
     const string label = "mb-1.5 block text-[12.5px] font-semibold text-ink-soft";
     const string input = "block h-10 w-full rounded-md border border-line bg-surface px-3 text-[13.5px] text-ink outline-none transition placeholder:text-ink-faint hover:border-line-strong focus:border-accent focus:ring-[3px] focus:ring-[var(--focus-ring)]";
@@ -11,8 +10,8 @@
 
 <div class="mx-auto max-w-[42rem]">
     <header class="mb-5 border-b border-line pb-5">
-        <h1 class="text-[24px] font-bold tracking-[-.02em]">@T("Batches_CreateTitle")</h1>
-        <p class="mt-1.5 max-w-[70ch] text-[13.5px] text-ink-soft">@T("Batches_CreateSub")</p>
+        <h1 class="text-[24px] font-bold tracking-[-.02em]">@(Loc.IsEn ? "Register batch (receipt)" : "تسجيل دفعة (استلام)")</h1>
+        <p class="mt-1.5 max-w-[70ch] text-[13.5px] text-ink-soft">@(Loc.IsEn ? "Registers stock received from a purchasing document. This does NOT place units into a warehouse — use Allocate stock afterwards to distribute units." : "تسجّل مخزوناً مستلماً من مستند شراء. هذا لا يضع الوحدات في مستودع — استخدم «تخصيص المخزون» بعدها لتوزيع الوحدات.")</p>
     </header>
 
     <form asp-area="Inventory" asp-controller="Batches" asp-action="Create" method="post"
@@ -21,25 +20,25 @@
             <div asp-validation-summary="ModelOnly" class="rounded-md border border-danger/30 bg-danger-tint px-4 py-3 text-[13px] text-danger empty:hidden"></div>
 
             <div>
-                <label class="@label" asp-for="ProductId">@T("Batches_ProductId")</label>
+                <label class="@label" asp-for="ProductId">@(Loc.IsEn ? "Product ID (Catalog)" : "معرّف المنتج (الكتالوج)")</label>
                 <input class="@input num font-mono" asp-for="ProductId" placeholder="00000000-0000-0000-0000-000000000000" />
                 <span asp-validation-for="ProductId" class="@err"></span>
             </div>
 
             <div>
-                <label class="@label" asp-for="PurchaseItemId">@T("Batches_PurchaseItemId")</label>
+                <label class="@label" asp-for="PurchaseItemId">@(Loc.IsEn ? "Purchase item ID (Purchasing)" : "معرّف بند الشراء (المشتريات)")</label>
                 <input class="@input num font-mono" asp-for="PurchaseItemId" placeholder="00000000-0000-0000-0000-000000000000" />
                 <span asp-validation-for="PurchaseItemId" class="@err"></span>
             </div>
 
             <div class="grid gap-5 sm:grid-cols-2">
                 <div>
-                    <label class="@label" asp-for="InitialQuantity">@T("Batches_InitialQty")</label>
+                    <label class="@label" asp-for="InitialQuantity">@(Loc.IsEn ? "Initial quantity" : "الكمية الأولية")</label>
                     <input type="number" class="@input num" asp-for="InitialQuantity" min="1" />
                     <span asp-validation-for="InitialQuantity" class="@err"></span>
                 </div>
                 <div>
-                    <label class="@label" asp-for="UnitCost">@T("Batches_UnitCost")</label>
+                    <label class="@label" asp-for="UnitCost">@(Loc.IsEn ? "Unit cost" : "تكلفة الوحدة")</label>
                     <input type="number" step="0.01" class="@input num" asp-for="UnitCost" min="0.01" />
                     <span asp-validation-for="UnitCost" class="@err"></span>
                 </div>
@@ -48,9 +47,9 @@
 
         <div class="flex flex-col-reverse gap-2.5 border-t border-line bg-sunken/40 px-5 py-4 sm:flex-row sm:justify-end sm:px-7">
             <a class="inline-flex h-9 items-center justify-center rounded-md border border-line bg-surface px-4 text-[13.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline"
-               asp-area="Inventory" asp-controller="Batches" asp-action="Index">@T("Common_Cancel")</a>
+               asp-area="Inventory" asp-controller="Batches" asp-action="Index">@(Loc.IsEn ? "Cancel" : "إلغاء")</a>
             <button type="submit" class="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-accent px-5 text-[13.5px] font-semibold text-on-accent transition-colors hover:bg-accent-hover">
-                <svg class="icon !size-4"><use href="#i-plus" /></svg>@T("Batches_RegisterAction")
+                <svg class="icon !size-4"><use href="#i-plus" /></svg>@(Loc.IsEn ? "Register batch" : "تسجيل دفعة")
             </button>
         </div>
     </form>

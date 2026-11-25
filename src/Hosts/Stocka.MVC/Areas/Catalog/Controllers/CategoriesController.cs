@@ -26,7 +26,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
-            ViewBag.Title = Loc.T("Categories_Title");
+            ViewBag.Title = (Loc.IsEn ? "Categories" : "الفئات");
             var query = new ListCategoriesQuery { OrganizationId = Guid.Empty };
             var categories = await _categoryCases.ListCategoriesAsync(query);
             return View(categories);
@@ -38,11 +38,11 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         public async Task<IActionResult> Details(Guid id)
         {
             if (id == Guid.Empty)
-                return RedirectToAction(nameof(Error), new { message = Loc.T("Msg_CategoryIdRequired") });
+                return RedirectToAction(nameof(Error), new { message = (Loc.IsEn ? "Category ID is required." : "معرّف الفئة مطلوب.") });
 
             try
             {
-                ViewBag.Title = Loc.T("Categories_DetailsTitle");
+                ViewBag.Title = (Loc.IsEn ? "Category details" : "تفاصيل الفئة");
                 var category = await _categoryCases.RetrieveCategoryAsync(new RetrieveCategoryQuery(id));
                 return View(category);
             }
@@ -63,7 +63,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         [HttpGet("SearchByName")]
         public async Task<IActionResult> SearchByName(string? name)
         {
-            ViewBag.Title = Loc.T("Categories_SearchTitle");
+            ViewBag.Title = (Loc.IsEn ? "Search category" : "بحث عن فئة");
             if (string.IsNullOrWhiteSpace(name))
                 return View(null);
 
@@ -89,7 +89,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         [HttpGet("Create")]
         public IActionResult Create()
         {
-            ViewBag.Title = Loc.T("Categories_CreateTitle");
+            ViewBag.Title = (Loc.IsEn ? "Create category" : "إنشاء فئة");
             return View(new RegisterCategoryCommand());
         }
 
@@ -107,11 +107,11 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
                 var result = await _categoryCases.RegisterCategoryAsync(command);
                 if (result is null)
                 {
-                    ModelState.AddModelError(string.Empty, Loc.T("Msg_CategoryCreateFailed"));
+                    ModelState.AddModelError(string.Empty, (Loc.IsEn ? "Failed to create category." : "فشل إنشاء الفئة."));
                     return View(command);
                 }
 
-                TempData["Success"] = Loc.F("Msg_CategoryCreated", result.Name);
+                TempData["Success"] = (Loc.IsEn ? $"Category '{result.Name}' created successfully." : $"تم إنشاء الفئة «{result.Name}» بنجاح.");
                 return RedirectToAction(nameof(Details), new { id = result.Id });
             }
             catch (ArgumentNullException ex)
@@ -132,12 +132,12 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         public async Task<IActionResult> Edit(Guid id)
         {
             if (id == Guid.Empty)
-                return RedirectToAction(nameof(Error), new { message = Loc.T("Msg_CategoryIdRequired") });
+                return RedirectToAction(nameof(Error), new { message = (Loc.IsEn ? "Category ID is required." : "معرّف الفئة مطلوب.") });
 
             try
             {
                 var category = await _categoryCases.RetrieveCategoryAsync(new RetrieveCategoryQuery(id));
-                ViewBag.Title = Loc.T("Categories_EditTitle");
+                ViewBag.Title = (Loc.IsEn ? "Edit category" : "تعديل فئة");
                 return View(new UpdateCategoryCommand
                 {
                     CategoryId = category.Id,
@@ -163,7 +163,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
             try
             {
                 var result = await _categoryCases.UpdateCategoryAsync(command);
-                TempData["Success"] = Loc.F("Msg_CategoryUpdated", result.Name);
+                TempData["Success"] = (Loc.IsEn ? $"Category '{result.Name}' updated successfully." : $"تم تحديث الفئة «{result.Name}» بنجاح.");
                 return RedirectToAction(nameof(Details), new { id = result.Id });
             }
             catch (KeyNotFoundException ex)
@@ -186,14 +186,14 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         {
             if (id == Guid.Empty)
             {
-                TempData["Error"] = Loc.T("Msg_CategoryIdRequired");
+                TempData["Error"] = (Loc.IsEn ? "Category ID is required." : "معرّف الفئة مطلوب.");
                 return RedirectToAction(nameof(Index));
             }
 
             try
             {
                 var result = await _categoryCases.ActivateCategoryAsync(new ActivateCategoryCommand(id));
-                TempData["Success"] = Loc.F("Msg_CategoryActivated", result.Name);
+                TempData["Success"] = (Loc.IsEn ? $"Category '{result.Name}' activated." : $"تم تفعيل الفئة «{result.Name}».");
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is ArgumentException)
             {
@@ -211,14 +211,14 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         {
             if (id == Guid.Empty)
             {
-                TempData["Error"] = Loc.T("Msg_CategoryIdRequired");
+                TempData["Error"] = (Loc.IsEn ? "Category ID is required." : "معرّف الفئة مطلوب.");
                 return RedirectToAction(nameof(Index));
             }
 
             try
             {
                 var result = await _categoryCases.DeactivateCategoryAsync(new DeactivateCategoryCommand(id));
-                TempData["Success"] = Loc.F("Msg_CategoryDeactivated", result.Name);
+                TempData["Success"] = (Loc.IsEn ? $"Category '{result.Name}' deactivated." : $"تم إيقاف الفئة «{result.Name}».");
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is ArgumentException)
             {
@@ -232,7 +232,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error(string? message)
         {
-            ViewBag.ErrorMessage = message ?? Loc.T("Msg_GenericError");
+            ViewBag.ErrorMessage = message ?? (Loc.IsEn ? "An error occurred." : "حدث خطأ.");
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }

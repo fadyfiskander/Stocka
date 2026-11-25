@@ -1,8 +1,7 @@
 @model IEnumerable<WarehouseDto>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = Loc.T("Warehouses_SearchTitle");
-    string T(string key) => Loc.T(key);
+    ViewData["Title"] = (Loc.IsEn ? "Search warehouses" : "بحث عن مستودعات");
 
     const string input = "block h-10 w-full rounded-md border border-line bg-surface px-3 text-[13.5px] text-ink outline-none transition placeholder:text-ink-faint hover:border-line-strong focus:border-accent focus:ring-[3px] focus:ring-[var(--focus-ring)]";
     const string btnPrimary = "inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-accent px-4 text-[13.5px] font-semibold text-on-accent transition-colors hover:bg-accent-hover hover:no-underline";
@@ -11,7 +10,7 @@
 
 <section class="grid gap-5">
     <header class="border-b border-line pb-5">
-        <h1 class="text-[22px] font-bold tracking-[-.015em]">@T("Warehouses_SearchHeading")</h1>
+        <h1 class="text-[22px] font-bold tracking-[-.015em]">@(Loc.IsEn ? "Search warehouses by name" : "بحث عن مستودعات بالاسم")</h1>
     </header>
 
     @if (ViewBag.NotFound != null)
@@ -31,10 +30,10 @@
           class="rounded-lg border border-line bg-surface p-5 shadow-card">
         <div class="flex flex-wrap items-end gap-3">
             <div class="min-w-[220px] flex-1">
-                <input type="text" name="name" class="@input" placeholder="@T("Warehouses_SearchPlaceholder")" value="@Context.Request.Query["name"]" />
+                <input type="text" name="name" class="@input" placeholder="@(Loc.IsEn ? "Warehouse name (contains)" : "اسم المستودع (يحتوي على)")" value="@Context.Request.Query["name"]" />
             </div>
             <button type="submit" class="@btnPrimary">
-                <svg class="icon !size-4"><use href="#i-search" /></svg>@T("Common_Search")
+                <svg class="icon !size-4"><use href="#i-search" /></svg>@(Loc.IsEn ? "Search" : "بحث")
             </button>
         </div>
     </form>
@@ -46,10 +45,10 @@
                 <table class="w-full min-w-[640px] border-collapse text-[13.5px]">
                     <thead>
                         <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
-                            <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Name")</th>
-                            <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Location")</th>
-                            <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@T("Common_Status")</th>
-                            <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@T("Common_Actions")</th>
+                            <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Name" : "الاسم")</th>
+                            <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Location" : "الموقع")</th>
+                            <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Status" : "الحالة")</th>
+                            <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Actions" : "الإجراءات")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -61,16 +60,16 @@
                                 <td class="px-4 py-3">
                                     @if (warehouse.IsActive)
                                     {
-                                        <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@T("Common_Active")</span>
+                                        <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@(Loc.IsEn ? "Active" : "نشط")</span>
                                     }
                                     else
                                     {
-                                        <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@T("Common_Inactive")</span>
+                                        <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@(Loc.IsEn ? "Inactive" : "غير نشط")</span>
                                     }
                                 </td>
                                 <td class="px-4 py-3">
                                     <div class="flex justify-end">
-                                        <a class="@rowBtn" asp-area="Inventory" asp-controller="Warehouses" asp-action="Details" asp-route-id="@warehouse.Id">@T("Common_Details")</a>
+                                        <a class="@rowBtn" asp-area="Inventory" asp-controller="Warehouses" asp-action="Details" asp-route-id="@warehouse.Id">@(Loc.IsEn ? "Details" : "التفاصيل")</a>
                                     </div>
                                 </td>
                             </tr>
@@ -84,7 +83,7 @@
     {
         <div class="rounded-lg border border-dashed border-line-strong px-6 py-12 text-center">
             <svg class="icon mx-auto !size-7 text-ink-faint"><use href="#i-search" /></svg>
-            <p class="mt-2 text-[13.5px] text-ink-soft">@T("Warehouses_SearchEmpty")</p>
+            <p class="mt-2 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No warehouses matched the search." : "لا توجد مستودعات مطابقة للبحث.")</p>
         </div>
     }
 </section>

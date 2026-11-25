@@ -1,8 +1,7 @@
 @model CategoryDto
 @{
-    ViewData["Title"] = Loc.T("Categories_DetailsTitle");
+    ViewData["Title"] = (Loc.IsEn ? "Category details" : "تفاصيل الفئة");
     Layout = "~/Views/Shared/_Layout.cshtml";
-    string T(string key) => Loc.T(key);
 
     const string btnGhost = "inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-line bg-surface px-4 text-[13.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline";
     const string btnPrimary = "inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-accent px-4 text-[13.5px] font-semibold text-on-accent transition-colors hover:bg-accent-hover hover:no-underline";
@@ -11,9 +10,9 @@
 
 <section class="grid gap-5">
     <header class="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
-        <h1 class="text-[22px] font-bold tracking-[-.015em]">@T("Categories_DetailsTitle")</h1>
+        <h1 class="text-[22px] font-bold tracking-[-.015em]">@(Loc.IsEn ? "Category details" : "تفاصيل الفئة")</h1>
         <a class="@btnGhost" asp-area="Catalog" asp-controller="Categories" asp-action="Index">
-            <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@T("Common_BackToList")
+            <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Back to list" : "العودة للقائمة")
         </a>
     </header>
 
@@ -21,7 +20,7 @@
     {
         <div class="flex items-start gap-3 rounded-md border border-warn/30 bg-warn-tint px-4 py-3 text-[13.5px] text-warn">
             <svg class="icon mt-0.5 !size-[17px]"><use href="#i-alert" /></svg>
-            <span>@T("Categories_NotFound")</span>
+            <span>@(Loc.IsEn ? "Category not found." : "الفئة غير موجودة.")</span>
         </div>
     }
     else
@@ -29,27 +28,27 @@
         <div class="rounded-lg border border-line bg-surface shadow-card">
             <dl class="grid gap-x-6 gap-y-5 p-5 sm:grid-cols-2 sm:p-6">
                 <div class="min-w-0">
-                    <dt class="@dt">@T("Common_Id")</dt>
+                    <dt class="@dt">@(Loc.IsEn ? "ID" : "المعرّف")</dt>
                     <dd class="num mt-1 break-all font-mono text-[12.5px] text-ink-soft">@Model.Id</dd>
                 </div>
                 <div class="min-w-0">
-                    <dt class="@dt">@T("Common_OrganizationId")</dt>
+                    <dt class="@dt">@(Loc.IsEn ? "Organization ID" : "معرّف المؤسسة")</dt>
                     <dd class="num mt-1 break-all font-mono text-[12.5px] text-ink-soft">@Model.OrganizationId</dd>
                 </div>
                 <div class="min-w-0">
-                    <dt class="@dt">@T("Common_Name")</dt>
+                    <dt class="@dt">@(Loc.IsEn ? "Name" : "الاسم")</dt>
                     <dd class="mt-1 text-[18px] font-bold tracking-[-.01em] text-ink">@Model.Name</dd>
                 </div>
                 <div class="min-w-0">
-                    <dt class="@dt">@T("Common_Status")</dt>
+                    <dt class="@dt">@(Loc.IsEn ? "Status" : "الحالة")</dt>
                     <dd class="mt-1">
                         @if (Model.IsActive)
                         {
-                            <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[12px] font-semibold text-ok">@T("Common_Active")</span>
+                            <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[12px] font-semibold text-ok">@(Loc.IsEn ? "Active" : "نشط")</span>
                         }
                         else
                         {
-                            <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 text-[12px] font-semibold text-ink-soft">@T("Common_Inactive")</span>
+                            <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 text-[12px] font-semibold text-ink-soft">@(Loc.IsEn ? "Inactive" : "غير نشط")</span>
                         }
                     </dd>
                 </div>
@@ -57,18 +56,18 @@
 
             <div class="flex flex-wrap items-center justify-end gap-2 border-t border-line bg-sunken/30 px-5 py-4 sm:px-6">
                 <a class="@btnPrimary" asp-area="Catalog" asp-controller="Categories" asp-action="Edit" asp-route-id="@Model.Id">
-                    <svg class="icon !size-4"><use href="#i-pencil" /></svg>@T("Common_Edit")
+                    <svg class="icon !size-4"><use href="#i-pencil" /></svg>@(Loc.IsEn ? "Edit" : "تعديل")
                 </a>
                 @if (Model.IsActive)
                 {
                     <form asp-area="Catalog" asp-controller="Categories" asp-action="Deactivate" asp-route-id="@Model.Id" method="post">
-                        <button type="submit" class="inline-flex h-9 items-center justify-center rounded-md border border-warn/35 bg-transparent px-4 text-[13.5px] font-medium text-warn transition-colors hover:bg-warn-tint">@T("Common_Deactivate")</button>
+                        <button type="submit" class="inline-flex h-9 items-center justify-center rounded-md border border-warn/35 bg-transparent px-4 text-[13.5px] font-medium text-warn transition-colors hover:bg-warn-tint">@(Loc.IsEn ? "Deactivate" : "إيقاف")</button>
                     </form>
                 }
                 else
                 {
                     <form asp-area="Catalog" asp-controller="Categories" asp-action="Activate" asp-route-id="@Model.Id" method="post">
-                        <button type="submit" class="inline-flex h-9 items-center justify-center rounded-md border border-ok/35 bg-transparent px-4 text-[13.5px] font-medium text-ok transition-colors hover:bg-ok-tint">@T("Common_Activate")</button>
+                        <button type="submit" class="inline-flex h-9 items-center justify-center rounded-md border border-ok/35 bg-transparent px-4 text-[13.5px] font-medium text-ok transition-colors hover:bg-ok-tint">@(Loc.IsEn ? "Activate" : "تفعيل")</button>
                     </form>
                 }
             </div>

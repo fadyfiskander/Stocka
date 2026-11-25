@@ -1,19 +1,18 @@
 ﻿@model ErrorViewModel
 @{
-    ViewData["Title"] = Loc.T("Err_Title");
-    string T(string key) => Loc.T(key);
+    ViewData["Title"] = (Loc.IsEn ? "Error" : "خطأ");
 }
 
 <article class="mx-auto max-w-[64ch]">
     <div class="flex items-start gap-4 rounded-lg border border-danger/30 bg-danger-tint p-5 text-danger sm:p-6">
         <svg class="icon mt-0.5 !size-[26px] shrink-0"><use href="#i-alert" /></svg>
         <div class="min-w-0">
-            <h1 class="text-[20px] font-bold tracking-[-.015em]">@T("Err_Heading")</h1>
-            <p class="mt-1.5 text-[13.5px] leading-relaxed">@T("Err_Text")</p>
+            <h1 class="text-[20px] font-bold tracking-[-.015em]">@(Loc.IsEn ? "Error." : "خطأ.")</h1>
+            <p class="mt-1.5 text-[13.5px] leading-relaxed">@(Loc.IsEn ? "An error occurred while processing your request." : "حدث خطأ أثناء معالجة طلبك.")</p>
             @if (Model.ShowRequestId)
             {
                 <p class="mt-3 text-[12.5px]">
-                    <span class="font-semibold">@T("Err_RequestId")</span>
+                    <span class="font-semibold">@(Loc.IsEn ? "Request ID:" : "معرّف الطلب:")</span>
                     <code class="rounded border border-danger/25 bg-danger/5 px-1.5 py-0.5">@Model.RequestId</code>
                 </p>
             }
@@ -21,11 +20,11 @@
     </div>
 
     <section class="mt-4 rounded-lg border border-line bg-surface p-5 shadow-card sm:p-6">
-        <h2 class="text-[15px] font-semibold text-ink">@T("Err_DevHeading")</h2>
-        <p class="mt-2 text-[13.5px] leading-relaxed text-ink-soft">@T("Err_DevText1")</p>
+        <h2 class="text-[15px] font-semibold text-ink">@(Loc.IsEn ? "Development mode" : "وضع التطوير")</h2>
+        <p class="mt-2 text-[13.5px] leading-relaxed text-ink-soft">@(Loc.IsEn ? "Switching to the Development environment will display more detailed information about the error that occurred." : "التبديل إلى بيئة التطوير سيعرض معلومات أكثر تفصيلاً عن الخطأ.")</p>
         <p class="mt-2 text-[13.5px] leading-relaxed text-ink-soft">
-            <strong class="text-ink">@T("Err_DevWarn")</strong>
-            @T("Err_DevText2")
+            <strong class="text-ink">@(Loc.IsEn ? "The Development environment shouldn't be enabled for deployed applications." : "لا ينبغي تفعيل بيئة التطوير للتطبيقات المنشورة.")</strong>
+            @(Loc.IsEn ? "It can result in displaying sensitive information from exceptions to end users. For local debugging, enable the Development environment by setting the ASPNETCORE_ENVIRONMENT environment variable to Development and restarting the app." : "قد يؤدي ذلك إلى عرض معلومات حساسة من الاستثناءات للمستخدمين. للتصحيح المحلي، فعّل بيئة التطوير بتعيين المتغير ASPNETCORE_ENVIRONMENT إلى Development ثم أعد تشغيل التطبيق.")
         </p>
     </section>
 </article>

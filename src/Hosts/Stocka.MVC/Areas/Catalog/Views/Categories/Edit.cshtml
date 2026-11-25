@@ -1,8 +1,7 @@
 @model UpdateCategoryCommand
 @{
-    ViewData["Title"] = Loc.T("Categories_EditTitle");
+    ViewData["Title"] = (Loc.IsEn ? "Edit category" : "تعديل فئة");
     Layout = "~/Views/Shared/_Layout.cshtml";
-    string T(string key) => Loc.T(key);
 
     const string label = "mb-1.5 block text-[12.5px] font-semibold text-ink-soft";
     const string input = "block h-10 w-full rounded-md border border-line bg-surface px-3 text-[13.5px] text-ink outline-none transition placeholder:text-ink-faint hover:border-line-strong focus:border-accent focus:ring-[3px] focus:ring-[var(--focus-ring)]";
@@ -12,7 +11,7 @@
 
 <div class="mx-auto max-w-[38rem]">
     <header class="mb-5 border-b border-line pb-5">
-        <h1 class="text-[24px] font-bold tracking-[-.02em]">@T("Categories_EditTitle")</h1>
+        <h1 class="text-[24px] font-bold tracking-[-.02em]">@(Loc.IsEn ? "Edit category" : "تعديل فئة")</h1>
     </header>
 
     <form asp-area="Catalog" asp-controller="Categories" asp-action="Edit" method="post"
@@ -23,22 +22,22 @@
             <input type="hidden" asp-for="CategoryId" />
 
             <div>
-                <span class="@label">@T("Categories_Id")</span>
+                <span class="@label">@(Loc.IsEn ? "Category ID" : "معرّف الفئة")</span>
                 <div class="num break-all rounded-md border border-line bg-sunken px-3 py-2.5 font-mono text-[12.5px] text-ink-soft">@Model.CategoryId</div>
             </div>
 
             <div>
-                <label asp-for="Name" class="@label">@T("Categories_Name")</label>
-                <input asp-for="Name" class="@input" placeholder="@T("Categories_NameEditPlaceholder")" />
+                <label asp-for="Name" class="@label">@(Loc.IsEn ? "Category name" : "اسم الفئة")</label>
+                <input asp-for="Name" class="@input" placeholder="@(Loc.IsEn ? "Enter new category name" : "أدخل اسم الفئة الجديد")" />
                 <span asp-validation-for="Name" class="@err"></span>
             </div>
         </div>
 
         <div class="flex flex-col-reverse gap-2.5 border-t border-line bg-sunken/40 px-5 py-4 sm:flex-row sm:items-center sm:justify-end sm:px-7">
-            <a asp-area="Catalog" asp-controller="Categories" asp-action="Index" class="@btnGhost sm:me-auto">@T("Common_Cancel")</a>
-            <a asp-area="Catalog" asp-controller="Categories" asp-action="Details" asp-route-id="@Model.CategoryId" class="@btnGhost">@T("Common_Details")</a>
+            <a asp-area="Catalog" asp-controller="Categories" asp-action="Index" class="@btnGhost sm:me-auto">@(Loc.IsEn ? "Cancel" : "إلغاء")</a>
+            <a asp-area="Catalog" asp-controller="Categories" asp-action="Details" asp-route-id="@Model.CategoryId" class="@btnGhost">@(Loc.IsEn ? "Details" : "التفاصيل")</a>
             <button type="submit" class="inline-flex h-9 items-center justify-center rounded-md bg-accent px-5 text-[13.5px] font-semibold text-on-accent transition-colors hover:bg-accent-hover">
-                @T("Common_SaveChanges")
+                @(Loc.IsEn ? "Save changes" : "حفظ التغييرات")
             </button>
         </div>
     </form>
