@@ -28,7 +28,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
             Guid? warehouseId, Guid? batchId, Guid? productId, DateTime? from, DateTime? to, int?[]? types,
             int page = 1, int pageSize = 20)
         {
-            ViewBag.Title = Loc.T("StockMovements_Title");
+            ViewBag.Title = (Loc.IsEn ? "Stock movements" : "حركات المخزون");
             ViewBag.WarehouseId = warehouseId;
             ViewBag.BatchId = batchId;
             ViewBag.ProductId = productId;
@@ -62,7 +62,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
             try
             {
                 var result = await _stockCases.AllocateStockAsync(command);
-                TempData["Success"] = Loc.F("Msg_Allocated", result.QuantityInWarehouse, result.BatchRemainingQuantity);
+                TempData["Success"] = (Loc.IsEn ? $"Allocated. Batch now holds {result.QuantityInWarehouse} units in this warehouse ({result.BatchRemainingQuantity} units remain unallocated)." : $"تم التخصيص. تحتوي الدفعة الآن على {result.QuantityInWarehouse} وحدة في هذا المستودع ({result.BatchRemainingQuantity} وحدة متبقية غير مخصَّصة).");
             }
             catch (KeyNotFoundException ex)
             {
@@ -88,7 +88,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
             try
             {
                 var movement = await _stockCases.RecordSaleOutAsync(command);
-                TempData["Success"] = Loc.F("Msg_SaleRecorded", movement.Quantity);
+                TempData["Success"] = (Loc.IsEn ? $"Sale recorded ({movement.Quantity} units out)." : $"تم تسجيل البيع ({movement.Quantity} وحدة خارجة).");
             }
             catch (Exception ex) when (ex is KeyNotFoundException or InvalidOperationException or ArgumentException)
             {
@@ -106,7 +106,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
             try
             {
                 var result = await _stockCases.TransferStockAsync(command);
-                TempData["Success"] = Loc.F("Msg_TransferCompleted", result.TransferReferenceId, result.QuantityInDestination, result.QuantityInSource);
+                TempData["Success"] = (Loc.IsEn ? $"Transfer {result.TransferReferenceId} completed: {result.QuantityInDestination} units now in destination, {result.QuantityInSource} remain in source." : $"اكتمل التحويل {result.TransferReferenceId}: {result.QuantityInDestination} وحدة الآن في الوجهة، {result.QuantityInSource} وحدة متبقية في المصدر.");
             }
             catch (Exception ex) when (ex is KeyNotFoundException or InvalidOperationException or ArgumentException)
             {
@@ -125,8 +125,8 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
             {
                 var result = await _stockCases.AdjustStockAsync(command);
                 TempData["Success"] = result.QuantityChange == 0
-                    ? Loc.T("Msg_AdjustNoChange")
-                    : Loc.F("Msg_AdjustRecorded", (result.QuantityChange > 0 ? "+" : string.Empty) + result.QuantityChange);
+                    ? (Loc.IsEn ? "Physical count matches recorded quantity — no adjustment recorded." : "الجرد الفعلي يطابق الكمية المسجّلة — لم تُسجَّل أي تسوية.")
+                    : (Loc.IsEn ? $"Adjustment recorded ({(result.QuantityChange > 0 ? "+" : string.Empty) + result.QuantityChange})." : $"تم تسجيل التسوية ({(result.QuantityChange > 0 ? "+" : string.Empty) + result.QuantityChange}).");
             }
             catch (Exception ex) when (ex is KeyNotFoundException or InvalidOperationException or ArgumentException)
             {
@@ -144,7 +144,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
             try
             {
                 var movement = await _stockCases.WriteOffDamagedStockAsync(command);
-                TempData["Success"] = Loc.F("Msg_DamageRecorded", movement.Quantity);
+                TempData["Success"] = (Loc.IsEn ? $"Damage write-off recorded ({movement.Quantity} units out). History preserved." : $"تم تسجيل شطب التلف ({movement.Quantity} وحدة خارجة). حُفظ السجل.");
             }
             catch (Exception ex) when (ex is KeyNotFoundException or InvalidOperationException or ArgumentException)
             {
@@ -162,7 +162,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
             try
             {
                 var movement = await _stockCases.RecordCustomerReturnAsync(command);
-                TempData["Success"] = Loc.F("Msg_ReturnRecorded", movement.Quantity);
+                TempData["Success"] = (Loc.IsEn ? $"Customer return recorded ({movement.Quantity} units in)." : $"تم تسجيل إرجاع العميل ({movement.Quantity} وحدة داخلة).");
             }
             catch (Exception ex) when (ex is KeyNotFoundException or InvalidOperationException or ArgumentException)
             {
@@ -180,7 +180,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
             try
             {
                 var reversal = await _stockCases.ReverseStockMovementAsync(new ReverseStockMovementCommand { MovementId = id, Reason = reason });
-                TempData["Success"] = Loc.F("Msg_ReversalAppended", reversal.Id, id);
+                TempData["Success"] = (Loc.IsEn ? $"Correction movement {reversal.Id} appended (original movement {id} not modified)." : $"أُضيفت حركة التصحيح {reversal.Id} (لم تُعدَّل الحركة الأصلية {id}).");
             }
             catch (Exception ex) when (ex is KeyNotFoundException or InvalidOperationException or ArgumentException)
             {

@@ -36,6 +36,22 @@ namespace Catalog.Infrastructure.Repositories.Queries
             return result;
         }
 
+        public async Task<IEnumerable<ProductDto>> GetByIdsAsync(
+            IReadOnlyCollection<Guid> ids,
+            Guid organizationId,
+            CancellationToken cancellationToken = default)
+        {
+            var query = "SELECT Id, OrganizationId, Name, Barcode, CategoryId, SellingPrice AS [Price], IsActive, ImagePath " +
+                        $"FROM {TableProducts} WHERE OrganizationId = @OrganizationId AND Id IN @Ids ORDER BY Name";
+
+            var command = new CommandDefinition(
+                query,
+                new { OrganizationId = organizationId, Ids = ids },
+                cancellationToken: cancellationToken);
+
+            return await _connection.QueryAsync<ProductDto>(command);
+        }
+
         public async Task<BuildingBlocks.Application.Common.Models.PaginatedResult<ProductDto>> GetPagedAsync(Guid organizationId, int page, int pageSize)
         {
             page = Math.Max(1, page);

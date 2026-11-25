@@ -30,7 +30,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
-            ViewBag.Title = Loc.T("Products_Title");
+            ViewBag.Title = (Loc.IsEn ? "Products" : "المنتجات");
             var products = await _productCases.ListProductsAsync(new ListProductsQuery { OrganizationId = null });
 
             if (products == null || !products.Any())
@@ -52,7 +52,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
 
             try
             {
-                ViewBag.Title = Loc.T("Products_DetailsTitle");
+                ViewBag.Title = (Loc.IsEn ? "Product details" : "تفاصيل المنتج");
                 var product = await _productCases.RetrieveProductAsync(new RetrieveProductQuery(id));
                 return View(product);
             }
@@ -60,8 +60,8 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
             {
                 return RedirectToAction(nameof(Handler), new
                 {
-                    HandlerText = Loc.T("Msg_ProductUnavailable"),
-                    Title = Loc.T("Msg_ProductUnavailableTitle")
+                    HandlerText = (Loc.IsEn ? "We're sorry, but the product you're looking for isn't available right now. It might have been moved, deleted, or the link could be incorrect." : "نعتذر، لكن المنتج الذي تبحث عنه غير متاح حالياً. ربما تم نقله أو حذفه أو أن الرابط غير صحيح."),
+                    Title = (Loc.IsEn ? "Product not found" : "المنتج غير موجود")
                 });
             }
         }
@@ -71,7 +71,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         [HttpGet("SearchByName")]
         public async Task<IActionResult> SearchByName(string? name)
         {
-            ViewBag.Title = Loc.T("Products_SearchTitle");
+            ViewBag.Title = (Loc.IsEn ? "Search product" : "بحث عن منتج");
             if (string.IsNullOrWhiteSpace(name))
                 return View(null);
 
@@ -98,7 +98,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         public async Task<IActionResult> Create()
         {
             await PopulateCategoriesAsync();
-            ViewBag.Title = Loc.T("Products_CreateTitle");
+            ViewBag.Title = (Loc.IsEn ? "Create product" : "إنشاء منتج");
             return View(new RegisterProductCommand());
         }
 
@@ -120,11 +120,11 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
                 if (createdProduct is null)
                 {
                     await PopulateCategoriesAsync();
-                    ModelState.AddModelError(string.Empty, Loc.T("Msg_ProductCreateFailed"));
+                    ModelState.AddModelError(string.Empty, (Loc.IsEn ? "Failed to create product." : "فشل إنشاء المنتج."));
                     return View(command);
                 }
 
-                TempData["Success"] = Loc.F("Msg_ProductCreated", createdProduct.Name);
+                TempData["Success"] = (Loc.IsEn ? $"Product '{createdProduct.Name}' created successfully." : $"تم إنشاء المنتج «{createdProduct.Name}» بنجاح.");
                 return RedirectToAction(nameof(Details), new { id = createdProduct.Id });
             }
             catch (Exception ex) when (ex is ArgumentNullException || ex is ArgumentException || ex is ArgumentOutOfRangeException || ex is KeyNotFoundException)
@@ -146,7 +146,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
             try
             {
                 var product = await _productCases.RetrieveProductAsync(new RetrieveProductQuery(id));
-                ViewBag.Title = Loc.T("Products_EditTitle");
+                ViewBag.Title = (Loc.IsEn ? "Edit product" : "تعديل منتج");
 
                 await PopulateCategoriesAsync();
                 return View(new UpdateProductCommand
@@ -161,7 +161,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
             }
             catch (Exception ex) when (ex is KeyNotFoundException or AggregateException)
             {
-                return RedirectToAction(nameof(Handler), new { HandlerText = Loc.T("Msg_ProductNotFound"), Title = Loc.T("Msg_NotFoundTitle") });
+                return RedirectToAction(nameof(Handler), new { HandlerText = (Loc.IsEn ? "Product not found." : "المنتج غير موجود."), Title = (Loc.IsEn ? "Not found" : "غير موجود") });
             }
         }
 
@@ -180,7 +180,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
             try
             {
                 var result = await _productCases.UpdateProductAsync(command);
-                TempData["Success"] = Loc.F("Msg_ProductUpdated", result.Name);
+                TempData["Success"] = (Loc.IsEn ? $"Product '{result.Name}' updated successfully." : $"تم تحديث المنتج «{result.Name}» بنجاح.");
                 return RedirectToAction(nameof(Details), new { id = result.Id });
             }
             catch (KeyNotFoundException ex)
@@ -205,14 +205,14 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         {
             if (id == Guid.Empty)
             {
-                TempData["Error"] = Loc.T("Msg_ProductIdRequired");
+                TempData["Error"] = (Loc.IsEn ? "Product ID is required." : "معرّف المنتج مطلوب.");
                 return RedirectToAction(nameof(Index));
             }
 
             try
             {
                 var result = await _productCases.ActivateProductAsync(new ActivateProductCommand(id));
-                TempData["Success"] = Loc.F("Msg_ProductActivated", result.Name);
+                TempData["Success"] = (Loc.IsEn ? $"Product '{result.Name}' activated." : $"تم تفعيل المنتج «{result.Name}».");
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is ArgumentException)
             {
@@ -230,14 +230,14 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         {
             if (id == Guid.Empty)
             {
-                TempData["Error"] = Loc.T("Msg_ProductIdRequired");
+                TempData["Error"] = (Loc.IsEn ? "Product ID is required." : "معرّف المنتج مطلوب.");
                 return RedirectToAction(nameof(Index));
             }
 
             try
             {
                 var result = await _productCases.DeactivateProductAsync(new DeactivateProductCommand(id));
-                TempData["Success"] = Loc.F("Msg_ProductDeactivated", result.Name);
+                TempData["Success"] = (Loc.IsEn ? $"Product '{result.Name}' deactivated." : $"تم إيقاف المنتج «{result.Name}».");
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is ArgumentException)
             {

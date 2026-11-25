@@ -1,66 +1,125 @@
 ﻿@model Inventory.Contracts.DTOs.Reports.InventorySummaryDto
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = Loc.T("Reports_Title");
-    string T(string key) => Loc.T(key);
-    string MoveType(int t) => Loc.T(t switch
+    ViewData["Title"] = (Loc.IsEn ? "Inventory reports" : "تقارير المخزون");
+    string MoveType(int t) => t switch
     {
-        0 => "Move_PurchaseIn",
-        1 => "Move_SaleOut",
-        2 => "Move_TransferIn",
-        3 => "Move_TransferOut",
-        4 => "Move_AdjustmentIn",
-        5 => "Move_AdjustmentOut",
-        6 => "Move_OrderReturn",
-        _ => "Move_PurchaseIn"
-    });
+        0 => (Loc.IsEn ? "Purchase in" : "إدخال شراء"),
+        1 => (Loc.IsEn ? "Sale out" : "بيع خارج"),
+        2 => (Loc.IsEn ? "Transfer in" : "تحويل داخل"),
+        3 => (Loc.IsEn ? "Transfer out" : "تحويل خارج"),
+        4 => (Loc.IsEn ? "Adjustment in" : "تسوية داخل"),
+        5 => (Loc.IsEn ? "Adjustment out" : "تسوية خارج"),
+        6 => (Loc.IsEn ? "Order return" : "إرجاع طلب"),
+        _ => (Loc.IsEn ? "Purchase in" : "إدخال شراء")
+    };
+    bool IsIncoming(int t) => t == 0 || t == 2 || t == 4 || t == 6;
     var totals = (IEnumerable<MovementTypeTotalsDto>?)ViewBag.MovementTotals;
+
+    const string btnGhost = "inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-line bg-surface px-4 text-[13.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline";
 }
 
-<div class="container-fluid py-4">
-    <h2 class="mb-1">@T("Reports_Title")</h2>
-    <p class="text-muted mb-4">@Loc.F("Reports_Sub", Model.GeneratedAtUtc.ToString("yyyy-MM-dd HH:mm"))</p>
+<section class="grid gap-5">
+    <header class="border-b border-line pb-5">
+        <h1 class="text-[22px] font-bold tracking-[-.015em]">@(Loc.IsEn ? "Inventory reports" : "تقارير المخزون")</h1>
+        <p class="mt-1.5 text-[13.5px] text-ink-soft">@(Loc.IsEn ? $"Organization-scoped rollup, generated {Model.GeneratedAtUtc.ToString("yyyy-MM-dd HH:mm")} UTC." : $"تجميع شامل المؤسسة، أُنشئ في {Model.GeneratedAtUtc.ToString("yyyy-MM-dd HH:mm")} UTC.")</p>
+    </header>
 
-    <div class="row g-3 mb-4">
-        <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">@T("Reports_TotalWarehouses")</h6><h3 class="mb-0">@Model.TotalWarehouses <small class="fs-6 text-success">@Loc.F("Reports_ActiveCount", Model.ActiveWarehouses)</small></h3></div></div></div>
-        <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">@T("Reports_TotalBatches")</h6><h3 class="mb-0">@Model.TotalBatches <small class="fs-6 text-secondary">@Loc.F("Reports_ExhaustedCount", Model.ExhaustedBatches)</small></h3></div></div></div>
-        <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">@T("Reports_UnitsInWarehouses")</h6><h3 class="mb-0">@Model.UnitsInWarehouses</h3><small class="text-muted">@T("Reports_RawUnitCount")</small></div></div></div>
-        <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">@T("Reports_TotalUnallocated")</h6><h3 class="mb-0">@Model.UnallocatedUnits</h3><small class="text-muted">@T("Reports_NeverPlaced")</small></div></div></div>
-        <div class="col-md-6"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">@T("Reports_TotalCost")</h6><h3 class="mb-0">@Model.TotalInventoryCost.ToString("N2")</h3><small class="text-muted">@T("Reports_NoValuation")</small></div></div></div>
+    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-lg border border-line bg-surface p-4 shadow-card">
+            <div class="flex items-center gap-1.5 text-[11.5px] font-semibold text-ink-soft">
+                <svg class="icon !size-[15px] text-accent"><use href="#i-store" /></svg>@(Loc.IsEn ? "Warehouses" : "المستودعات")
+            </div>
+            <div class="mt-1.5 flex items-baseline gap-2">
+                <span class="num text-[26px] font-bold tracking-[-.02em] text-ink">@Model.TotalWarehouses</span>
+                <span class="text-[11.5px] font-semibold text-ok">@(Loc.IsEn ? $"({Model.ActiveWarehouses} active)" : $"({Model.ActiveWarehouses} نشط)")</span>
+            </div>
+        </div>
+        <div class="rounded-lg border border-line bg-surface p-4 shadow-card">
+            <div class="flex items-center gap-1.5 text-[11.5px] font-semibold text-ink-soft">
+                <svg class="icon !size-[15px] text-accent"><use href="#i-layers" /></svg>@(Loc.IsEn ? "Batches" : "الدفعات")
+            </div>
+            <div class="mt-1.5 flex items-baseline gap-2">
+                <span class="num text-[26px] font-bold tracking-[-.02em] text-ink">@Model.TotalBatches</span>
+                <span class="text-[11.5px] font-semibold text-ink-faint">@(Loc.IsEn ? $"({Model.ExhaustedBatches} exhausted)" : $"({Model.ExhaustedBatches} مستنفدة)")</span>
+            </div>
+        </div>
+        <div class="rounded-lg border border-line bg-surface p-4 shadow-card">
+            <div class="flex items-center gap-1.5 text-[11.5px] font-semibold text-ink-soft">
+                <svg class="icon !size-[15px] text-accent"><use href="#i-box" /></svg>@(Loc.IsEn ? "Units in warehouses" : "وحدات بالمستودعات")
+            </div>
+            <div class="mt-1.5 num text-[26px] font-bold tracking-[-.02em] text-ink">@Model.UnitsInWarehouses</div>
+            <div class="mt-0.5 text-[11px] text-ink-faint">@(Loc.IsEn ? "raw unit count, not capacity" : "عدد وحدات خام، ليس سعة")</div>
+        </div>
+        <div class="rounded-lg border border-line bg-surface p-4 shadow-card">
+            <div class="flex items-center gap-1.5 text-[11.5px] font-semibold text-ink-soft">
+                <svg class="icon !size-[15px] text-signal"><use href="#i-swap" /></svg>@(Loc.IsEn ? "Total unallocated" : "إجمالي غير المخصَّص")
+            </div>
+            <div class="mt-1.5 num text-[26px] font-bold tracking-[-.02em] text-signal">@Model.UnallocatedUnits</div>
+            <div class="mt-0.5 text-[11px] text-ink-faint">@(Loc.IsEn ? "units never placed" : "وحدات لم تُوضع أبداً")</div>
+        </div>
     </div>
 
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white"><strong>@T("Reports_MovementTotals")</strong></div>
-        <div class="card-body p-0">
-            <table class="table-hover mb-0 table align-middle">
-                <thead class="table-light"><tr><th class="ps-4">@T("Common_Type")</th><th>@T("Reports_Col_Movements")</th><th>@T("Reports_Col_TotalUnits")</th><th>@T("Reports_Col_NetSigned")</th></tr></thead>
+    <div class="rounded-lg border border-line bg-surface shadow-card">
+        <div class="flex flex-wrap items-baseline justify-between gap-3 border-b border-line px-5 py-3">
+            <span class="flex items-center gap-2.5 text-[14px] font-semibold text-ink">
+                <svg class="icon !size-[18px] text-accent"><use href="#i-chart" /></svg>@(Loc.IsEn ? "Total inventory cost (recorded batch unit costs)" : "إجمالي تكلفة المخزون (تكاليف وحدات الدفعات المسجّلة)")
+            </span>
+            <span class="num text-[24px] font-bold tracking-[-.02em] text-ink">@Model.TotalInventoryCost.ToString("N2")</span>
+        </div>
+        <p class="px-5 py-3 text-[11.5px] text-ink-faint">@(Loc.IsEn ? "No FIFO / weighted-average valuation policy approved — traceable cost data only." : "لا توجد سياسة تقييم FIFO أو متوسط مرجّح معتمدة — بيانات تكلفة قابلة للتتبع فقط.")</p>
+    </div>
+
+    <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
+        <div class="flex items-center gap-2.5 border-b border-line px-5 py-3">
+            <svg class="icon !size-[18px] text-accent"><use href="#i-chart" /></svg>
+            <span class="text-[14px] font-semibold text-ink">@(Loc.IsEn ? "Movement totals by type (all time)" : "إجماليات الحركات حسب النوع (كل الوقت)")</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[560px] border-collapse text-[13.5px]">
+                <thead>
+                    <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Type" : "النوع")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Movements" : "الحركات")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Total units" : "إجمالي الوحدات")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Net signed" : "الصافي بالإشارة")</th>
+                    </tr>
+                </thead>
                 <tbody>
                     @if (totals != null && totals.Any())
                     {
                         @foreach (var t in totals)
                         {
-                            <tr>
-                                <td class="ps-4"><span class="badge text-bg-@(t.MovementType == 0 || t.MovementType == 2 || t.MovementType == 4 || t.MovementType == 6 ? "success" : "danger")">@MoveType(t.MovementType)</span></td>
-                                <td>@t.MovementCount</td>
-                                <td>@t.TotalQuantity</td>
-                                <td>@t.SignedQuantity</td>
+                            <tr class="border-b border-line last:border-0 hover:bg-sunken/50">
+                                <td class="px-4 py-3">
+                                    @if (IsIncoming(t.MovementType))
+                                    {
+                                        <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@MoveType(t.MovementType)</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-flex items-center rounded-full bg-danger-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-danger">@MoveType(t.MovementType)</span>
+                                    }
+                                </td>
+                                <td class="num px-4 py-3 text-end text-ink-soft">@t.MovementCount</td>
+                                <td class="num px-4 py-3 text-end font-semibold text-ink">@t.TotalQuantity</td>
+                                <td class="num px-4 py-3 text-end font-semibold @(t.SignedQuantity < 0 ? "text-danger" : "text-ok")">@t.SignedQuantity</td>
                             </tr>
                         }
                     }
                     else
                     {
-                        <tr><td colspan="4" class="py-4 text-center text-muted">@T("Reports_NoMovements")</td></tr>
+                        <tr><td colspan="4" class="px-6 py-10 text-center text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No movements recorded." : "لا توجد حركات مسجّلة.")</td></tr>
                     }
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div class="d-flex gap-2 flex-wrap">
-        <a class="btn btn-outline-primary" asp-area="Inventory" asp-controller="Reports" asp-action="Warehouses">@T("Reports_WarehouseReports")</a>
-        <a class="btn btn-outline-primary" asp-area="Inventory" asp-controller="Reports" asp-action="Products">@T("Reports_ZeroStockProducts")</a>
-        <a class="btn btn-outline-primary" asp-area="Inventory" asp-controller="Reports" asp-action="Movements">@T("Reports_MovementReports")</a>
-        <a class="btn btn-outline-primary" asp-area="Inventory" asp-controller="Reports" asp-action="Balance">@T("Reports_HistoricalBalance")</a>
+    <div class="flex flex-wrap gap-2">
+        <a class="@btnGhost" asp-area="Inventory" asp-controller="Reports" asp-action="Warehouses"><svg class="icon !size-4"><use href="#i-store" /></svg>@(Loc.IsEn ? "Warehouse reports" : "تقارير المستودعات")</a>
+        <a class="@btnGhost" asp-area="Inventory" asp-controller="Reports" asp-action="Products"><svg class="icon !size-4"><use href="#i-box" /></svg>@(Loc.IsEn ? "Zero-stock products" : "منتجات نفاد المخزون")</a>
+        <a class="@btnGhost" asp-area="Inventory" asp-controller="Reports" asp-action="Movements"><svg class="icon !size-4"><use href="#i-swap" /></svg>@(Loc.IsEn ? "Movement reports" : "تقارير الحركات")</a>
+        <a class="@btnGhost" asp-area="Inventory" asp-controller="Reports" asp-action="Balance"><svg class="icon !size-4"><use href="#i-chart" /></svg>@(Loc.IsEn ? "Historical balance" : "الرصيد التاريخي")</a>
     </div>
-    <div class="mb-5"></div>
-</div>
+</section>

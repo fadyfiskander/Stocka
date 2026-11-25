@@ -33,6 +33,8 @@ namespace Catalog.Contracts.Services
 
         /// <summary>Retrieves the product listing for the current (or explicitly requested) Organization.</summary>
         Task<IEnumerable<ProductDto>> ListProductsAsync(Guid? organizationId = null, CancellationToken cancellationToken = default);
+
+        Task<IEnumerable<ProductDto>> GetProductsByIdsAsync(List<Guid> Ids, CancellationToken cancellationToken = default);
         #endregion
 
         #region Categories

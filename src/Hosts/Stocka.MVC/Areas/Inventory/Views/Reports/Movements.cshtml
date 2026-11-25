@@ -1,126 +1,202 @@
 ﻿@model IEnumerable<MovementTypeTotalsDto>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = Loc.T("ReportMovements_Title");
-    string T(string key) => Loc.T(key);
-    string MoveType(int t) => Loc.T(t switch
+    ViewData["Title"] = (Loc.IsEn ? "Stock movement reports" : "تقارير حركات المخزون");
+    string MoveType(int t) => t switch
     {
-        0 => "Move_PurchaseIn",
-        1 => "Move_SaleOut",
-        2 => "Move_TransferIn",
-        3 => "Move_TransferOut",
-        4 => "Move_AdjustmentIn",
-        5 => "Move_AdjustmentOut",
-        6 => "Move_OrderReturn",
-        _ => "Move_PurchaseIn"
-    });
+        0 => (Loc.IsEn ? "Purchase in" : "إدخال شراء"),
+        1 => (Loc.IsEn ? "Sale out" : "بيع خارج"),
+        2 => (Loc.IsEn ? "Transfer in" : "تحويل داخل"),
+        3 => (Loc.IsEn ? "Transfer out" : "تحويل خارج"),
+        4 => (Loc.IsEn ? "Adjustment in" : "تسوية داخل"),
+        5 => (Loc.IsEn ? "Adjustment out" : "تسوية خارج"),
+        6 => (Loc.IsEn ? "Order return" : "إرجاع طلب"),
+        _ => (Loc.IsEn ? "Purchase in" : "إدخال شراء")
+    };
+    bool IsIncoming(int t) => t == 0 || t == 2 || t == 4 || t == 6;
     var from = (DateTime?)ViewBag.From;
     var to = (DateTime?)ViewBag.To;
     var inboundOutbound = (InboundOutboundSummaryDto?)ViewBag.InboundOutbound;
     var transfers = (PaginatedResult<TransferHistoryDto>?)ViewBag.TransferHistory;
     var adjustments = (PaginatedResult<Inventory.Contracts.DTOs.StockMovement.StockMovementDto>?)ViewBag.AdjustmentHistory;
+
+    const string input = "block h-10 w-full rounded-md border border-line bg-surface px-3 text-[13.5px] text-ink outline-none transition hover:border-line-strong focus:border-accent focus:ring-[3px] focus:ring-[var(--focus-ring)]";
+    const string btnPrimary = "inline-flex h-10 items-center justify-center gap-1.5 rounded-md bg-accent px-5 text-[13.5px] font-semibold text-on-accent transition-colors hover:bg-accent-hover";
 }
 
-<div class="container-fluid py-4">
-    <h2 class="mb-1">@T("ReportMovements_Title")</h2>
-    <p class="text-muted mb-3">@T("ReportMovements_Sub")</p>
+<section class="grid gap-5">
+    <header class="border-b border-line pb-5">
+        <h1 class="text-[22px] font-bold tracking-[-.015em]">@(Loc.IsEn ? "Stock movement reports" : "تقارير حركات المخزون")</h1>
+        <p class="mt-1.5 max-w-[80ch] text-[13.5px] text-ink-soft">@(Loc.IsEn ? "Transfer pairs are reported once (out + in legs aggregated) — no double counting." : "أزواج التحويل تُعرض مرة واحدة (رجل الإدخال والإخراج مجمّعتان) — دون ازدواج.")</p>
+    </header>
 
-    <form method="get" class="row g-2 mb-3" asp-area="Inventory" asp-controller="Reports" asp-action="Movements">
-        <div class="col-md-3"><input type="date" class="form-control" name="from" value="@(from?.ToString("yyyy-MM-dd"))" /></div>
-        <div class="col-md-3"><input type="date" class="form-control" name="to" value="@(to?.ToString("yyyy-MM-dd"))" /></div>
-        <div class="col-auto"><button class="btn btn-primary">@T("Common_Apply")</button></div>
+    <form method="get" asp-area="Inventory" asp-controller="Reports" asp-action="Movements"
+          class="flex flex-wrap items-end gap-3 rounded-lg border border-line bg-surface p-4 shadow-card">
+        <div class="min-w-[180px]">
+            <label for="from" class="mb-1.5 block text-[12.5px] font-semibold text-ink-soft">@(Loc.IsEn ? "Date (UTC)" : "التاريخ (UTC)")</label>
+            <input id="from" type="date" class="@input num font-mono" name="from" value="@(from?.ToString("yyyy-MM-dd"))" />
+        </div>
+        <div class="min-w-[180px]">
+            <label for="to" class="mb-1.5 block text-[12.5px] font-semibold text-ink-soft">@(Loc.IsEn ? "Date (UTC)" : "التاريخ (UTC)")</label>
+            <input id="to" type="date" class="@input num font-mono" name="to" value="@(to?.ToString("yyyy-MM-dd"))" />
+        </div>
+        <button type="submit" class="@btnPrimary">
+            <svg class="icon !size-4"><use href="#i-filter" /></svg>@(Loc.IsEn ? "Apply" : "تطبيق")
+        </button>
     </form>
 
     @if (inboundOutbound != null)
     {
-        <div class="row g-3 mb-4">
-            <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">@T("ReportMovements_Inbound")</h6><h3 class="mb-0">@inboundOutbound.InboundUnits</h3></div></div></div>
-            <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="text-muted mb-1">@T("ReportMovements_Outbound")</h6><h3 class="mb-0">@inboundOutbound.OutboundUnits</h3></div></div></div>
-            <div class="col-md-6"><div class="card border-0 shadow-sm"><div class="card-body"><small class="text-muted">@Loc.F("ReportMovements_Range", inboundOutbound.DateFromUtc.ToString("yyyy-MM-dd"), inboundOutbound.DateToUtc.ToString("yyyy-MM-dd"))</small></div></div></div>
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="rounded-lg border border-line bg-surface p-4 shadow-card">
+                <div class="flex items-center gap-1.5 text-[11.5px] font-semibold text-ink-soft">
+                    <svg class="icon !size-[15px] text-ok"><use href="#i-arrow-down" /></svg>@(Loc.IsEn ? "Inbound units (net)" : "وحدات داخلة (صافي)")
+                </div>
+                <div class="num mt-1.5 text-[26px] font-bold tracking-[-.02em] text-ok">@inboundOutbound.InboundUnits</div>
+            </div>
+            <div class="rounded-lg border border-line bg-surface p-4 shadow-card">
+                <div class="flex items-center gap-1.5 text-[11.5px] font-semibold text-ink-soft">
+                    <svg class="icon !size-[15px] text-danger"><use href="#i-arrow-up" /></svg>@(Loc.IsEn ? "Outbound units (net)" : "وحدات خارجة (صافي)")
+                </div>
+                <div class="num mt-1.5 text-[26px] font-bold tracking-[-.02em] text-danger">@inboundOutbound.OutboundUnits</div>
+            </div>
+            <div class="rounded-lg border border-line bg-surface p-4 shadow-card sm:col-span-2 lg:col-span-1">
+                <div class="text-[11.5px] font-semibold text-ink-soft">@(Loc.IsEn ? "Date (UTC)" : "التاريخ (UTC)")</div>
+                <div class="num mt-1.5 text-[13.5px] text-ink-soft">@(Loc.IsEn ? $"Date range {inboundOutbound.DateFromUtc.ToString("yyyy-MM-dd")} → {inboundOutbound.DateToUtc.ToString("yyyy-MM-dd")}. Transfer legs excluded (internal movements); see transfer history below." : $"نطاق التاريخ {inboundOutbound.DateFromUtc.ToString("yyyy-MM-dd")} ← {inboundOutbound.DateToUtc.ToString("yyyy-MM-dd")}. رجل التحويل مستثناة (حركات داخلية)؛ انظر سجل التحويلات أدناه.")</div>
+            </div>
         </div>
     }
 
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white"><strong>@T("ReportMovements_TotalsByType")</strong></div>
-        <div class="card-body p-0">
-            <table class="table-hover mb-0 table align-middle">
-                <thead class="table-light"><tr><th class="ps-4">@T("Common_Type")</th><th>@T("Reports_Col_Movements")</th><th>@T("ReportMovements_Col_Units")</th><th>@T("Reports_Col_NetSigned")</th></tr></thead>
+    <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
+        <div class="flex items-center gap-2.5 border-b border-line px-5 py-3">
+            <svg class="icon !size-[18px] text-accent"><use href="#i-chart" /></svg>
+            <span class="text-[14px] font-semibold text-ink">@(Loc.IsEn ? "Totals by movement type" : "الإجماليات حسب نوع الحركة")</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[560px] border-collapse text-[13.5px]">
+                <thead>
+                    <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Type" : "النوع")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Movements" : "الحركات")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Units" : "الوحدات")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Net signed" : "الصافي بالإشارة")</th>
+                    </tr>
+                </thead>
                 <tbody>
                     @if (Model != null && Model.Any())
                     {
                         @foreach (var t in Model)
-                         {
-                             <tr>
-                                 <td class="ps-4"><span class="badge text-bg-@(t.MovementType == 0 || t.MovementType == 2 || t.MovementType == 4 || t.MovementType == 6 ? "success" : "danger")">@MoveType(t.MovementType)</span></td>
-                                 <td>@t.MovementCount</td>
-                                 <td>@t.TotalQuantity</td>
-                                 <td>@t.SignedQuantity</td>
-                             </tr>
-                         }
+                        {
+                            <tr class="border-b border-line last:border-0 hover:bg-sunken/50">
+                                <td class="px-4 py-3">
+                                    @if (IsIncoming(t.MovementType))
+                                    {
+                                        <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@MoveType(t.MovementType)</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-flex items-center rounded-full bg-danger-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-danger">@MoveType(t.MovementType)</span>
+                                    }
+                                </td>
+                                <td class="num px-4 py-3 text-end text-ink-soft">@t.MovementCount</td>
+                                <td class="num px-4 py-3 text-end font-semibold text-ink">@t.TotalQuantity</td>
+                                <td class="num px-4 py-3 text-end font-semibold @(t.SignedQuantity < 0 ? "text-danger" : "text-ok")">@t.SignedQuantity</td>
+                            </tr>
+                        }
                     }
                     else
                     {
-                        <tr><td colspan="4" class="py-4 text-center text-muted">@T("ReportMovements_NoneInRange")</td></tr>
+                        <tr><td colspan="4" class="px-6 py-10 text-center text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No movements in this range." : "لا توجد حركات في هذا النطاق.")</td></tr>
                     }
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white"><strong>@T("ReportMovements_TransferHistory")</strong></div>
-        <div class="card-body p-0">
-            <table class="table-hover mb-0 table align-middle">
-                <thead class="table-light"><tr><th class="ps-4">@T("Common_Date")</th><th>@T("ReportMovements_Col_TransferRef")</th><th>@T("Batches_Source")</th><th>@T("Batches_Destination")</th><th>@T("Common_Quantity")</th></tr></thead>
+    <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
+        <div class="flex items-center gap-2.5 border-b border-line px-5 py-3">
+            <svg class="icon !size-[18px] text-info"><use href="#i-swap" /></svg>
+            <span class="text-[14px] font-semibold text-ink">@(Loc.IsEn ? "Transfer history (source → destination)" : "سجل التحويلات (المصدر ← الوجهة)")</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[720px] border-collapse text-[13.5px]">
+                <thead>
+                    <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Date (UTC)" : "التاريخ (UTC)")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Transfer ref" : "مرجع التحويل")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Source" : "المصدر")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Destination" : "الوجهة")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Quantity" : "الكمية")</th>
+                    </tr>
+                </thead>
                 <tbody>
                     @if (transfers != null)
                     {
                         @foreach (var t in transfers.Items)
-                         {
-                             <tr>
-                                 <td class="ps-4">@t.OccurredAtUtc.ToString("yyyy-MM-dd HH:mm")</td>
-                                 <td><small>@t.TransferReferenceId</small></td>
-                                 <td><small>@t.SourceWarehouseId</small></td>
-                                 <td><small>@t.DestinationWarehouseId</small></td>
-                                 <td>@t.Quantity</td>
-                             </tr>
-                         }
-                         if (!transfers.Items.Any())
-                         {
-                             <tr><td colspan="5" class="py-4 text-center text-muted">@T("ReportMovements_NoTransfers")</td></tr>
-                         }
+                        {
+                            <tr class="border-b border-line last:border-0 hover:bg-sunken/50">
+                                <td class="whitespace-nowrap px-4 py-3"><span class="num font-mono text-[12.5px] text-ink-soft" dir="ltr">@t.OccurredAtUtc.ToString("yyyy-MM-dd HH:mm")</span></td>
+                                <td class="px-4 py-3"><span class="num break-all font-mono text-[12px] text-ink-soft">@t.TransferReferenceId</span></td>
+                                <td class="px-4 py-3"><span class="num break-all font-mono text-[12px] text-ink-soft">@t.SourceWarehouseId</span></td>
+                                <td class="px-4 py-3"><span class="num break-all font-mono text-[12px] text-ink-soft">@t.DestinationWarehouseId</span></td>
+                                <td class="num px-4 py-3 text-end font-semibold text-ink">@t.Quantity</td>
+                            </tr>
+                        }
+                        if (!transfers.Items.Any())
+                        {
+                            <tr><td colspan="5" class="px-6 py-10 text-center text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No transfers recorded." : "لا توجد تحويلات مسجّلة.")</td></tr>
+                        }
                     }
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white"><strong>@T("ReportMovements_Adjustments")</strong></div>
-        <div class="card-body p-0">
-            <table class="table-hover mb-0 table align-middle">
-                <thead class="table-light"><tr><th class="ps-4">@T("Common_Date")</th><th>@T("Common_Type")</th><th>@T("Common_Quantity")</th><th>@T("Common_Reason")</th><th>@T("Common_Reference")</th></tr></thead>
+    <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
+        <div class="flex items-center gap-2.5 border-b border-line px-5 py-3">
+            <svg class="icon !size-[18px] text-signal"><use href="#i-undo" /></svg>
+            <span class="text-[14px] font-semibold text-ink">@(Loc.IsEn ? "Adjustments, damage & reversals (with recorded reasons)" : "التسويات والتلف وعمليات العكس (مع الأسباب المسجّلة)")</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[720px] border-collapse text-[13.5px]">
+                <thead>
+                    <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Date (UTC)" : "التاريخ (UTC)")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Type" : "النوع")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Quantity" : "الكمية")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Reason" : "السبب")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Reference" : "المرجع")</th>
+                    </tr>
+                </thead>
                 <tbody>
                     @if (adjustments != null)
                     {
                         @foreach (var m in adjustments.Items)
-                         {
-                             <tr>
-                                 <td class="ps-4">@m.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
-                                 <td><span class="badge text-bg-@(m.MovementType == 4 ? "success" : "warning text-dark")">@MoveType(m.MovementType)</span></td>
-                                 <td>@m.Quantity</td>
-                                 <td>@m.Reason</td>
-                                 <td><small>@(m.ReferenceId?.ToString() ?? "-")</small></td>
-                             </tr>
-                         }
-                         if (!adjustments.Items.Any())
-                         {
-                             <tr><td colspan="5" class="py-4 text-center text-muted">@T("ReportMovements_NoAdjustments")</td></tr>
-                         }
+                        {
+                            <tr class="border-b border-line last:border-0 hover:bg-sunken/50">
+                                <td class="whitespace-nowrap px-4 py-3"><span class="num font-mono text-[12.5px] text-ink-soft" dir="ltr">@m.CreatedAt.ToString("yyyy-MM-dd HH:mm")</span></td>
+                                <td class="px-4 py-3">
+                                    @if (m.MovementType == 4)
+                                    {
+                                        <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@MoveType(m.MovementType)</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-flex items-center rounded-full bg-warn-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-warn">@MoveType(m.MovementType)</span>
+                                    }
+                                </td>
+                                <td class="num px-4 py-3 text-end font-semibold text-ink">@m.Quantity</td>
+                                <td class="px-4 py-3 text-ink-soft">@m.Reason</td>
+                                <td class="px-4 py-3"><span class="num break-all font-mono text-[12px] text-ink-faint">@(m.ReferenceId?.ToString() ?? "-")</span></td>
+                            </tr>
+                        }
+                        if (!adjustments.Items.Any())
+                        {
+                            <tr><td colspan="5" class="px-6 py-10 text-center text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No adjustments, write-offs or reversals recorded." : "لا توجد تسويات أو أشطاب أو عمليات عكس مسجّلة.")</td></tr>
+                        }
                     }
                 </tbody>
             </table>
         </div>
     </div>
-    <div class="mb-5"></div>
-</div>
+</section>

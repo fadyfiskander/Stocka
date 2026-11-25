@@ -1,4 +1,3 @@
-using BuildingBlocks.Application.Abstractions;
 using Catalog.Infrastructure;
 using Identity.Infrastructure;
 using Inventory.Infrastructure;
@@ -124,38 +123,45 @@ app.MapControllerRoute(
     .WithStaticAssets();
 
 #region Photino.NET single-instance lock and window
-// All endpoints must be mapped BEFORE the server starts: mapping after StartAsync
-// throws, and the window would load an app with no controllers registered.
-
-// Start Kestrel and wait until it is actually listening.
-app.StartAsync().GetAwaiter().GetResult();
-var url = app.Services.GetRequiredService<IServer>()
-    .Features.Get<IServerAddressesFeature>()!.Addresses.First();
-
-var thread = new Thread(() =>
+if (app.Environment.IsDevelopment())
 {
-    try
+    // All endpoints must be mapped BEFORE the server starts: mapping after StartAsync
+    // throws, and the window would load an app with no controllers registered.
+
+    // Start Kestrel and wait until it is actually listening.
+    app.StartAsync().GetAwaiter().GetResult();
+    var url = app.Services.GetRequiredService<IServer>()
+        .Features.Get<IServerAddressesFeature>()!.Addresses.First();
+
+    var thread = new Thread(() =>
     {
-        var window = new PhotinoWindow()
-            .SetTitle("Stocka")
-            .SetSize(1280, 800)
-            .Center()
-            .SetDevToolsEnabled(true)
-            .SetContextMenuEnabled(true)
-            .Load(url);
+        try
+        {
+            var window = new PhotinoWindow()
+                .SetTitle("Stocka")
+                .SetSize(1280, 800)
+                .Center()
+                .SetDevToolsEnabled(true)
+                .SetContextMenuEnabled(true)
+                .Load(url);
 
-        window.WaitForClose();
-    }
-    finally
-    {
-        app.StopAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
-    }
-});
+            window.WaitForClose();
+        }
+        finally
+        {
+            app.StopAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
+        }
+    });
 
-if (OperatingSystem.IsWindows())
-    thread.SetApartmentState(ApartmentState.STA);
+    if (OperatingSystem.IsWindows())
+        thread.SetApartmentState(ApartmentState.STA);
 
-thread.Start();
-thread.Join();
+    thread.Start();
+    thread.Join();
+}
+else
+{
+    app.Run();
+}
 #endregion
 

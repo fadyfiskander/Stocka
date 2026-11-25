@@ -33,3 +33,8 @@ public record ListProductsQueryMediatR(ListProductsQuery Contract) : IRequest<IE
 {
     object IContractRequest.Contract => Contract;
 }
+
+public record ListProductsByIdsQueryMediatR(ListProductsByIdsQuery Contract) : IRequest<IEnumerable<ProductDto>>, IContractRequest
+{
+    object IContractRequest.Contract => Contract;
+}

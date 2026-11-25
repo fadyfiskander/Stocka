@@ -36,4 +36,7 @@ public class ProductMediatorCases : IProductCases
 
     public Task<IEnumerable<ProductDto>> ListProductsAsync(ListProductsQuery query, CancellationToken cancellationToken = default)
         => _mediator.Send(new ListProductsQueryMediatR(query), cancellationToken);
+
+    public Task<IEnumerable<ProductDto>> ListProductsByIdsAsync(ListProductsByIdsQuery query, CancellationToken cancellationToken = default)
+        => _mediator.Send(new ListProductsByIdsQueryMediatR(query), cancellationToken);
 }

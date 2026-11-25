@@ -1,6 +1,4 @@
-using BuildingBlocks.Application.Common.Models;
 using Inventory.Application.Common.Interfaces;
-using Inventory.Contracts.DTOs.Reports;
 using Inventory.Contracts.DTOs.Stock;
 using Inventory.Contracts.DTOs.StockMovement;
 using Inventory.Contracts.UseCases.StockCases;
@@ -33,26 +31,6 @@ public record RecordSaleOutCommandMediatR(RecordSaleOutCommand Contract) : IComm
     object IContractRequest.Contract => Contract;
 }
 public record RecordCustomerReturnCommandMediatR(RecordCustomerReturnCommand Contract) : ICommand<StockMovementDto>, IContractRequest
-{
-    object IContractRequest.Contract => Contract;
-}
-public record ListMovementsQueryMediatR(ListMovementsQuery Contract) : IRequest<PaginatedResult<StockMovementDto>>, IContractRequest
-{
-    object IContractRequest.Contract => Contract;
-}
-public record GetProductStockQueryMediatR(GetProductStockQuery Contract) : IRequest<ProductStockDistributionDto>, IContractRequest
-{
-    object IContractRequest.Contract => Contract;
-}
-public record GetProductUnallocatedUnitsQueryMediatR(GetProductUnallocatedUnitsQuery Contract) : IRequest<int>, IContractRequest
-{
-    object IContractRequest.Contract => Contract;
-}
-public record GetBatchQuantityInWarehouseQueryMediatR(GetBatchQuantityInWarehouseQuery Contract) : IRequest<int>, IContractRequest
-{
-    object IContractRequest.Contract => Contract;
-}
-public record GetWarehouseTotalUnitsQueryMediatR(GetWarehouseTotalUnitsQuery Contract) : IRequest<int>, IContractRequest
 {
     object IContractRequest.Contract => Contract;
 }

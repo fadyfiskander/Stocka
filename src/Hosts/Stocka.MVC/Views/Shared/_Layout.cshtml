@@ -4,7 +4,6 @@
     /* ---- Culture & direction (single source for the whole shell) ---- */
     var isRtl = Loc.IsRtl;
     var htmlLang = Loc.Language;
-    string T(string key) => Loc.T(key);
 
     // return URL for the language switch, stripped of any culture parameters
     var langQuery = Context.Request.Query
@@ -22,20 +21,39 @@
     // validator + JS strings, serialized once, consumed by app.js
     var i18n = new
     {
-        required = T("Val_Required"),
-        email    = T("Val_Email"),
-        url      = T("Val_Url"),
-        pattern  = T("Val_Pattern"),
-        minlength = T("Val_MinLength"),
-        maxlength = T("Val_MaxLength"),
-        min      = T("Val_Min"),
-        max      = T("Val_Max"),
-        step     = T("Val_Step"),
-        number   = T("Val_Number"),
-        oneIssue = T("Val_OneIssue"),
-        manyIssues = T("Val_ManyIssues")
+        required = (Loc.IsEn ? "This field is required." : "هذا الحقل مطلوب."),
+        email    = (Loc.IsEn ? "Enter a valid email address." : "أدخل بريداً إلكترونياً صحيحاً."),
+        url      = (Loc.IsEn ? "Enter a valid URL." : "أدخل رابطاً صحيحاً."),
+        pattern  = (Loc.IsEn ? "The value is invalid." : "القيمة غير صالحة."),
+        minlength = (Loc.IsEn ? "The value is too short." : "القيمة أقصر من المطلوب."),
+        maxlength = (Loc.IsEn ? "The value is too long." : "القيمة أطول من المسموح."),
+        min      = (Loc.IsEn ? "The value is below the minimum." : "القيمة أقل من الحد الأدنى."),
+        max      = (Loc.IsEn ? "The value exceeds the maximum." : "القيمة أكبر من الحد الأقصى."),
+        step     = (Loc.IsEn ? "Enter a valid step value." : "أدخل قيمة صحيحة."),
+        number   = (Loc.IsEn ? "Enter a valid number." : "أدخل رقماً صحيحاً."),
+        oneIssue = (Loc.IsEn ? "Please fix the following issue:" : "يرجى تصحيح الخطأ التالي:"),
+        manyIssues = (Loc.IsEn ? "Please fix the following issues:" : "يرجى تصحيح الأخطاء التالية:")
     };
+
+    /* ---- shared Tailwind class strings (kept literal so the scanner sees them) ---- */
+    const string navLink =
+        "nav-link group/nav relative flex items-center gap-2.5 rounded-md px-2.5 py-2 text-[13.5px] font-medium leading-tight " +
+        "text-aside-soft transition-colors duration-150 hover:bg-white/[0.055] hover:text-aside-ink " +
+        "[&.is-active]:bg-white/[0.095] [&.is-active]:font-semibold [&.is-active]:text-aside-ink " +
+        "[&.is-active]:before:absolute [&.is-active]:before:start-0 [&.is-active]:before:top-1/2 [&.is-active]:before:h-[55%] " +
+        "[&.is-active]:before:w-[2.5px] [&.is-active]:before:-translate-y-1/2 [&.is-active]:before:rounded-full [&.is-active]:before:bg-aside-accent [&.is-active]:before:content-['']";
+
+    const string groupLabel =
+        "block px-2.5 pb-1 pt-3.5 text-[11px] font-semibold tracking-wide text-aside-soft select-none " +
+        "lg:group-data-[rail=true]/shell:hidden";
+
+    const string navText = "nav-text lg:group-data-[rail=true]/shell:hidden";
+
+    const string toolBtn =
+        "inline-flex size-9 items-center justify-center rounded-md text-ink-soft transition-colors " +
+        "hover:bg-sunken hover:text-ink";
 }
+
 @functions {
     /* nav helpers — used only by this layout */
     string NavActive(string area, string controller, string? action = null)
@@ -81,15 +99,12 @@
         })();
     </script>
 
-    <link rel="stylesheet" href="~/css/tokens.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/base.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/shell.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/components.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/tailwind.css" asp-append-version="true" />
 </head>
 <body>
 
     @* ============ icon sprite (hand-drawn, 24×24, stroke) ============ *@
-    <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" class="hidden" aria-hidden="true">
         <symbol id="i-home" viewBox="0 0 24 24">
             <path d="M4 11.2 12 4.4l8 6.8" /><path d="M6.3 9.7V20h11.4V9.7" /><path d="M10 20v-5.4h4V20" />
         </symbol>
@@ -175,122 +190,139 @@
         </symbol>
     </svg>
 
-    <a class="skip-link" href="#content">@T("SkipToContent")</a>
+    <a class="sr-only focus:text-on-accent focus:not-sr-only focus:fixed focus:start-4 focus:top-3 focus:z-100 focus:rounded-md focus:bg-accent focus:px-4 focus:py-2.5 focus:font-semibold"
+       href="#content">@(Loc.IsEn ? "Skip to content" : "انتقل إلى المحتوى")</a>
 
-    <div class="shell" id="shell" data-nav-open="false">
+    <div class="group/shell grid min-h-dvh grid-cols-1 bg-bg lg:grid-cols-[var(--aside-w)_minmax(0,1fr)] data-[rail=true]:lg:grid-cols-[var(--aside-w-rail)_minmax(0,1fr)]"
+         id="shell" data-nav-open="false">
 
         @* ============ Sidebar ============ *@
-        <aside class="sidebar" id="sidebar" aria-label="@T("Nav_Main")">
-            <a class="brand" asp-area="" asp-controller="Home" asp-action="Index">
-                <span class="brand-mark"><svg class="icon"><use href="#i-box" /></svg></span>
-                <span class="brand-name">
-                    <b>Stocka</b>
-                    <span>@T("App_Subtitle")</span>
+        <aside class="border-aside-line text-aside-ink z-40 flex flex-col overflow-y-auto overscroll-contain border-e bg-aside group-data-[nav-open=true]/shell:max-lg:shadow-drawer group-data-[nav-open=true]/shell:max-lg:translate-x-0 lg:sticky lg:top-0 lg:h-dvh max-lg:fixed max-lg:inset-y-0 max-lg:start-0 max-lg:w-[min(300px,86vw)] max-lg:translate-x-[var(--drawer-x)] max-lg:transition-transform max-lg:duration-200"
+               id="sidebar" aria-label="@(Loc.IsEn ? "Main navigation" : "التنقل الرئيسي")">
+            <a class="text-aside-ink flex min-h-14 items-center gap-2.5 px-4 py-3.5 hover:text-aside-ink lg:group-data-[rail=true]/shell:border-aside-line lg:group-data-[rail=true]/shell:justify-center lg:group-data-[rail=true]/shell:border-b lg:group-data-[rail=true]/shell:px-3"
+               asp-area="" asp-controller="Home" asp-action="Index">
+                <span class="text-aside-accent grid size-9 shrink-0 place-items-center rounded-[10px] bg-white/10">
+                    <svg class="icon !size-5 !stroke-2"><use href="#i-box" /></svg>
+                </span>
+                <span class="grid leading-[1.15] lg:group-data-[rail=true]/shell:hidden">
+                    <b class="font-semibold tracking-[.01em] text-[15.5px]">Stocka</b>
+                    <span class="text-[11px] text-aside-soft">@(Loc.IsEn ? "Inventory control" : "إدارة المخزون")</span>
                 </span>
             </a>
 
-            <nav class="nav">
-                <a class="nav-link @NavActive("", "Home")" asp-area="" asp-controller="Home" asp-action="Index">
-                    <svg class="icon"><use href="#i-home" /></svg><span class="nav-text">@T("Nav_Home")</span>
+            <nav class="grid flex-1 content-start gap-1 px-2.5 pt-1 pb-4">
+                <a class="@navLink @NavActive("", "Home")" asp-area="" asp-controller="Home" asp-action="Index">
+                    <svg class="icon text-aside-accent/80"><use href="#i-home" /></svg><span class="@navText">@(Loc.IsEn ? "Home" : "الرئيسية")</span>
                 </a>
 
-                <span class="group-label" aria-hidden="true">@T("Group_Catalog")</span>
-                <a class="nav-link @NavActive("Catalog", "Products")" asp-area="Catalog" asp-controller="Products" asp-action="Index">
-                    <svg class="icon"><use href="#i-box" /></svg><span class="nav-text">@T("Nav_Products")</span>
+                <span class="@groupLabel" aria-hidden="true">@(Loc.IsEn ? "Catalog" : "المنتجات")</span>
+                <a class="@navLink @NavActive("Catalog", "Products")" asp-area="Catalog" asp-controller="Products" asp-action="Index">
+                    <svg class="icon text-aside-accent/80"><use href="#i-box" /></svg><span class="@navText">@(Loc.IsEn ? "Products" : "المنتجات")</span>
                 </a>
-                <a class="nav-link @NavActive("Catalog", "Categories")" asp-area="Catalog" asp-controller="Categories" asp-action="Index">
-                    <svg class="icon"><use href="#i-tag" /></svg><span class="nav-text">@T("Nav_Categories")</span>
-                </a>
-
-                <span class="group-label" aria-hidden="true">@T("Group_Inventory")</span>
-                <a class="nav-link @NavActive("Inventory", "Warehouses")" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index">
-                    <svg class="icon"><use href="#i-store" /></svg><span class="nav-text">@T("Nav_Warehouses")</span>
-                </a>
-                <a class="nav-link @NavActive("Inventory", "Batches")" asp-area="Inventory" asp-controller="Batches" asp-action="Index">
-                    <svg class="icon"><use href="#i-layers" /></svg><span class="nav-text">@T("Nav_Batches")</span>
-                </a>
-                <a class="nav-link @NavActive("Inventory", "Stock", "Movements")" asp-area="Inventory" asp-controller="Stock" asp-action="Movements">
-                    <svg class="icon"><use href="#i-swap" /></svg><span class="nav-text">@T("Nav_Movements")</span>
+                <a class="@navLink @NavActive("Catalog", "Categories")" asp-area="Catalog" asp-controller="Categories" asp-action="Index">
+                    <svg class="icon text-aside-accent/80"><use href="#i-tag" /></svg><span class="@navText">@(Loc.IsEn ? "Categories" : "التصنيفات")</span>
                 </a>
 
-                <details class="nav-group@(NavGroupActive("Inventory", "Reports") ? " is-open" : "")">
-                    <summary title="@T("Nav_Reports")" aria-label="@T("Nav_Reports")">
-                        @T("Nav_Reports")
-                        <svg class="icon chev"><use href="#i-chevron-down" /></svg>
+                <span class="@groupLabel" aria-hidden="true">@(Loc.IsEn ? "Inventory" : "المخزون")</span>
+                <a class="@navLink @NavActive("Inventory", "Warehouses")" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index">
+                    <svg class="icon text-aside-accent/80"><use href="#i-store" /></svg><span class="@navText">@(Loc.IsEn ? "Warehouses" : "المستودعات")</span>
+                </a>
+                <a class="@navLink @NavActive("Inventory", "Batches")" asp-area="Inventory" asp-controller="Batches" asp-action="Index">
+                    <svg class="icon text-aside-accent/80"><use href="#i-layers" /></svg><span class="@navText">@(Loc.IsEn ? "Batches" : "الدفعات")</span>
+                </a>
+                <a class="@navLink @NavActive("Inventory", "Stock", "Movements")" asp-area="Inventory" asp-controller="Stock" asp-action="Movements">
+                    <svg class="icon text-aside-accent/80"><use href="#i-swap" /></svg><span class="@navText">@(Loc.IsEn ? "Movements" : "الحركات")</span>
+                </a>
+
+                <details class="nav-group rounded-md @(NavGroupActive("Inventory", "Reports") ? "is-open" : "")">
+                    <summary title="@(Loc.IsEn ? "Reports" : "التقارير")" aria-label="@(Loc.IsEn ? "Reports" : "التقارير")"
+                             class="relative flex cursor-pointer list-none items-center justify-between gap-2 rounded-md px-2.5 py-2 font-semibold tracking-wide text-[11px] text-aside-soft transition-colors select-none hover:text-aside-ink hover:bg-white/[0.055] lg:group-data-[rail=true]/shell:justify-center lg:group-data-[rail=true]/shell:px-0 [&::-webkit-details-marker]:hidden">
+                        <span class="@navText">@(Loc.IsEn ? "Reports" : "التقارير")</span>
+                        <svg class="icon !size-[13px] transition-transform duration-150 group-open:rotate-180 lg:group-data-[rail=true]/shell:hidden"><use href="#i-chevron-down" /></svg>
                     </summary>
-                    <div class="nav">
-                        <a class="nav-link @NavActive("Inventory", "Reports", "Index")" asp-area="Inventory" asp-controller="Reports" asp-action="Index">
-                            <span class="nav-text">@T("Nav_ReportsOverview")</span>
+                    <div class="grid gap-1 pb-1">
+                        <a class="@navLink @NavActive("Inventory", "Reports", "Index")" asp-area="Inventory" asp-controller="Reports" asp-action="Index">
+                            <span class="@navText">@(Loc.IsEn ? "Overview" : "نظرة عامة")</span>
                         </a>
-                        <a class="nav-link @NavActive("Inventory", "Reports", "Balance")" asp-area="Inventory" asp-controller="Reports" asp-action="Balance">
-                            <span class="nav-text">@T("Nav_Balance")</span>
+                        <a class="@navLink @NavActive("Inventory", "Reports", "Balance")" asp-area="Inventory" asp-controller="Reports" asp-action="Balance">
+                            <span class="@navText">@(Loc.IsEn ? "Balance" : "الرصيد")</span>
                         </a>
-                        <a class="nav-link @NavActive("Inventory", "Reports", "Movements")" asp-area="Inventory" asp-controller="Reports" asp-action="Movements">
-                            <span class="nav-text">@T("Nav_MovementReports")</span>
+                        <a class="@navLink @NavActive("Inventory", "Reports", "Movements")" asp-area="Inventory" asp-controller="Reports" asp-action="Movements">
+                            <span class="@navText">@(Loc.IsEn ? "Movement report" : "تقرير الحركات")</span>
                         </a>
-                        <a class="nav-link @NavActive("Inventory", "Reports", "Products")" asp-area="Inventory" asp-controller="Reports" asp-action="Products">
-                            <span class="nav-text">@T("Nav_ZeroStock")</span>
+                        <a class="@navLink @NavActive("Inventory", "Reports", "Products")" asp-area="Inventory" asp-controller="Reports" asp-action="Products">
+                            <span class="@navText">@(Loc.IsEn ? "Zero stock" : "نفاد المخزون")</span>
                         </a>
-                        <a class="nav-link @NavActive("Inventory", "Reports", "Warehouses")" asp-area="Inventory" asp-controller="Reports" asp-action="Warehouses">
-                            <span class="nav-text">@T("Nav_WarehouseReports")</span>
+                        <a class="@navLink @NavActive("Inventory", "Reports", "Warehouses")" asp-area="Inventory" asp-controller="Reports" asp-action="Warehouses">
+                            <span class="@navText">@(Loc.IsEn ? "Warehouse reports" : "تقارير المستودعات")</span>
                         </a>
                     </div>
                 </details>
             </nav>
 
-            <div class="aside-foot">
-                <button type="button" class="collapse-btn" data-rail-toggle
-                        aria-label="@T("Nav_Collapse")" title="@T("Nav_Collapse")">
-                    <svg class="icon icon-collapse"><use href="#i-chevrons" /></svg>
+            <div class="border-aside-line flex items-center justify-end border-t px-3.5 py-3 max-lg:hidden lg:group-data-[rail=true]/shell:justify-center">
+                <button type="button"
+                        class="inline-flex size-9 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-aside-soft transition-colors hover:text-aside-ink hover:bg-white/[0.055]"
+                        data-rail-toggle aria-label="@(Loc.IsEn ? "Collapse navigation" : "طي القائمة")" title="@(Loc.IsEn ? "Collapse navigation" : "طي القائمة")">
+                    <svg class="icon !size-[17px] scale-x-[var(--dir-flip)] group-data-[rail=true]/shell:scale-x-[calc(var(--dir-flip)*-1)]"><use href="#i-chevrons" /></svg>
                 </button>
             </div>
         </aside>
 
-        <div class="scrim" data-nav-close></div>
+        <div class="backdrop-blur-[1.5px] pointer-events-none fixed inset-0 z-50 bg-[rgba(10,16,12,.46)] opacity-0 transition-opacity duration-200 group-data-[nav-open=true]/shell:pointer-events-auto group-data-[nav-open=true]/shell:opacity-100 lg:hidden"
+             data-nav-close></div>
 
         @* ============ Frame ============ *@
-        <div class="frame">
-            <header class="topbar">
-                <button type="button" class="tool-btn menu-btn" data-nav-toggle aria-label="@T("Nav_Open")">
-                    <svg class="icon"><use href="#i-menu" /></svg>
+        <div class="flex min-w-0 flex-col">
+            <header class="sticky top-0 z-30 flex min-h-[58px] items-center gap-2.5 border-b border-line bg-bg/85 px-6 py-2 backdrop-blur-md max-lg:px-4">
+                <button type="button" class="@toolBtn lg:hidden" data-nav-toggle aria-label="@(Loc.IsEn ? "Open navigation" : "فتح القائمة")">
+                    <svg class="icon !size-[19px]"><use href="#i-menu" /></svg>
                 </button>
 
-                <a class="topbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                    <span class="brand-mark" style="width:26px;height:26px;border-radius:7px;"><svg class="icon" style="width:15px;height:15px;"><use href="#i-box" /></svg></span>
+                <a class="hidden items-center gap-2 font-semibold text-[15px] text-ink hover:no-underline max-lg:inline-flex"
+                   asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="grid size-[26px] place-items-center rounded-[7px] bg-accent-tint text-accent">
+                        <svg class="icon !size-[15px]"><use href="#i-box" /></svg>
+                    </span>
                     Stocka
                 </a>
 
-                <form class="searchbar" role="search" method="get"
+                <form class="flex h-9 w-[min(340px,42vw)] items-center gap-2 rounded-md border border-line bg-surface px-3 text-ink-faint transition focus-within:border-accent focus-within:ring-[var(--focus-ring)] focus-within:ring-[3px] max-lg:hidden"
+                      role="search" method="get"
                       asp-area="Catalog" asp-controller="Products" asp-action="SearchByName">
-                    <svg class="icon"><use href="#i-search" /></svg>
-                    <input type="search" name="name" autocomplete="off" placeholder="@T("Search_Placeholder")" aria-label="@T("Search_Placeholder")" />
+                    <svg class="icon !size-[17px]"><use href="#i-search" /></svg>
+                    <input type="search" name="name" autocomplete="off" placeholder="@(Loc.IsEn ? "Search products" : "ابحث عن منتج")" aria-label="@(Loc.IsEn ? "Search products" : "ابحث عن منتج")"
+                           class="min-w-0 flex-1 border-0 bg-transparent text-[13.5px] text-ink outline-none placeholder:text-ink-faint" />
                 </form>
 
-                <div class="topbar-side">
-                    <a class="lang-chip" asp-controller="Localization" asp-action="SetLanguage"
+                <div class="ms-auto flex items-center gap-2">
+                    <a class="inline-flex h-9 items-center gap-1.5 rounded-full border border-line bg-surface px-3 font-semibold text-[12.5px] text-ink-soft transition-colors hover:border-accent hover:text-accent hover:no-underline"
+                       asp-controller="Localization" asp-action="SetLanguage"
                        asp-route-culture="@other" asp-route-returnUrl="@returnUrl"
-                       title="@T("Lang_ChangeTo")">
-                        <svg class="icon"><use href="#i-globe" /></svg>
+                       title="@(Loc.IsEn ? "Switch to Arabic" : "التبديل إلى الإنجليزية")">
+                        <svg class="icon !size-[15px]"><use href="#i-globe" /></svg>
                         <span>@otherLabel</span>
                     </a>
-                    <button type="button" class="tool-btn" data-theme-toggle
-                            data-aria-label-light="@T("Theme_Light")" data-aria-label-dark="@T("Theme_Dark")"
-                            aria-label="@T("Theme_Dark")">
-                        <svg class="icon theme-ic theme-ic-sun"><use href="#i-sun" /></svg>
-                        <svg class="icon theme-ic theme-ic-moon"><use href="#i-moon" /></svg>
+                    <button type="button" class="@toolBtn"
+                            data-theme-toggle
+                            data-aria-label-light="@(Loc.IsEn ? "Light theme" : "الوضع الفاتح")" data-aria-label-dark="@(Loc.IsEn ? "Dark theme" : "الوضع الداكن")"
+                            aria-label="@(Loc.IsEn ? "Dark theme" : "الوضع الداكن")">
+                        <svg class="icon hidden !size-[19px] dark:inline-block"><use href="#i-sun" /></svg>
+                        <svg class="icon hidden !size-[19px] light:inline-block"><use href="#i-moon" /></svg>
                     </button>
                 </div>
             </header>
 
-            <main class="content" id="content">
-                <partial name="_Flash" />
-                @RenderBody()
+            <main class="bg-grid w-full flex-1" id="content">
+                <div class="mx-auto w-full max-w-[1280px] px-6 pt-6 pb-14 max-lg:px-4">
+                    <partial name="_Flash" />
+                    @RenderBody()
+                </div>
             </main>
 
-            <footer class="footer">
+            <footer class="flex flex-wrap items-center gap-4 border-t border-line px-6 pt-4 pb-6 text-[12.5px] text-ink-faint max-lg:px-4">
                 <span>© Stocka</span>
-                <span class="spacer"></span>
-                <span>@T("Footer_Note")</span>
+                <span class="ms-auto">@(Loc.IsEn ? "Business operations system" : "نظام إدارة الأعمال")</span>
             </footer>
         </div>
     </div>

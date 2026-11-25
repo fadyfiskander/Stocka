@@ -48,7 +48,7 @@ public class UpdateWarehouseCommandHandler : IRequestHandler<UpdateWarehouseComm
 
         if (!string.IsNullOrWhiteSpace(request.Contract.Name))
         {
-            var duplicate = await _warehouseQueryRepository.GetByExactNameAsync(organizationId.Value, request.Contract.Name.Trim());
+            var duplicate = await _warehouseQueryRepository.GetByExactNameAsync(request.Contract.Name.Trim());
             if (duplicate != null && duplicate.Id != warehouse.Id.Value)
                 throw new InvalidOperationException($"A warehouse named '{request.Contract.Name.Trim()}' already exists.");
 
