@@ -1,4 +1,3 @@
-using BuildingBlocks.Application.Common.Models;
 using Inventory.Application.Common.Interfaces;
 using Inventory.Contracts.DTOs.Warehouse;
 using Inventory.Contracts.UseCases.WarehouseCases;
@@ -19,18 +18,6 @@ public record RegisterWarehouseCommandMediatR(RegisterWarehouseCommand Contract)
     object IContractRequest.Contract => Contract;
 }
 public record UpdateWarehouseCommandMediatR(UpdateWarehouseCommand Contract) : ICommand<WarehouseDto>, IContractRequest
-{
-    object IContractRequest.Contract => Contract;
-}
-public record RetrieveWarehouseQueryMediatR(RetrieveWarehouseQuery Contract) : IRequest<WarehouseDto>, IContractRequest
-{
-    object IContractRequest.Contract => Contract;
-}
-public record RetrieveWarehousesByNameQueryMediatR(RetrieveWarehousesByNameQuery Contract) : IRequest<IEnumerable<WarehouseDto>>, IContractRequest
-{
-    object IContractRequest.Contract => Contract;
-}
-public record ListWarehousesQueryMediatR(ListWarehousesQuery Contract) : IRequest<PaginatedResult<WarehouseDto>>, IContractRequest
 {
     object IContractRequest.Contract => Contract;
 }

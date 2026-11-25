@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Application.Abstractions;
+using Catalog.Contracts.UseCases.ProductCases;
 using Inventory.Application.Bindings.BatchCases;
 using Inventory.Application.Repositories.Commands;
 using Inventory.Contracts.DTOs.Batch;
@@ -17,11 +18,16 @@ public class RegisterBatchCommandHandler : IRequestHandler<RegisterBatchCommandM
 {
     private readonly IBatchRepository _batchRepository;
     private readonly ICurrentUserService _currentUser;
+    private readonly IProductCases _productCases;
 
-    public RegisterBatchCommandHandler(IBatchRepository batchRepository, ICurrentUserService currentUser)
+    public RegisterBatchCommandHandler(
+        IBatchRepository batchRepository,
+        ICurrentUserService currentUser,
+        IProductCases productCases)
     {
         _batchRepository = batchRepository;
         _currentUser = currentUser;
+        _productCases = productCases;
     }
 
     public async Task<BatchDto> Handle(RegisterBatchCommandMediatR request, CancellationToken cancellationToken)
@@ -39,15 +45,22 @@ public class RegisterBatchCommandHandler : IRequestHandler<RegisterBatchCommandM
 
         await _batchRepository.AddAsync(batch);
 
+        var product = await _productCases.RetrieveProductAsync(
+            new RetrieveProductQuery(batch.ProductId),
+            cancellationToken);
+
         return new BatchDto(
             batch.Id.Value,
-            batch.ProductId,
+            product.Name,
             batch.PurchaseItemId,
             batch.OrganizationId,
             batch.InitialQuantity,
             batch.RemainingQuantity,
             batch.UnitCost,
-            batch.CreatedAt);
+            batch.CreatedAt)
+        {
+            ProductId = batch.ProductId
+        };
     }
 }
 #endregion

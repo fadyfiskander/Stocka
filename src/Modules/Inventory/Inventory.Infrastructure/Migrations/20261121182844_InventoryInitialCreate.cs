@@ -36,7 +36,7 @@ namespace Inventory.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Warehouse",
+                name: "Warehouses",
                 schema: "Inventory",
                 columns: table => new
                 {
@@ -50,7 +50,7 @@ namespace Inventory.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Warehouse", x => x.Id);
+                    table.PrimaryKey("PK_Warehouses", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -85,7 +85,7 @@ namespace Inventory.Infrastructure.Migrations
                         name: "FK_StockMovements_Warehouses_WarehouseId",
                         column: x => x.WarehouseId,
                         principalSchema: "Inventory",
-                        principalTable: "Warehouse",
+                        principalTable: "Warehouses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -117,7 +117,7 @@ namespace Inventory.Infrastructure.Migrations
                         name: "FK_WarehouseBatches_Warehouses_WarehouseId",
                         column: x => x.WarehouseId,
                         principalSchema: "Inventory",
-                        principalTable: "Warehouse",
+                        principalTable: "Warehouses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -159,13 +159,6 @@ namespace Inventory.Infrastructure.Migrations
                 columns: new[] { "WarehouseId", "CreatedAt" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Warehouse_OrganizationId_Name",
-                schema: "Inventory",
-                table: "Warehouse",
-                columns: new[] { "OrganizationId", "Name" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "ix_warehouse_batches_warehouse_id_batch_id",
                 schema: "Inventory",
                 table: "WarehouseBatches",
@@ -177,6 +170,13 @@ namespace Inventory.Infrastructure.Migrations
                 schema: "Inventory",
                 table: "WarehouseBatches",
                 columns: new[] { "BatchId", "WarehouseId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Warehouses_OrganizationId_Name",
+                schema: "Inventory",
+                table: "Warehouses",
+                columns: new[] { "OrganizationId", "Name" },
                 unique: true);
         }
 
@@ -196,7 +196,7 @@ namespace Inventory.Infrastructure.Migrations
                 schema: "Inventory");
 
             migrationBuilder.DropTable(
-                name: "Warehouse",
+                name: "Warehouses",
                 schema: "Inventory");
         }
     }

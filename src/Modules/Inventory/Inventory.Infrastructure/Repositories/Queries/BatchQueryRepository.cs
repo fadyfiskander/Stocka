@@ -1,12 +1,12 @@
-﻿using Dapper;
+﻿using BuildingBlocks.Application.Abstractions;
+using BuildingBlocks.Application.Common.Models;
+using Dapper;
 using Inventory.Application.Common.Interfaces;
 using Inventory.Application.Repositories.Queries;
 using Inventory.Contracts.DTOs.Batch;
-using Inventory.Infrastructure.Repositories.Queries.Bases;
 using Inventory.Domain.Batches;
 using Inventory.Domain.Warehouses;
-using BuildingBlocks.Application.Common.Models;
-using System.Data;
+using Inventory.Infrastructure.Repositories.Queries.Bases;
 
 namespace Inventory.Infrastructure.Repositories.Queries
 {
@@ -15,91 +15,130 @@ namespace Inventory.Infrastructure.Repositories.Queries
         private const string BaseSelect =
             "SELECT Id, ProductId, PurchaseItemId, OrganizationId, InitialQuantity, RemainingQuantity, UnitCost, CreatedAt FROM " + TableBatches;
 
-        public BatchQueryRepository(IInventoryDbConnection connection) : base(connection)
+        public BatchQueryRepository(IInventoryDbConnection connection, ICurrentUserService currentUser)
+            : base(connection, currentUser)
         {
         }
 
-        public async Task<IEnumerable<BatchDto>> GetAllAsync(Guid organizationId)
-        {
-            var sql = $"{BaseSelect} WHERE OrganizationId = @OrganizationId ORDER BY CreatedAt DESC";
-            return await _connection.QueryAsync<BatchDto>(sql, new { OrganizationId = organizationId });
-        }
-
-        public async Task<PaginatedResult<BatchDto>> GetAllPagedAsync(Guid organizationId, int page, int pageSize)
+        public async Task<PaginatedResult<BatchProductGuidDto>> GetAllPagedAsync(
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken = default)
         {
             return await GetPagedCoreAsync(
-                organizationId,
                 " WHERE OrganizationId = @OrganizationId",
-                new { OrganizationId = organizationId },
-                page, pageSize);
+                new { OrganizationId },
+                page,
+                pageSize,
+                cancellationToken);
         }
 
-        public async Task<PaginatedResult<BatchDto>> GetByProductAsync(Guid organizationId, Guid productId, int page, int pageSize)
+        public async Task<PaginatedResult<BatchProductGuidDto>> GetByProductAsync(
+            Guid productId,
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken = default)
         {
-            if (productId == Guid.Empty) throw new ArgumentException("Product ID cannot be empty.", nameof(productId));
+            if (productId == Guid.Empty)
+                throw new ArgumentException("Product ID cannot be empty.", nameof(productId));
+
             return await GetPagedCoreAsync(
-                organizationId,
                 " WHERE OrganizationId = @OrganizationId AND ProductId = @ProductId",
-                new { OrganizationId = organizationId, ProductId = productId },
-                page, pageSize);
+                new { OrganizationId, ProductId = productId },
+                page,
+                pageSize,
+                cancellationToken);
         }
 
-        public async Task<PaginatedResult<BatchDto>> GetByPurchaseItemAsync(Guid organizationId, Guid purchaseItemId, int page, int pageSize)
+        public async Task<PaginatedResult<BatchProductGuidDto>> GetByPurchaseItemAsync(
+            Guid purchaseItemId,
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken = default)
         {
-            if (purchaseItemId == Guid.Empty) throw new ArgumentException("Purchase item ID cannot be empty.", nameof(purchaseItemId));
+            if (purchaseItemId == Guid.Empty)
+                throw new ArgumentException("Purchase item ID cannot be empty.", nameof(purchaseItemId));
+
             return await GetPagedCoreAsync(
-                organizationId,
                 " WHERE OrganizationId = @OrganizationId AND PurchaseItemId = @PurchaseItemId",
-                new { OrganizationId = organizationId, PurchaseItemId = purchaseItemId },
-                page, pageSize);
+                new { OrganizationId, PurchaseItemId = purchaseItemId },
+                page,
+                pageSize,
+                cancellationToken);
         }
 
-        private async Task<PaginatedResult<BatchDto>> GetPagedCoreAsync(Guid organizationId, string where, object parameters, int page, int pageSize)
+        private async Task<PaginatedResult<BatchProductGuidDto>> GetPagedCoreAsync(
+            string where,
+            object parameters,
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             page = Math.Max(1, page);
             pageSize = Math.Clamp(pageSize, 1, 100);
 
-            var countSql = "SELECT COUNT(*) FROM " + TableBatches + where;
-            var total = await _connection.ExecuteScalarAsync<int>(countSql, parameters);
+            var countSql = $"SELECT COUNT(*) FROM {TableBatches}{where}";
+            var countCommand = new CommandDefinition(
+                countSql,
+                parameters,
+                cancellationToken: cancellationToken);
+
+            var total = await _connection.ExecuteScalarAsync<int>(countCommand);
 
             var offset = (page - 1) * pageSize;
             var sql = $"{BaseSelect}{where} ORDER BY CreatedAt DESC OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
-            var merged = new System.Collections.Generic.Dictionary<string, object?>();
-            foreach (var prop in parameters.GetType().GetProperties())
-                merged[prop.Name] = prop.GetValue(parameters);
-            merged["Offset"] = offset;
-            merged["PageSize"] = pageSize;
 
-            var items = await _connection.QueryAsync<BatchDto>(sql, merged);
-            return new PaginatedResult<BatchDto>(items.ToList(), total, page, pageSize);
+            var dp = new DynamicParameters(parameters);
+            dp.Add("Offset", offset);
+            dp.Add("PageSize", pageSize);
+
+            var itemsCommand = new CommandDefinition(
+                sql,
+                dp,
+                cancellationToken: cancellationToken);
+
+            var items = await _connection.QueryAsync<BatchProductGuidDto>(itemsCommand);
+            return new PaginatedResult<BatchProductGuidDto>(items.ToList(), total, page, pageSize);
         }
 
-        public async Task<IEnumerable<BatchDto>> GetByWarehouseAsync(Guid organizationId, WarehouseId warehouseId)
+        public async Task<IEnumerable<BatchProductGuidDto>> GetByWarehouseAsync(
+            WarehouseId warehouseId,
+            CancellationToken cancellationToken = default)
         {
             // Batches currently holding (positive) stock in that warehouse.
             var sql = $"""
                 SELECT b.Id, b.ProductId, b.PurchaseItemId, b.OrganizationId, b.InitialQuantity, b.RemainingQuantity, b.UnitCost, b.CreatedAt
                 FROM {TableBatches} b
                 JOIN {TableWarehouseBatches} wb ON wb.BatchId = b.Id
-                WHERE wb.WarehouseId = @WarehouseId AND wb.Quantity > 0 AND wb.OrganizationId = @OrganizationId
+                WHERE wb.WarehouseId = @WarehouseId
+                  AND wb.Quantity > 0
+                  AND wb.OrganizationId = @OrganizationId
+                  AND b.OrganizationId = @OrganizationId
                 ORDER BY b.CreatedAt DESC
                 """;
-            return await _connection.QueryAsync<BatchDto>(sql, new { WarehouseId = warehouseId.Value, OrganizationId = organizationId });
+
+            var command = new CommandDefinition(
+                sql,
+                new { WarehouseId = warehouseId.Value, OrganizationId },
+                cancellationToken: cancellationToken);
+
+            return await _connection.QueryAsync<BatchProductGuidDto>(command);
         }
 
-        public async Task<IEnumerable<BatchDto>> GetUnallocatedAsync(Guid organizationId)
+        public async Task<IEnumerable<BatchProductGuidDto>> GetUnallocatedAsync(CancellationToken cancellationToken = default)
         {
             var sql = $"{BaseSelect} WHERE OrganizationId = @OrganizationId AND RemainingQuantity > 0 ORDER BY CreatedAt DESC";
-            return await _connection.QueryAsync<BatchDto>(sql, new { OrganizationId = organizationId });
+            var command = new CommandDefinition(
+                sql,
+                new { OrganizationId },
+                cancellationToken: cancellationToken);
+
+            return await _connection.QueryAsync<BatchProductGuidDto>(command);
         }
 
-        public async Task<IEnumerable<BatchDto>> GetExhaustedAsync(Guid organizationId)
-        {
-            var sql = $"{BaseSelect} WHERE OrganizationId = @OrganizationId AND RemainingQuantity = 0 ORDER BY CreatedAt DESC";
-            return await _connection.QueryAsync<BatchDto>(sql, new { OrganizationId = organizationId });
-        }
-
-        public async Task<BatchDto?> GetByIdAsync(Guid organizationId, BatchId id)
+        public async Task<BatchProductGuidDto?> GetByIdAsync(BatchId id, CancellationToken cancellationToken = default)
         {
             var sql = $"{BaseSelect} WHERE Id = @Id AND OrganizationId = @OrganizationId";
             return await _connection.QueryFirstOrDefaultAsync<BatchDto>(sql, new { Id = id.Value, OrganizationId = organizationId });

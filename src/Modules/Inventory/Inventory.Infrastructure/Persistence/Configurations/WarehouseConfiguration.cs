@@ -1,4 +1,3 @@
-﻿
 using Inventory.Domain.Warehouses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
