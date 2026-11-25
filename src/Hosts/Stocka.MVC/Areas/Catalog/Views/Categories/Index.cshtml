@@ -31,7 +31,6 @@
                     <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
                         <th class="px-4 py-2.5 text-start font-semibold text-[11.5px]">@(Loc.IsEn ? "Name" : "الاسم")</th>
                         <th class="px-4 py-2.5 text-start font-semibold text-[11.5px]">@(Loc.IsEn ? "Status" : "الحالة")</th>
-                        <th class="px-4 py-2.5 text-start font-semibold text-[11.5px]">@(Loc.IsEn ? "Organization" : "المؤسسة")</th>
                         <th class="px-4 py-2.5 text-end font-semibold text-[11.5px]">@(Loc.IsEn ? "Actions" : "الإجراءات")</th>
                     </tr>
                 </thead>
@@ -43,7 +42,6 @@
                             <tr class="border-b border-line last:border-0 hover:bg-sunken/50">
                                 <td class="px-4 py-3">
                                     <div class="font-semibold text-ink">@category.Name</div>
-                                    <div class="num mt-0.5 font-mono break-all text-[11.5px] text-ink-faint">@category.Id</div>
                                 </td>
                                 <td class="px-4 py-3">
                                     @if (category.IsActive)
@@ -55,7 +53,6 @@
                                         <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 font-semibold text-[11.5px] text-ink-soft">@(Loc.IsEn ? "Inactive" : "غير نشط")</span>
                                     }
                                 </td>
-                                <td class="px-4 py-3"><span class="num font-mono break-all text-[11.5px] text-ink-soft">@category.OrganizationId</span></td>
                                 <td class="px-4 py-3">
                                     <div class="flex flex-wrap items-center justify-end gap-1.5">
                                         <a class="@rowBtn" asp-area="Catalog" asp-controller="Categories" asp-action="Details" asp-route-id="@category.Id">@(Loc.IsEn ? "Details" : "التفاصيل")</a>

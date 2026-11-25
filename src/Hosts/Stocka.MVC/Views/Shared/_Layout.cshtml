@@ -216,8 +216,12 @@
                 </a>
 
                 <span class="@groupLabel" aria-hidden="true">@(Loc.IsEn ? "Catalog" : "المنتجات")</span>
-                <a class="@navLink @NavActive("Catalog", "Products")" asp-area="Catalog" asp-controller="Products" asp-action="Index">
+                <a class="@navLink @NavActive("Catalog", "Products", "Index")" asp-area="Catalog" asp-controller="Products" asp-action="Index">
                     <svg class="icon text-aside-accent/80"><use href="#i-box" /></svg><span class="@navText">@(Loc.IsEn ? "Products" : "المنتجات")</span>
+                </a>
+                <a class="@navLink @NavActive("Catalog", "Products", "Create")" asp-area="Catalog" asp-controller="Products" asp-action="Create">
+                    <svg class="icon text-aside-accent/80"><use href="#i-box" /></svg>
+                    <span class="@navText">@(Loc.IsEn ? "Create Product" : "انشاء منتج")</span>
                 </a>
                 <a class="@navLink @NavActive("Catalog", "Categories")" asp-area="Catalog" asp-controller="Categories" asp-action="Index">
                     <svg class="icon text-aside-accent/80"><use href="#i-tag" /></svg><span class="@navText">@(Loc.IsEn ? "Categories" : "التصنيفات")</span>
