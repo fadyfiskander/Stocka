@@ -141,7 +141,12 @@ namespace Inventory.Infrastructure.Repositories.Queries
         public async Task<BatchProductGuidDto?> GetByIdAsync(BatchId id, CancellationToken cancellationToken = default)
         {
             var sql = $"{BaseSelect} WHERE Id = @Id AND OrganizationId = @OrganizationId";
-            return await _connection.QueryFirstOrDefaultAsync<BatchDto>(sql, new { Id = id.Value, OrganizationId = organizationId });
+            var command = new CommandDefinition(
+                sql,
+                new { Id = id.Value, OrganizationId },
+                cancellationToken: cancellationToken);
+
+            return await _connection.QueryFirstOrDefaultAsync<BatchProductGuidDto>(command);
         }
     }
 }
