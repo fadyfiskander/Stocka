@@ -2379,6 +2379,11 @@
   inherits: false;
   initial-value: 0;
 }
+@property --tw-outline-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
 @property --tw-content {
   syntax: "*";
   initial-value: "";
@@ -2427,6 +2432,7 @@
       --tw-translate-x: 0;
       --tw-translate-y: 0;
       --tw-translate-z: 0;
+      --tw-outline-style: solid;
       --tw-content: "";
     }
   }

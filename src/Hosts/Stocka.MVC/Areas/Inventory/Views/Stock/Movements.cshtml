@@ -1,19 +1,19 @@
 ﻿@model PaginatedResult<Inventory.Contracts.DTOs.StockMovement.StockMovementDto>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = Loc.T("StockMovements_Title");
-    string T(string key) => Loc.T(key);
-    string MoveType(int t) => Loc.T(t switch
+    ViewData["Title"] = (Loc.IsEn ? "Stock movements" : "حركات المخزون");
+    string MoveType(int t) => t switch
     {
-        0 => "Move_PurchaseIn",
-        1 => "Move_SaleOut",
-        2 => "Move_TransferIn",
-        3 => "Move_TransferOut",
-        4 => "Move_AdjustmentIn",
-        5 => "Move_AdjustmentOut",
-        6 => "Move_OrderReturn",
-        _ => "Move_PurchaseIn"
-    });
+        0 => (Loc.IsEn ? "Purchase in" : "إدخال شراء"),
+        1 => (Loc.IsEn ? "Sale out" : "بيع خارج"),
+        2 => (Loc.IsEn ? "Transfer in" : "تحويل داخل"),
+        3 => (Loc.IsEn ? "Transfer out" : "تحويل خارج"),
+        4 => (Loc.IsEn ? "Adjustment in" : "تسوية داخل"),
+        5 => (Loc.IsEn ? "Adjustment out" : "تسوية خارج"),
+        6 => (Loc.IsEn ? "Order return" : "إرجاع طلب"),
+        _ => (Loc.IsEn ? "Purchase in" : "إدخال شراء")
+    };
+    bool IsIncoming(int t) => t == 0 || t == 2 || t == 4 || t == 6;
     int[] typeIds = { 0, 1, 2, 3, 4, 5, 6 };
     var warehouseId = (Guid?)ViewBag.WarehouseId;
     var batchId = (Guid?)ViewBag.BatchId;
@@ -21,89 +21,142 @@
     var from = (DateTime?)ViewBag.From;
     var to = (DateTime?)ViewBag.To;
     var types = (int?[]?)ViewBag.Types ?? Array.Empty<int?>();
+
+    const string input = "block h-10 w-full rounded-md border border-line bg-surface px-3 text-[13.5px] text-ink outline-none transition placeholder:text-ink-faint hover:border-line-strong focus:border-accent focus:ring-[3px] focus:ring-[var(--focus-ring)]";
+    const string pageBtn = "inline-flex h-8 items-center justify-center rounded-md border border-line bg-surface px-3 text-[12.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline";
+    const string pageOff = "inline-flex h-8 cursor-not-allowed items-center justify-center rounded-md border border-line bg-surface px-3 text-[12.5px] font-medium text-ink-faint opacity-45";
 }
 
-<div class="container-fluid py-4">
-    <h2 class="mb-1">@T("StockMovements_Title")</h2>
-    <p class="text-muted mb-3">@T("StockMovements_Sub")</p>
+<section class="grid gap-5">
+    <header class="border-b border-line pb-5">
+        <h1 class="text-[22px] font-bold tracking-[-.015em]">@(Loc.IsEn ? "Stock movements" : "حركات المخزون")</h1>
+        <p class="mt-1.5 max-w-[80ch] text-[13.5px] text-ink-soft">@(Loc.IsEn ? "Movement audit trail. Filters, pagination and aggregation run in the database." : "سجل تدقيق الحركات. التصفية والترقيم والتجميع تتم في قاعدة البيانات.")</p>
+    </header>
 
-    <form method="get" class="row g-2 mb-3" asp-area="Inventory" asp-controller="Stock" asp-action="Movements">
-        <div class="col-md-3"><input type="text" class="form-control" name="warehouseId" placeholder="@T("StockMovements_FilterWarehouse")" value="@warehouseId" /></div>
-        <div class="col-md-3"><input type="text" class="form-control" name="productId" placeholder="@T("StockMovements_FilterProduct")" value="@productId" /></div>
-        <div class="col-md-3"><input type="text" class="form-control" name="batchId" placeholder="@T("StockMovements_FilterBatch")" value="@batchId" /></div>
-        <div class="col-md-2"><input type="date" class="form-control" name="from" value="@(from?.ToString("yyyy-MM-dd"))" /></div>
-        <div class="col-md-2"><input type="date" class="form-control" name="to" value="@(to?.ToString("yyyy-MM-dd"))" /></div>
-        <div class="col-12 d-flex gap-3 align-items-center flex-wrap">
+    <form method="get" asp-area="Inventory" asp-controller="Stock" asp-action="Movements"
+          class="rounded-lg border border-line bg-surface p-4 shadow-card">
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            <input type="text" name="warehouseId" class="@input num font-mono" placeholder="@(Loc.IsEn ? "Warehouse (Guid)" : "المستودع (Guid)")" value="@warehouseId" />
+            <input type="text" name="productId" class="@input num font-mono" placeholder="@(Loc.IsEn ? "Product (Guid)" : "المنتج (Guid)")" value="@productId" />
+            <input type="text" name="batchId" class="@input num font-mono" placeholder="@(Loc.IsEn ? "Batch (Guid)" : "الدفعة (Guid)")" value="@batchId" />
+            <input type="date" name="from" class="@input num font-mono" value="@(from?.ToString("yyyy-MM-dd"))" />
+            <input type="date" name="to" class="@input num font-mono" value="@(to?.ToString("yyyy-MM-dd"))" />
+        </div>
+
+        <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line pt-4">
             @foreach (var id in typeIds)
             {
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="types" value="@id" id="type-@id" checked="@(types.Contains(id))" />
-                    <label class="form-check-label" for="type-@id">@MoveType(id)</label>
-                </div>
+                <label class="inline-flex cursor-pointer items-center gap-2 text-[12.5px] text-ink-soft">
+                    <input class="size-4 cursor-pointer rounded border-line accent-accent" type="checkbox" name="types" value="@id" id="type-@id" checked="@(types.Contains(id))" />
+                    <span>@MoveType(id)</span>
+                </label>
             }
-            <button type="submit" class="btn btn-sm btn-outline-primary">@T("StockMovements_ApplyFilters")</button>
-            <a class="btn btn-sm btn-outline-secondary" asp-area="Inventory" asp-controller="Stock" asp-action="Movements">@T("Common_Clear")</a>
+            <div class="ms-auto flex items-center gap-2">
+                <button type="submit" class="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-line bg-surface px-4 text-[13.5px] font-medium text-ink transition-colors hover:bg-sunken">
+                    <svg class="icon !size-4"><use href="#i-filter" /></svg>@(Loc.IsEn ? "Apply filters" : "تطبيق التصفية")
+                </button>
+                <a class="inline-flex h-9 items-center justify-center rounded-md px-4 text-[13.5px] font-medium text-ink-soft transition-colors hover:bg-sunken hover:text-ink hover:no-underline"
+                   asp-area="Inventory" asp-controller="Stock" asp-action="Movements">@(Loc.IsEn ? "Clear" : "مسح")</a>
+            </div>
         </div>
     </form>
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table-hover mb-0 table align-middle">
-                    <thead class="table-light">
+    <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[960px] border-collapse text-[13.5px]">
+                <thead>
+                    <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Date (UTC)" : "التاريخ (UTC)")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Type" : "النوع")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Quantity" : "الكمية")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Product" : "المنتج")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Batch" : "الدفعة")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Warehouse" : "المستودع")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Reference" : "المرجع")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Reason" : "السبب")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items.Any())
+                    {
+                        @foreach (var m in Model.Items)
+                        {
+                            <tr class="border-b border-line last:border-0 hover:bg-sunken/50">
+                                <td class="whitespace-nowrap px-4 py-3"><span class="num font-mono text-[12.5px] text-ink-soft" dir="ltr">@m.CreatedAt.ToString("yyyy-MM-dd HH:mm")</span></td>
+                                <td class="px-4 py-3">
+                                    @if (IsIncoming(m.MovementType))
+                                    {
+                                        <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@MoveType(m.MovementType)</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-flex items-center rounded-full bg-danger-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-danger">@MoveType(m.MovementType)</span>
+                                    }
+                                </td>
+                                <td class="px-4 py-3 text-end">
+                                    @if (IsIncoming(m.MovementType))
+                                    {
+                                        <span class="num font-bold text-ok" dir="ltr">+@m.Quantity</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="num font-bold text-danger" dir="ltr">-@m.Quantity</span>
+                                    }
+                                </td>
+                                <td class="px-4 py-3"><span class="num break-all font-mono text-[12px] text-ink-soft">@m.ProductId</span></td>
+                                <td class="px-4 py-3">
+                                    <a class="num break-all font-mono text-[12px] font-medium" asp-area="Inventory" asp-controller="Batches" asp-action="Details" asp-route-id="@m.BatchId">@m.BatchId</a>
+                                </td>
+                                <td class="px-4 py-3"><span class="num break-all font-mono text-[12px] text-ink-soft">@m.WarehouseId</span></td>
+                                <td class="px-4 py-3"><span class="num break-all font-mono text-[12px] text-ink-faint">@(m.ReferenceId?.ToString() ?? "-")</span></td>
+                                <td class="px-4 py-3 text-ink-soft">@m.Reason</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
                         <tr>
-                            <th class="ps-4">@T("Common_Date")</th>
-                            <th>@T("Common_Type")</th>
-                            <th>@T("Common_Quantity")</th>
-                            <th>@T("Common_Product")</th>
-                            <th>@T("Common_Batch")</th>
-                            <th>@T("Common_Warehouse")</th>
-                            <th>@T("Common_Reference")</th>
-                            <th>@T("Common_Reason")</th>
+                            <td colspan="8" class="px-6 py-14 text-center">
+                                <svg class="icon mx-auto !size-8 text-ink-faint"><use href="#i-swap" /></svg>
+                                <p class="mt-2 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No movements match the filters." : "لا توجد حركات مطابقة للتصفية.")</p>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.Items.Any())
-                        {
-                            @foreach (var m in Model.Items)
-                            {
-                                <tr>
-                                    <td class="ps-4">@m.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
-                                    <td><span class="badge text-bg-@(m.MovementType == 0 || m.MovementType == 2 || m.MovementType == 4 || m.MovementType == 6 ? "success" : "danger")">@MoveType(m.MovementType)</span></td>
-                                    <td>@m.Quantity</td>
-                                    <td><small>@m.ProductId</small></td>
-                                    <td><a asp-area="Inventory" asp-controller="Batches" asp-action="Details" asp-route-id="@m.BatchId"><small>@m.BatchId</small></a></td>
-                                    <td><small>@m.WarehouseId</small></td>
-                                    <td><small>@(m.ReferenceId?.ToString() ?? "-")</small></td>
-                                    <td><small>@m.Reason</small></td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr><td colspan="8" class="py-5 text-center text-muted">@T("StockMovements_Empty")</td></tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 
     @if (string.IsNullOrWhiteSpace(Context.Request.Query["batchId"]))
     {
-        <div class="d-flex justify-content-between align-items-center mt-3">
-            <small class="text-muted">@Loc.F("StockMovements_PageInfo", Model.Page, Model.TotalPages, Model.TotalCount)</small>
-            <div class="btn-group">
-                <a asp-area="Inventory" asp-controller="Stock" asp-action="Movements"
-                   asp-route-warehouseId="@warehouseId" asp-route-batchId="@batchId" asp-route-productId="@productId"
-                   asp-route-from="@from" asp-route-to="@to" asp-route-page="@(Model.Page - 1)"
-                   class="btn btn-sm btn-outline-secondary @(Model.HasPrevious ? "" : "disabled")">@T("Common_Previous")</a>
-                <a asp-area="Inventory" asp-controller="Stock" asp-action="Movements"
-                   asp-route-warehouseId="@warehouseId" asp-route-batchId="@batchId" asp-route-productId="@productId"
-                   asp-route-from="@from" asp-route-to="@to" asp-route-page="@(Model.Page + 1)"
-                   class="btn btn-sm btn-outline-secondary @(Model.HasNext ? "" : "disabled")">@T("Common_Next")</a>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <span class="text-[12.5px] text-ink-faint">@(Loc.IsEn ? $"Page {Model.Page} of {Model.TotalPages} ({Model.TotalCount} movements)" : $"صفحة {Model.Page} من {Model.TotalPages} ({Model.TotalCount} حركة)")</span>
+            <div class="flex items-center gap-1.5">
+                @if (Model.HasPrevious)
+                {
+                    <a class="@pageBtn" asp-area="Inventory" asp-controller="Stock" asp-action="Movements"
+                       asp-route-warehouseId="@warehouseId" asp-route-batchId="@batchId" asp-route-productId="@productId"
+                       asp-route-from="@from" asp-route-to="@to" asp-route-page="@(Model.Page - 1)">
+                        <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Previous" : "السابق")
+                    </a>
+                }
+                else
+                {
+                    <span class="@pageOff"><svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Previous" : "السابق")</span>
+                }
+                @if (Model.HasNext)
+                {
+                    <a class="@pageBtn" asp-area="Inventory" asp-controller="Stock" asp-action="Movements"
+                       asp-route-warehouseId="@warehouseId" asp-route-batchId="@batchId" asp-route-productId="@productId"
+                       asp-route-from="@from" asp-route-to="@to" asp-route-page="@(Model.Page + 1)">
+                        @(Loc.IsEn ? "Next" : "التالي")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg>
+                    </a>
+                }
+                else
+                {
+                    <span class="@pageOff">@(Loc.IsEn ? "Next" : "التالي")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg></span>
+                }
             </div>
         </div>
     }
-    <div class="mb-5"></div>
-</div>
+</section>

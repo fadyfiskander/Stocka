@@ -20,14 +20,9 @@
             ? fn()
             : document.addEventListener("DOMContentLoaded", fn);
 
-    ready(() => {
-        Theme.init();
-        Shell.init();
-        NavGroups.init();
-        Alerts.init();
-        Validator.init();
-        FileFields.init();
-    });
+    /* NOTE: init runs at the very bottom of this IIFE — the modules below are
+       `const` declarations, and calling them here would hit the temporal dead
+       zone (deferred scripts already see readyState "interactive"). */
 
     /* ------------------------------------------------------------
        1) Theme
@@ -331,4 +326,16 @@
             });
         }
     };
+
+    /* ------------------------------------------------------------
+       Boot — every module above is declared; safe to initialize.
+       ------------------------------------------------------------ */
+    ready(() => {
+        Theme.init();
+        Shell.init();
+        NavGroups.init();
+        Alerts.init();
+        Validator.init();
+        FileFields.init();
+    });
 })();

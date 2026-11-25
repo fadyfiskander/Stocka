@@ -26,7 +26,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
         [HttpGet("Index")]
         public async Task<IActionResult> Index(bool? isActive, int page = 1, int pageSize = 20)
         {
-            ViewBag.Title = Loc.T("Warehouses_Title");
+            ViewBag.Title = (Loc.IsEn ? "Warehouses" : "المستودعات");
             var query = new ListWarehousesQuery { IsActive = isActive, Page = page, PageSize = pageSize };
             var warehouses = await _warehouseCases.ListWarehousesAsync(query);
             return View(warehouses);
@@ -38,13 +38,13 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
         {
             if (id == Guid.Empty)
             {
-                TempData["Error"] = Loc.T("Msg_WarehouseIdRequired");
+                TempData["Error"] = (Loc.IsEn ? "Warehouse ID is required." : "معرّف المستودع مطلوب.");
                 return RedirectToAction(nameof(Index));
             }
 
             try
             {
-                ViewBag.Title = Loc.T("Warehouses_DetailsTitle");
+                ViewBag.Title = (Loc.IsEn ? "Warehouse details" : "تفاصيل المستودع");
                 var warehouse = await _warehouseCases.RetrieveWarehouseAsync(new RetrieveWarehouseQuery(id));
                 var inventory = await _reportCases.GetWarehouseInventoryAsync(new WarehouseInventoryQuery(id, inventoryPage, pageSize));
                 var rankedStock = await _reportCases.GetWarehousesRankedByStockAsync(new WarehousesRankedByStockQuery(Descending: true, Page: 1, PageSize: 100));
@@ -69,7 +69,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
         [HttpGet("Create")]
         public IActionResult Create()
         {
-            ViewBag.Title = Loc.T("Warehouses_CreateTitle");
+            ViewBag.Title = (Loc.IsEn ? "Register warehouse" : "تسجيل مستودع");
             return View(new RegisterWarehouseCommand());
         }
 
@@ -84,7 +84,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
             try
             {
                 var result = await _warehouseCases.RegisterWarehouseAsync(command);
-                TempData["Success"] = Loc.F("Msg_WarehouseRegistered", result.Name);
+                TempData["Success"] = (Loc.IsEn ? $"Warehouse '{result.Name}' registered." : $"تم تسجيل المستودع «{result.Name}».");
                 return RedirectToAction(nameof(Details), new { id = result.Id });
             }
             catch (ArgumentException ex)
@@ -105,14 +105,14 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
         {
             if (id == Guid.Empty)
             {
-                TempData["Error"] = Loc.T("Msg_WarehouseIdRequired");
+                TempData["Error"] = (Loc.IsEn ? "Warehouse ID is required." : "معرّف المستودع مطلوب.");
                 return RedirectToAction(nameof(Index));
             }
 
             try
             {
                 var warehouse = await _warehouseCases.RetrieveWarehouseAsync(new RetrieveWarehouseQuery(id));
-                ViewBag.Title = Loc.T("Warehouses_EditTitle");
+                ViewBag.Title = (Loc.IsEn ? "Edit warehouse" : "تعديل مستودع");
                 return View(new UpdateWarehouseCommand
                 {
                     WarehouseId = warehouse.Id,
@@ -140,7 +140,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
             try
             {
                 var result = await _warehouseCases.UpdateWarehouseAsync(command);
-                TempData["Success"] = Loc.F("Msg_WarehouseUpdated", result.Name);
+                TempData["Success"] = (Loc.IsEn ? $"Warehouse '{result.Name}' updated." : $"تم تحديث المستودع «{result.Name}».");
                 return RedirectToAction(nameof(Details), new { id = result.Id });
             }
             catch (KeyNotFoundException ex)
@@ -168,7 +168,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
             try
             {
                 var result = await _warehouseCases.ActivateWarehouseAsync(new ActivateWarehouseCommand(id));
-                TempData["Success"] = Loc.F("Msg_WarehouseActivated", result.Name);
+                TempData["Success"] = (Loc.IsEn ? $"Warehouse '{result.Name}' activated." : $"تم تفعيل المستودع «{result.Name}».");
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is ArgumentException || ex is InvalidOperationException)
             {
@@ -186,7 +186,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
             try
             {
                 var result = await _warehouseCases.DeactivateWarehouseAsync(new DeactivateWarehouseCommand(id));
-                TempData["Success"] = Loc.F("Msg_WarehouseDeactivated", result.Name);
+                TempData["Success"] = (Loc.IsEn ? $"Warehouse '{result.Name}' deactivated (historical data preserved)." : $"تم إيقاف المستودع «{result.Name}» (حُفظت البيانات التاريخية).");
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is ArgumentException || ex is InvalidOperationException)
             {
@@ -200,7 +200,7 @@ namespace Stocka.MVC.Areas.Inventory.Controllers
         [HttpGet("SearchByName")]
         public async Task<IActionResult> SearchByName(string? name)
         {
-            ViewBag.Title = Loc.T("Warehouses_SearchTitle");
+            ViewBag.Title = (Loc.IsEn ? "Search warehouses" : "بحث عن مستودعات");
             if (string.IsNullOrWhiteSpace(name))
                 return View(Enumerable.Empty<WarehouseDto>());
 

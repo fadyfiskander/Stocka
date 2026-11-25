@@ -44,6 +44,9 @@ namespace Catalog.Application.Services
 
         public Task<IEnumerable<ProductDto>> ListProductsAsync(Guid? organizationId = null, CancellationToken cancellationToken = default)
             => _productCases.ListProductsAsync(new ListProductsQuery { OrganizationId = organizationId }, cancellationToken);
+
+        public Task<IEnumerable<ProductDto>> GetProductsByIdsAsync(List<Guid> ids, CancellationToken cancellationToken = default)
+            => _productCases.ListProductsByIdsAsync(new ListProductsByIdsQuery(ids), cancellationToken);
         #endregion
 
         #region Categories
@@ -67,6 +70,7 @@ namespace Catalog.Application.Services
 
         public Task<IEnumerable<CategoryDto>> ListCategoriesAsync(Guid organizationId = default, CancellationToken cancellationToken = default)
             => _categoryCases.ListCategoriesAsync(new ListCategoriesQuery { OrganizationId = organizationId }, cancellationToken);
+
         #endregion
     }
 }

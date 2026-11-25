@@ -1,88 +1,97 @@
-@model CategoryDto
+﻿@model CategoryDto
 @{
-    ViewData["Title"] = Loc.T("Categories_SearchTitle");
+    ViewData["Title"] = (Loc.IsEn ? "Search category" : "بحث عن تصنيف");
     Layout = "~/Views/Shared/_Layout.cshtml";
-    string T(string key) => Loc.T(key);
+
+    const string label = "mb-1.5 block text-[12.5px] font-semibold text-ink-soft";
+    const string input = "block h-10 w-full rounded-md border border-line bg-surface px-3 text-[13.5px] text-ink outline-none transition placeholder:text-ink-faint hover:border-line-strong focus:border-accent focus:ring-[3px] focus:ring-[var(--focus-ring)]";
+    const string btnGhost = "inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-line bg-surface px-4 text-[13.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline";
+    const string btnPrimary = "inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-accent px-4 text-[13.5px] font-semibold text-on-accent transition-colors hover:bg-accent-hover hover:no-underline";
+    const string dt = "text-[11.5px] font-semibold tracking-wide text-ink-faint";
 }
 
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="mb-4">
-                <h2 class="mb-1">@T("Categories_SearchHeading")</h2>
+<div class="mx-auto max-w-[52rem]">
+    <header class="mb-5 border-b border-line pb-5">
+        <h1 class="font-bold tracking-[-.015em] text-[22px]">@(Loc.IsEn ? "Search category by name" : "بحث عن تصنيف بالاسم")</h1>
+    </header>
+
+    <form asp-area="Catalog" asp-controller="Categories" asp-action="SearchByName" method="get"
+          class="shadow-card mb-5 rounded-lg border border-line bg-surface p-5">
+        <div class="flex flex-wrap items-end gap-3">
+            <div class="min-w-[220px] flex-1">
+                <label for="q-name" class="@label">@(Loc.IsEn ? "Category name" : "اسم التصنيف")</label>
+                <input id="q-name" name="name" value="@Context.Request.Query["name"]" class="@input" placeholder="@(Loc.IsEn ? "Enter category name to search" : "أدخل اسم التصنيف للبحث")" />
             </div>
+            <button type="submit" class="@btnPrimary">
+                <svg class="icon !size-4"><use href="#i-search" /></svg>@(Loc.IsEn ? "Search" : "بحث")
+            </button>
+        </div>
 
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body p-4">
-                    <form asp-area="Catalog" asp-controller="Categories" asp-action="SearchByName" method="get" class="row g-3">
-                        <div class="col-md-9">
-                            <label class="form-label">@T("Categories_Name")</label>
-                            <input name="name" value="@Context.Request.Query["name"]" class="form-control" placeholder="@T("Categories_SearchPlaceholder")" />
-                        </div>
-                        <div class="col-md-3 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary w-100">@T("Common_Search")</button>
-                        </div>
-                    </form>
-                    @if (ViewBag.NotFound != null)
-                    {
-                        <div class="alert alert-warning mt-3 mb-0">@ViewBag.NotFound</div>
-                    }
-                    @if (ViewBag.Error != null)
-                    {
-                        <div class="alert alert-danger mt-3 mb-0">@ViewBag.Error</div>
-                    }
-                </div>
+        @if (ViewBag.NotFound != null)
+        {
+            <div class="mt-4 flex items-start gap-3 rounded-md border border-warn/30 bg-warn-tint px-4 py-3 text-[13px] text-warn">
+                <svg class="icon mt-0.5 !size-4 shrink-0"><use href="#i-alert" /></svg><span>@ViewBag.NotFound</span>
             </div>
+        }
+        @if (ViewBag.Error != null)
+        {
+            <div class="mt-4 flex items-start gap-3 rounded-md border border-danger/30 bg-danger-tint px-4 py-3 text-[13px] text-danger">
+                <svg class="icon mt-0.5 !size-4 shrink-0"><use href="#i-alert" /></svg><span>@ViewBag.Error</span>
+            </div>
+        }
+    </form>
 
-            @if (Model != null)
-            {
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-4">
-                        <h5 class="card-title">@T("Categories_Result")</h5>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label text-muted small mb-1">@T("Common_Id")</label>
-                                <div class="fw-semibold font-monospace small">@Model.Id</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label text-muted small mb-1">@T("Common_OrganizationId")</label>
-                                <div class="fw-semibold font-monospace small">@Model.OrganizationId</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label text-muted small mb-1">@T("Common_Name")</label>
-                                <div class="fw-semibold">@Model.Name</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label text-muted small mb-1">@T("Common_Status")</label>
-                                <div>
-                                    @if (Model.IsActive)
-                                    {
-                                        <span class="badge text-bg-success">@T("Common_Active")</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge text-bg-secondary">@T("Common_Inactive")</span>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-4 d-flex gap-2">
-                            <a asp-area="Catalog" asp-controller="Categories" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-primary btn-sm">@T("Common_ViewDetails")</a>
-                            <a asp-area="Catalog" asp-controller="Categories" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-secondary btn-sm">@T("Common_Edit")</a>
-                        </div>
-                    </div>
+    @if (Model != null)
+    {
+        <div class="shadow-card rounded-lg border border-line bg-surface">
+            <div class="flex items-center gap-2.5 border-b border-line px-5 py-3">
+                <svg class="icon !size-[18px] text-accent"><use href="#i-tag" /></svg>
+                <span class="font-semibold text-[14px] text-ink">@(Loc.IsEn ? "Result" : "النتيجة")</span>
+            </div>
+            <dl class="grid gap-x-6 gap-y-5 p-5 sm:grid-cols-2">
+                <div class="min-w-0">
+                    <dt class="@dt">@(Loc.IsEn ? "ID" : "المعرّف")</dt>
+                    <dd class="num mt-1 font-mono break-all text-[12.5px] text-ink-soft">@Model.Id</dd>
                 </div>
-            }
-            else if (!string.IsNullOrWhiteSpace(Context.Request.Query["name"]) && ViewBag.NotFound == null)
-            {
-                <div class="text-center text-muted py-4">
-                    <p>@T("Categories_SearchEmpty")</p>
+                <div class="min-w-0">
+                    <dt class="@dt">@(Loc.IsEn ? "Organization ID" : "معرّف المؤسسة")</dt>
+                    <dd class="num mt-1 font-mono break-all text-[12.5px] text-ink-soft">@Model.OrganizationId</dd>
                 </div>
-            }
-
-            <div class="mt-3">
-                <a asp-area="Catalog" asp-controller="Categories" asp-action="Index" class="btn btn-light">@T("Common_BackToList")</a>
+                <div class="min-w-0">
+                    <dt class="@dt">@(Loc.IsEn ? "Name" : "الاسم")</dt>
+                    <dd class="mt-1 font-bold text-[16px] text-ink">@Model.Name</dd>
+                </div>
+                <div class="min-w-0">
+                    <dt class="@dt">@(Loc.IsEn ? "Status" : "الحالة")</dt>
+                    <dd class="mt-1">
+                        @if (Model.IsActive)
+                        {
+                            <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 font-semibold text-[11.5px] text-ok">@(Loc.IsEn ? "Active" : "نشط")</span>
+                        }
+                        else
+                        {
+                            <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 font-semibold text-[11.5px] text-ink-soft">@(Loc.IsEn ? "Inactive" : "غير نشط")</span>
+                        }
+                    </dd>
+                </div>
+            </dl>
+            <div class="flex flex-wrap gap-2 border-t border-line bg-sunken/30 px-5 py-4">
+                <a class="@btnPrimary" asp-area="Catalog" asp-controller="Categories" asp-action="Details" asp-route-id="@Model.Id">@(Loc.IsEn ? "View details" : "عرض التفاصيل")</a>
+                <a class="@btnGhost" asp-area="Catalog" asp-controller="Categories" asp-action="Edit" asp-route-id="@Model.Id">@(Loc.IsEn ? "Edit" : "تعديل")</a>
             </div>
         </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(Context.Request.Query["name"]) && ViewBag.NotFound == null)
+    {
+        <div class="rounded-lg border border-dashed border-line-strong px-6 py-12 text-center">
+            <svg class="icon mx-auto !size-7 text-ink-faint"><use href="#i-search" /></svg>
+            <p class="mt-2 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No category found. Try another name." : "لم يتم العثور على تصنيف. جرّب اسماً آخر.")</p>
+        </div>
+    }
+
+    <div class="mt-5">
+        <a class="@btnGhost" asp-area="Catalog" asp-controller="Categories" asp-action="Index">
+            <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Back to list" : "العودة للقائمة")
+        </a>
     </div>
 </div>

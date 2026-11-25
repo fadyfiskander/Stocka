@@ -52,6 +52,7 @@ public class AllocateStockCommandHandler : IRequestHandler<AllocateStockCommandM
 
         var warehouse = await _warehouseRepository.GetByIdAsync(WarehouseId.From(request.Contract.WarehouseId))
             ?? throw new KeyNotFoundException(StockOperationMessages.WarehouseNotFound);
+
         if (warehouse.OrganizationId != organizationId) throw new KeyNotFoundException(StockOperationMessages.WarehouseNotFound);
         if (!warehouse.IsActive) throw new InvalidOperationException(StockOperationMessages.WarehouseInactive);
 

@@ -1,7 +1,8 @@
 ﻿@{
-    ViewData["Title"] = Loc.T("Privacy_Title");
-    string T(string key) => Loc.T(key);
+    ViewData["Title"] = (Loc.IsEn ? "Privacy policy" : "سياسة الخصوصية");
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>@T("Privacy_Body")</p>
+<article class="mx-auto max-w-[68ch] rounded-lg border border-line bg-surface p-6 shadow-card sm:p-8">
+    <h1 class="text-[22px] font-bold tracking-[-.015em]">@(Loc.IsEn ? "Privacy policy" : "سياسة الخصوصية")</h1>
+    <p class="mt-3 text-[14px] leading-relaxed text-ink-soft">@(Loc.IsEn ? "Use this page to detail your site's privacy policy." : "استخدم هذه الصفحة لتفصيل سياسة الخصوصية لموقعك.")</p>
+</article>

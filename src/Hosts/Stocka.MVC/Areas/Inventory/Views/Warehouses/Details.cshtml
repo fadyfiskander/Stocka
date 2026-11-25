@@ -1,89 +1,158 @@
 ﻿@model WarehouseDto
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = Loc.T("Warehouses_DetailsTitle");
-    string T(string key) => Loc.T(key);
+    ViewData["Title"] = (Loc.IsEn ? "Warehouse details" : "تفاصيل المستودع");
     var inventory = (PaginatedResult<Inventory.Contracts.DTOs.Reports.WarehouseInventoryItemDto>?)ViewBag.Inventory;
+
+    const string btnGhost = "inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-line bg-surface px-4 text-[13.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline";
+    const string btnPrimary = "inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-accent px-4 text-[13.5px] font-semibold text-on-accent transition-colors hover:bg-accent-hover hover:no-underline";
+    const string pageBtn = "inline-flex h-8 items-center justify-center rounded-md border border-line bg-surface px-3 text-[12.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline";
+    const string pageOff = "inline-flex h-8 cursor-not-allowed items-center justify-center rounded-md border border-line bg-surface px-3 text-[12.5px] font-medium text-ink-faint opacity-45";
+    const string dt = "text-[11.5px] font-semibold tracking-wide text-ink-faint";
 }
 
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<section class="grid gap-5">
+    <header class="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
         <div>
-            <h2 class="mb-1">@Model.Name <span class="badge text-bg-@(Model.IsActive ? "success" : "secondary")">@(Model.IsActive ? T("Common_Active") : T("Common_Inactive"))</span></h2>
-            <p class="text-muted mb-0">@Model.Location &middot; @(Model.Type == 0 ? T("Warehouses_Type_Shop") : T("Warehouses_Type_Storage")) &middot; @Loc.F("Warehouses_DetailsSub", ViewBag.TotalUnits)</p>
-        </div>
-        <div class="d-flex gap-2">
-            <a class="btn btn-outline-secondary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Edit" asp-route-id="@Model.Id">@T("Common_Edit")</a>
-            <a class="btn btn-outline-secondary" asp-area="Inventory" asp-controller="Stock" asp-action="Movements" asp-route-warehouseId="@Model.Id">@T("Warehouses_Movements")</a>
-            <a class="btn btn-outline-primary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index">@T("Common_BackToList")</a>
-        </div>
-    </div>
-
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white"><strong>@T("Warehouses_DetailsTitle")</strong></div>
-        <div class="card-body">
-            <dl class="row mb-0">
-                <dt class="col-sm-3">@T("Common_Name")</dt><dd class="col-sm-9">@Model.Name</dd>
-                <dt class="col-sm-3">@T("Common_Location")</dt><dd class="col-sm-9">@Model.Location</dd>
-                <dt class="col-sm-3">@T("Common_Description")</dt><dd class="col-sm-9">@Model.Description</dd>
-                <dt class="col-sm-3">@T("Common_Organization")</dt><dd class="col-sm-9">@Model.OrganizationId</dd>
-                <dt class="col-sm-3">@T("Warehouses_WarehouseId")</dt><dd class="col-sm-9">@Model.Id</dd>
-            </dl>
-        </div>
-    </div>
-
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white"><strong>@T("Warehouses_InventoryTitle")</strong></div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table-hover mb-0 table align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="ps-4">@T("Common_Product")</th>
-                            <th>@T("Common_Batch")</th>
-                            <th>@T("Common_Quantity")</th>
-                            <th>@T("Warehouses_BatchUnitCost")</th>
-                            <th class="pe-4 text-end">@T("Warehouses_LineCost")</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (inventory != null && inventory.Items.Any())
-                        {
-                            @foreach (var item in inventory.Items)
-                            {
-                                <tr>
-                                    <td class="ps-4"><small>@item.ProductId</small></td>
-                                    <td>
-                                        <a asp-area="Inventory" asp-controller="Batches" asp-action="Details" asp-route-id="@item.BatchId"><small>@item.BatchId</small></a>
-                                    </td>
-                                    <td>@item.Quantity</td>
-                                    <td>@item.BatchUnitCost.ToString("N2")</td>
-                                    <td class="pe-4 text-end">@item.LineCost.ToString("N2")</td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr><td colspan="5" class="py-5 text-center text-muted">@T("Warehouses_InventoryEmpty")</td></tr>
-                        }
-                    </tbody>
-                </table>
+            <div class="flex flex-wrap items-center gap-2.5">
+                <h1 class="text-[22px] font-bold tracking-[-.015em]">@Model.Name</h1>
+                @if (Model.IsActive)
+                {
+                    <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@(Loc.IsEn ? "Active" : "نشط")</span>
+                }
+                else
+                {
+                    <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@(Loc.IsEn ? "Inactive" : "غير نشط")</span>
+                }
             </div>
+            <p class="mt-1.5 flex flex-wrap items-center gap-x-2 text-[13.5px] text-ink-soft">
+                <span>@Model.Location</span>
+                <span class="text-ink-faint">·</span>
+                <span>@(Model.Type == 0 ? (Loc.IsEn ? "Shop" : "متجر") : (Loc.IsEn ? "Storage" : "مخزن"))</span>
+                <span class="text-ink-faint">·</span>
+                <span>@(Loc.IsEn ? $"{ViewBag.TotalUnits} current units (raw unit count)" : $"{ViewBag.TotalUnits} وحدة حالية (عدد وحدات خام)")</span>
+            </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+            <a class="@btnGhost" asp-area="Inventory" asp-controller="Stock" asp-action="Movements" asp-route-warehouseId="@Model.Id">
+                <svg class="icon !size-4"><use href="#i-swap" /></svg>@(Loc.IsEn ? "Movements" : "الحركات")
+            </a>
+            <a class="@btnGhost" asp-area="Inventory" asp-controller="Warehouses" asp-action="Edit" asp-route-id="@Model.Id">
+                <svg class="icon !size-4"><use href="#i-pencil" /></svg>@(Loc.IsEn ? "Edit" : "تعديل")
+            </a>
+            <a class="@btnPrimary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index">
+                <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Back to list" : "العودة للقائمة")
+            </a>
+        </div>
+    </header>
+
+    <div class="rounded-lg border border-line bg-surface shadow-card">
+        <div class="flex items-center gap-2.5 border-b border-line px-5 py-3">
+            <svg class="icon !size-[18px] text-accent"><use href="#i-store" /></svg>
+            <span class="text-[14px] font-semibold text-ink">@(Loc.IsEn ? "Warehouse details" : "تفاصيل المستودع")</span>
+        </div>
+        <dl class="grid gap-x-6 gap-y-5 p-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="min-w-0">
+                <dt class="@dt">@(Loc.IsEn ? "Name" : "الاسم")</dt>
+                <dd class="mt-1 text-[14px] font-semibold text-ink">@Model.Name</dd>
+            </div>
+            <div class="min-w-0">
+                <dt class="@dt">@(Loc.IsEn ? "Location" : "الموقع")</dt>
+                <dd class="mt-1 text-[14px] font-semibold text-ink">@Model.Location</dd>
+            </div>
+            <div class="min-w-0 sm:col-span-2 lg:col-span-1">
+                <dt class="@dt">@(Loc.IsEn ? "Description" : "الوصف")</dt>
+                <dd class="mt-1 text-[13.5px] text-ink-soft">@Model.Description</dd>
+            </div>
+            <div class="min-w-0">
+                <dt class="@dt">@(Loc.IsEn ? "Organization" : "المؤسسة")</dt>
+                <dd class="num mt-1 break-all font-mono text-[12.5px] text-ink-soft">@Model.OrganizationId</dd>
+            </div>
+            <div class="min-w-0">
+                <dt class="@dt">@(Loc.IsEn ? "Warehouse ID" : "معرّف المستودع")</dt>
+                <dd class="num mt-1 break-all font-mono text-[12.5px] text-ink-soft">@Model.Id</dd>
+            </div>
+        </dl>
+    </div>
+
+    <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
+        <div class="flex items-center justify-between gap-3 border-b border-line px-5 py-3">
+            <span class="flex items-center gap-2.5 text-[14px] font-semibold text-ink">
+                <svg class="icon !size-[18px] text-accent"><use href="#i-layers" /></svg>
+                @(Loc.IsEn ? "Inventory (product & batch breakdown)" : "المخزون (تفصيل المنتج والدفعة)")
+            </span>
+            @if (inventory != null)
+            {
+                <span class="num rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@inventory.TotalCount</span>
+            }
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[720px] border-collapse text-[13.5px]">
+                <thead>
+                    <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Product" : "المنتج")</th>
+                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Batch" : "الدفعة")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Quantity" : "الكمية")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Batch unit cost" : "تكلفة وحدة الدفعة")</th>
+                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Line cost (recorded, no valuation policy)" : "تكلفة السطر (مُسجّلة، بلا سياسة تقييم)")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (inventory != null && inventory.Items.Any())
+                    {
+                        @foreach (var item in inventory.Items)
+                        {
+                            <tr class="border-b border-line last:border-0 hover:bg-sunken/50">
+                                <td class="px-4 py-3"><span class="num break-all font-mono text-[12px] text-ink-soft">@item.ProductId</span></td>
+                                <td class="px-4 py-3">
+                                    <a class="num break-all font-mono text-[12px] font-medium" asp-area="Inventory" asp-controller="Batches" asp-action="Details" asp-route-id="@item.BatchId">@item.BatchId</a>
+                                </td>
+                                <td class="num px-4 py-3 text-end font-semibold text-ink">@item.Quantity</td>
+                                <td class="num px-4 py-3 text-end text-ink-soft">@item.BatchUnitCost.ToString("N2")</td>
+                                <td class="num px-4 py-3 text-end font-semibold text-ink">@item.LineCost.ToString("N2")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="px-6 py-12 text-center">
+                                <svg class="icon mx-auto !size-7 text-ink-faint"><use href="#i-layers" /></svg>
+                                <p class="mt-2 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No stock placements recorded in this warehouse." : "لا توجد أرصدة مخزون مسجّلة في هذا المستودع.")</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 
     @if (inventory != null)
     {
-        <div class="d-flex justify-content-between align-items-center mt-3">
-            <small class="text-muted">@Loc.F("Common_PageOf", inventory.Page, inventory.TotalPages) @Loc.F("Warehouses_Placements", inventory.TotalCount)</small>
-            <div class="btn-group">
-                <a asp-area="Inventory" asp-controller="Warehouses" asp-action="Details" asp-route-id="@Model.Id" asp-route-inventoryPage="@(inventory.Page - 1)"
-                   class="btn btn-sm btn-outline-secondary @(inventory.HasPrevious ? "" : "disabled")">@T("Common_Previous")</a>
-                <a asp-area="Inventory" asp-controller="Warehouses" asp-action="Details" asp-route-id="@Model.Id" asp-route-inventoryPage="@(inventory.Page + 1)"
-                   class="btn btn-sm btn-outline-secondary @(inventory.HasNext ? "" : "disabled")">@T("Common_Next")</a>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <span class="text-[12.5px] text-ink-faint">@(Loc.IsEn ? $"Page {inventory.Page} of {inventory.TotalPages}" : $"صفحة {inventory.Page} من {inventory.TotalPages}") @(Loc.IsEn ? $"({inventory.TotalCount} placements)" : $"({inventory.TotalCount} موضع)")</span>
+            <div class="flex items-center gap-1.5">
+                @if (inventory.HasPrevious)
+                {
+                    <a class="@pageBtn" asp-area="Inventory" asp-controller="Warehouses" asp-action="Details" asp-route-id="@Model.Id" asp-route-inventoryPage="@(inventory.Page - 1)">
+                        <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Previous" : "السابق")
+                    </a>
+                }
+                else
+                {
+                    <span class="@pageOff"><svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Previous" : "السابق")</span>
+                }
+                @if (inventory.HasNext)
+                {
+                    <a class="@pageBtn" asp-area="Inventory" asp-controller="Warehouses" asp-action="Details" asp-route-id="@Model.Id" asp-route-inventoryPage="@(inventory.Page + 1)">
+                        @(Loc.IsEn ? "Next" : "التالي")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg>
+                    </a>
+                }
+                else
+                {
+                    <span class="@pageOff">@(Loc.IsEn ? "Next" : "التالي")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg></span>
+                }
             </div>
         </div>
     }
-
-    <div class="mb-5"></div>
-</div>
+</section>
