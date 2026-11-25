@@ -1,6 +1,6 @@
-@model CategoryDto
+﻿@model CategoryDto
 @{
-    ViewData["Title"] = (Loc.IsEn ? "Search category" : "بحث عن فئة");
+    ViewData["Title"] = (Loc.IsEn ? "Search category" : "بحث عن تصنيف");
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     const string label = "mb-1.5 block text-[12.5px] font-semibold text-ink-soft";
@@ -12,15 +12,15 @@
 
 <div class="mx-auto max-w-[52rem]">
     <header class="mb-5 border-b border-line pb-5">
-        <h1 class="text-[22px] font-bold tracking-[-.015em]">@(Loc.IsEn ? "Search category by name" : "بحث عن فئة بالاسم")</h1>
+        <h1 class="font-bold tracking-[-.015em] text-[22px]">@(Loc.IsEn ? "Search category by name" : "بحث عن تصنيف بالاسم")</h1>
     </header>
 
     <form asp-area="Catalog" asp-controller="Categories" asp-action="SearchByName" method="get"
-          class="mb-5 rounded-lg border border-line bg-surface p-5 shadow-card">
+          class="shadow-card mb-5 rounded-lg border border-line bg-surface p-5">
         <div class="flex flex-wrap items-end gap-3">
             <div class="min-w-[220px] flex-1">
-                <label for="q-name" class="@label">@(Loc.IsEn ? "Category name" : "اسم الفئة")</label>
-                <input id="q-name" name="name" value="@Context.Request.Query["name"]" class="@input" placeholder="@(Loc.IsEn ? "Enter category name to search" : "أدخل اسم الفئة للبحث")" />
+                <label for="q-name" class="@label">@(Loc.IsEn ? "Category name" : "اسم التصنيف")</label>
+                <input id="q-name" name="name" value="@Context.Request.Query["name"]" class="@input" placeholder="@(Loc.IsEn ? "Enter category name to search" : "أدخل اسم التصنيف للبحث")" />
             </div>
             <button type="submit" class="@btnPrimary">
                 <svg class="icon !size-4"><use href="#i-search" /></svg>@(Loc.IsEn ? "Search" : "بحث")
@@ -43,34 +43,34 @@
 
     @if (Model != null)
     {
-        <div class="rounded-lg border border-line bg-surface shadow-card">
+        <div class="shadow-card rounded-lg border border-line bg-surface">
             <div class="flex items-center gap-2.5 border-b border-line px-5 py-3">
                 <svg class="icon !size-[18px] text-accent"><use href="#i-tag" /></svg>
-                <span class="text-[14px] font-semibold text-ink">@(Loc.IsEn ? "Result" : "النتيجة")</span>
+                <span class="font-semibold text-[14px] text-ink">@(Loc.IsEn ? "Result" : "النتيجة")</span>
             </div>
             <dl class="grid gap-x-6 gap-y-5 p-5 sm:grid-cols-2">
                 <div class="min-w-0">
                     <dt class="@dt">@(Loc.IsEn ? "ID" : "المعرّف")</dt>
-                    <dd class="num mt-1 break-all font-mono text-[12.5px] text-ink-soft">@Model.Id</dd>
+                    <dd class="num mt-1 font-mono break-all text-[12.5px] text-ink-soft">@Model.Id</dd>
                 </div>
                 <div class="min-w-0">
                     <dt class="@dt">@(Loc.IsEn ? "Organization ID" : "معرّف المؤسسة")</dt>
-                    <dd class="num mt-1 break-all font-mono text-[12.5px] text-ink-soft">@Model.OrganizationId</dd>
+                    <dd class="num mt-1 font-mono break-all text-[12.5px] text-ink-soft">@Model.OrganizationId</dd>
                 </div>
                 <div class="min-w-0">
                     <dt class="@dt">@(Loc.IsEn ? "Name" : "الاسم")</dt>
-                    <dd class="mt-1 text-[16px] font-bold text-ink">@Model.Name</dd>
+                    <dd class="mt-1 font-bold text-[16px] text-ink">@Model.Name</dd>
                 </div>
                 <div class="min-w-0">
                     <dt class="@dt">@(Loc.IsEn ? "Status" : "الحالة")</dt>
                     <dd class="mt-1">
                         @if (Model.IsActive)
                         {
-                            <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@(Loc.IsEn ? "Active" : "نشط")</span>
+                            <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 font-semibold text-[11.5px] text-ok">@(Loc.IsEn ? "Active" : "نشط")</span>
                         }
                         else
                         {
-                            <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@(Loc.IsEn ? "Inactive" : "غير نشط")</span>
+                            <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 font-semibold text-[11.5px] text-ink-soft">@(Loc.IsEn ? "Inactive" : "غير نشط")</span>
                         }
                     </dd>
                 </div>
@@ -85,7 +85,7 @@
     {
         <div class="rounded-lg border border-dashed border-line-strong px-6 py-12 text-center">
             <svg class="icon mx-auto !size-7 text-ink-faint"><use href="#i-search" /></svg>
-            <p class="mt-2 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No category found. Try another name." : "لم يتم العثور على فئة. جرّب اسماً آخر.")</p>
+            <p class="mt-2 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No category found. Try another name." : "لم يتم العثور على تصنيف. جرّب اسماً آخر.")</p>
         </div>
     }
 

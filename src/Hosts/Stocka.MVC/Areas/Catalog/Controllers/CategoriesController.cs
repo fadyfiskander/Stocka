@@ -26,7 +26,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
-            ViewBag.Title = (Loc.IsEn ? "Categories" : "الفئات");
+            ViewBag.Title = (Loc.IsEn ? "Categories" : "التصنيفات");
             var query = new ListCategoriesQuery { OrganizationId = Guid.Empty };
             var categories = await _categoryCases.ListCategoriesAsync(query);
             return View(categories);
@@ -38,11 +38,11 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         public async Task<IActionResult> Details(Guid id)
         {
             if (id == Guid.Empty)
-                return RedirectToAction(nameof(Error), new { message = (Loc.IsEn ? "Category ID is required." : "معرّف الفئة مطلوب.") });
+                return RedirectToAction(nameof(Error), new { message = (Loc.IsEn ? "Category ID is required." : "معرّف التصنيف مطلوب.") });
 
             try
             {
-                ViewBag.Title = (Loc.IsEn ? "Category details" : "تفاصيل الفئة");
+                ViewBag.Title = (Loc.IsEn ? "Category details" : "تفاصيل التصنيف");
                 var category = await _categoryCases.RetrieveCategoryAsync(new RetrieveCategoryQuery(id));
                 return View(category);
             }
@@ -63,7 +63,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         [HttpGet("SearchByName")]
         public async Task<IActionResult> SearchByName(string? name)
         {
-            ViewBag.Title = (Loc.IsEn ? "Search category" : "بحث عن فئة");
+            ViewBag.Title = (Loc.IsEn ? "Search category" : "بحث عن تصنيف");
             if (string.IsNullOrWhiteSpace(name))
                 return View(null);
 
@@ -89,7 +89,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         [HttpGet("Create")]
         public IActionResult Create()
         {
-            ViewBag.Title = (Loc.IsEn ? "Create category" : "إنشاء فئة");
+            ViewBag.Title = (Loc.IsEn ? "Create category" : "إنشاء تصنيف");
             return View(new RegisterCategoryCommand());
         }
 
@@ -107,11 +107,11 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
                 var result = await _categoryCases.RegisterCategoryAsync(command);
                 if (result is null)
                 {
-                    ModelState.AddModelError(string.Empty, (Loc.IsEn ? "Failed to create category." : "فشل إنشاء الفئة."));
+                    ModelState.AddModelError(string.Empty, (Loc.IsEn ? "Failed to create category." : "فشل إنشاء التصنيف."));
                     return View(command);
                 }
 
-                TempData["Success"] = (Loc.IsEn ? $"Category '{result.Name}' created successfully." : $"تم إنشاء الفئة «{result.Name}» بنجاح.");
+                TempData["Success"] = (Loc.IsEn ? $"Category '{result.Name}' created successfully." : $"تم إنشاء التصنيف «{result.Name}» بنجاح.");
                 return RedirectToAction(nameof(Details), new { id = result.Id });
             }
             catch (ArgumentNullException ex)
@@ -132,12 +132,12 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         public async Task<IActionResult> Edit(Guid id)
         {
             if (id == Guid.Empty)
-                return RedirectToAction(nameof(Error), new { message = (Loc.IsEn ? "Category ID is required." : "معرّف الفئة مطلوب.") });
+                return RedirectToAction(nameof(Error), new { message = (Loc.IsEn ? "Category ID is required." : "معرّف التصنيف مطلوب.") });
 
             try
             {
                 var category = await _categoryCases.RetrieveCategoryAsync(new RetrieveCategoryQuery(id));
-                ViewBag.Title = (Loc.IsEn ? "Edit category" : "تعديل فئة");
+                ViewBag.Title = (Loc.IsEn ? "Edit category" : "تعديل تصنيف");
                 return View(new UpdateCategoryCommand
                 {
                     CategoryId = category.Id,
@@ -163,7 +163,7 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
             try
             {
                 var result = await _categoryCases.UpdateCategoryAsync(command);
-                TempData["Success"] = (Loc.IsEn ? $"Category '{result.Name}' updated successfully." : $"تم تحديث الفئة «{result.Name}» بنجاح.");
+                TempData["Success"] = (Loc.IsEn ? $"Category '{result.Name}' updated successfully." : $"تم تحديث التصنيف «{result.Name}» بنجاح.");
                 return RedirectToAction(nameof(Details), new { id = result.Id });
             }
             catch (KeyNotFoundException ex)
@@ -186,14 +186,14 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         {
             if (id == Guid.Empty)
             {
-                TempData["Error"] = (Loc.IsEn ? "Category ID is required." : "معرّف الفئة مطلوب.");
+                TempData["Error"] = (Loc.IsEn ? "Category ID is required." : "معرّف التصنيف مطلوب.");
                 return RedirectToAction(nameof(Index));
             }
 
             try
             {
                 var result = await _categoryCases.ActivateCategoryAsync(new ActivateCategoryCommand(id));
-                TempData["Success"] = (Loc.IsEn ? $"Category '{result.Name}' activated." : $"تم تفعيل الفئة «{result.Name}».");
+                TempData["Success"] = (Loc.IsEn ? $"Category '{result.Name}' activated." : $"تم تفعيل التصنيف «{result.Name}».");
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is ArgumentException)
             {
@@ -211,14 +211,14 @@ namespace Stocka.MVC.Areas.Catalog.Controllers
         {
             if (id == Guid.Empty)
             {
-                TempData["Error"] = (Loc.IsEn ? "Category ID is required." : "معرّف الفئة مطلوب.");
+                TempData["Error"] = (Loc.IsEn ? "Category ID is required." : "معرّف التصنيف مطلوب.");
                 return RedirectToAction(nameof(Index));
             }
 
             try
             {
                 var result = await _categoryCases.DeactivateCategoryAsync(new DeactivateCategoryCommand(id));
-                TempData["Success"] = (Loc.IsEn ? $"Category '{result.Name}' deactivated." : $"تم إيقاف الفئة «{result.Name}».");
+                TempData["Success"] = (Loc.IsEn ? $"Category '{result.Name}' deactivated." : $"تم إيقاف التصنيف «{result.Name}».");
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is ArgumentException)
             {

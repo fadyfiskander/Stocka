@@ -16,12 +16,12 @@
             <svg class="icon !size-3.5 opacity-60 rtl:rotate-180"><use href="#i-chevron-end" /></svg>
             <span class="text-ink-soft">@(Loc.IsEn ? "Create product" : "إنشاء منتج")</span>
         </nav>
-        <h1 class="text-[24px] font-bold tracking-[-.02em]">@(Loc.IsEn ? "Create product" : "إنشاء منتج")</h1>
+        <h1 class="font-bold tracking-[-.02em] text-[24px]">@(Loc.IsEn ? "Create product" : "إنشاء منتج")</h1>
         <p class="mt-1.5 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "Add a new product to the catalog." : "أضف منتجاً جديداً إلى الكتالوج.")</p>
     </header>
 
     <form asp-action="Create" asp-controller="Products" asp-area="Catalog" method="post" enctype="multipart/form-data"
-          class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
+          class="shadow-card overflow-hidden rounded-lg border border-line bg-surface">
 
         <div class="grid gap-6 p-5 sm:p-7">
             <div asp-validation-summary="ModelOnly" class="rounded-md border border-danger/30 bg-danger-tint px-4 py-3 text-[13px] text-danger empty:hidden"></div>
@@ -41,20 +41,20 @@
 
                 <div>
                     <label asp-for="SellingPrice" class="@label">@(Loc.IsEn ? "Selling price" : "سعر البيع")<span class="@req">*</span></label>
-                    <div class="flex items-stretch overflow-hidden rounded-md border border-line bg-surface transition focus-within:border-accent focus-within:ring-[3px] focus-within:ring-[var(--focus-ring)]">
+                    <div class="flex items-stretch overflow-hidden rounded-md border border-line bg-surface transition focus-within:border-accent focus-within:ring-[var(--focus-ring)] focus-within:ring-[3px]">
                         <input asp-for="SellingPrice" type="number" step="0.01" min="0" placeholder="0.00"
                                class="num block h-10 min-w-0 flex-1 border-0 bg-transparent px-3 text-[13.5px] text-ink outline-none placeholder:text-ink-faint" />
-                        <span class="grid place-items-center border-s border-line bg-sunken px-3 text-[12.5px] font-semibold text-ink-soft">EGP</span>
+                        <span class="grid place-items-center border-s border-line bg-sunken px-3 font-semibold text-[12.5px] text-ink-soft">EGP</span>
                     </div>
                     <span asp-validation-for="SellingPrice" class="@err"></span>
                 </div>
             </div>
 
             <div>
-                <label asp-for="CategoryId" class="@label">@(Loc.IsEn ? "Category" : "الفئة")</label>
+                <label asp-for="CategoryId" class="@label">@(Loc.IsEn ? "Category" : "التصنيف")</label>
                 <select asp-for="CategoryId" asp-items="ViewBag.Categories"
-                        class="block h-10 w-full rounded-md border border-line bg-surface px-3 text-[13.5px] text-ink outline-none transition hover:border-line-strong focus:border-accent focus:ring-[3px] focus:ring-[var(--focus-ring)]">
-                    <option value="">@(Loc.IsEn ? "Select category" : "اختر فئة")</option>
+                        class="block h-10 w-full rounded-md border border-line bg-surface px-3 text-[13.5px] text-ink transition outline-none hover:border-line-strong focus:border-accent focus:ring-[var(--focus-ring)] focus:ring-[3px]">
+                    <option value="">@(Loc.IsEn ? "Select category" : "اختر تصنيف")</option>
                 </select>
                 <span asp-validation-for="CategoryId" class="@err"></span>
             </div>
@@ -62,11 +62,11 @@
 
         <div class="flex flex-col-reverse gap-2.5 border-t border-line bg-sunken/40 px-5 py-4 sm:flex-row sm:justify-end sm:px-7">
             <a asp-action="Index" asp-controller="Products" asp-area="Catalog"
-               class="inline-flex h-9 items-center justify-center rounded-md border border-line bg-surface px-4 text-[13.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline">
+               class="inline-flex h-9 items-center justify-center rounded-md border border-line bg-surface px-4 font-medium text-[13.5px] text-ink transition-colors hover:bg-sunken hover:no-underline">
                 @(Loc.IsEn ? "Cancel" : "إلغاء")
             </a>
             <button type="submit"
-                    class="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-accent px-5 text-[13.5px] font-semibold text-on-accent transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+                    class="text-on-accent inline-flex h-9 items-center justify-center gap-2 rounded-md bg-accent px-5 font-semibold text-[13.5px] transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
                 <svg class="icon !size-4"><use href="#i-plus" /></svg>@(Loc.IsEn ? "Create product" : "إنشاء منتج")
             </button>
         </div>

@@ -1,7 +1,7 @@
-@model IEnumerable<CategoryDto>
+﻿@model IEnumerable<CategoryDto>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = (Loc.IsEn ? "Categories" : "الفئات");
+    ViewData["Title"] = (Loc.IsEn ? "Categories" : "التصنيفات");
 
     const string btnGhost = "inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-line bg-surface px-4 text-[13.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline";
     const string btnPrimary = "inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-accent px-4 text-[13.5px] font-semibold text-on-accent transition-colors hover:bg-accent-hover hover:no-underline";
@@ -11,7 +11,7 @@
 <section class="grid gap-5">
     <header class="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
         <div>
-            <h1 class="text-[22px] font-bold tracking-[-.015em]">@(Loc.IsEn ? "Categories" : "الفئات")</h1>
+            <h1 class="font-bold tracking-[-.015em] text-[22px]">@(Loc.IsEn ? "Categories" : "التصنيفات")</h1>
             <p class="mt-1.5 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "Manage your categories." : "أدر فئاتك.")</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
@@ -19,20 +19,20 @@
                 <svg class="icon !size-4"><use href="#i-search" /></svg>@(Loc.IsEn ? "Search by name" : "بحث بالاسم")
             </a>
             <a class="@btnPrimary" asp-area="Catalog" asp-controller="Categories" asp-action="Create">
-                <svg class="icon !size-4"><use href="#i-plus" /></svg>@(Loc.IsEn ? "Add category" : "إضافة فئة")
+                <svg class="icon !size-4"><use href="#i-plus" /></svg>@(Loc.IsEn ? "Add category" : "إضافة تصنيف")
             </a>
         </div>
     </header>
 
-    <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
+    <div class="shadow-card overflow-hidden rounded-lg border border-line bg-surface">
         <div class="overflow-x-auto">
             <table class="w-full min-w-[720px] border-collapse text-[13.5px]">
                 <thead>
                     <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Name" : "الاسم")</th>
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Status" : "الحالة")</th>
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Organization" : "المؤسسة")</th>
-                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Actions" : "الإجراءات")</th>
+                        <th class="px-4 py-2.5 text-start font-semibold text-[11.5px]">@(Loc.IsEn ? "Name" : "الاسم")</th>
+                        <th class="px-4 py-2.5 text-start font-semibold text-[11.5px]">@(Loc.IsEn ? "Status" : "الحالة")</th>
+                        <th class="px-4 py-2.5 text-start font-semibold text-[11.5px]">@(Loc.IsEn ? "Organization" : "المؤسسة")</th>
+                        <th class="px-4 py-2.5 text-end font-semibold text-[11.5px]">@(Loc.IsEn ? "Actions" : "الإجراءات")</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -43,19 +43,19 @@
                             <tr class="border-b border-line last:border-0 hover:bg-sunken/50">
                                 <td class="px-4 py-3">
                                     <div class="font-semibold text-ink">@category.Name</div>
-                                    <div class="num mt-0.5 break-all font-mono text-[11.5px] text-ink-faint">@category.Id</div>
+                                    <div class="num mt-0.5 font-mono break-all text-[11.5px] text-ink-faint">@category.Id</div>
                                 </td>
                                 <td class="px-4 py-3">
                                     @if (category.IsActive)
                                     {
-                                        <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@(Loc.IsEn ? "Active" : "نشط")</span>
+                                        <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 font-semibold text-[11.5px] text-ok">@(Loc.IsEn ? "Active" : "نشط")</span>
                                     }
                                     else
                                     {
-                                        <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@(Loc.IsEn ? "Inactive" : "غير نشط")</span>
+                                        <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 font-semibold text-[11.5px] text-ink-soft">@(Loc.IsEn ? "Inactive" : "غير نشط")</span>
                                     }
                                 </td>
-                                <td class="px-4 py-3"><span class="num break-all font-mono text-[11.5px] text-ink-soft">@category.OrganizationId</span></td>
+                                <td class="px-4 py-3"><span class="num font-mono break-all text-[11.5px] text-ink-soft">@category.OrganizationId</span></td>
                                 <td class="px-4 py-3">
                                     <div class="flex flex-wrap items-center justify-end gap-1.5">
                                         <a class="@rowBtn" asp-area="Catalog" asp-controller="Categories" asp-action="Details" asp-route-id="@category.Id">@(Loc.IsEn ? "Details" : "التفاصيل")</a>
@@ -63,13 +63,13 @@
                                         @if (category.IsActive)
                                         {
                                             <form asp-area="Catalog" asp-controller="Categories" asp-action="Deactivate" asp-route-id="@category.Id" method="post" class="inline-flex">
-                                                <button type="submit" class="inline-flex h-8 items-center justify-center rounded-md border border-warn/35 bg-transparent px-2.5 text-[12.5px] font-medium text-warn transition-colors hover:bg-warn-tint">@(Loc.IsEn ? "Deactivate" : "إيقاف")</button>
+                                                <button type="submit" class="inline-flex h-8 items-center justify-center rounded-md border border-warn/35 bg-transparent px-2.5 font-medium text-[12.5px] text-warn transition-colors hover:bg-warn-tint">@(Loc.IsEn ? "Deactivate" : "إيقاف")</button>
                                             </form>
                                         }
                                         else
                                         {
                                             <form asp-area="Catalog" asp-controller="Categories" asp-action="Activate" asp-route-id="@category.Id" method="post" class="inline-flex">
-                                                <button type="submit" class="inline-flex h-8 items-center justify-center rounded-md border border-ok/35 bg-transparent px-2.5 text-[12.5px] font-medium text-ok transition-colors hover:bg-ok-tint">@(Loc.IsEn ? "Activate" : "تفعيل")</button>
+                                                <button type="submit" class="inline-flex h-8 items-center justify-center rounded-md border border-ok/35 bg-transparent px-2.5 font-medium text-[12.5px] text-ok transition-colors hover:bg-ok-tint">@(Loc.IsEn ? "Activate" : "تفعيل")</button>
                                             </form>
                                         }
                                     </div>
@@ -82,8 +82,8 @@
                         <tr>
                             <td colspan="4" class="px-6 py-14 text-center">
                                 <svg class="icon mx-auto !size-8 text-ink-faint"><use href="#i-tag" /></svg>
-                                <p class="mt-2 text-[14px] font-semibold text-ink">@(Loc.IsEn ? "No categories found" : "لا توجد فئات")</p>
-                                <p class="mx-auto mt-1 max-w-[46ch] text-[12.5px] text-ink-soft">@(Loc.IsEn ? "There are no categories to display. Try creating one." : "لا توجد فئات للعرض. جرّب إنشاء فئة.")</p>
+                                <p class="mt-2 font-semibold text-[14px] text-ink">@(Loc.IsEn ? "No categories found" : "لا توجد فئات")</p>
+                                <p class="mx-auto mt-1 max-w-[46ch] text-[12.5px] text-ink-soft">@(Loc.IsEn ? "There are no categories to display. Try creating one." : "لا توجد فئات للعرض. جرّب إنشاء تصنيف.")</p>
                             </td>
                         </tr>
                     }

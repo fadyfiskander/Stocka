@@ -1,4 +1,4 @@
-@model ProductDto
+﻿@model ProductDto
 @{
     ViewData["Title"] = (Loc.IsEn ? "Search product" : "بحث عن منتج");
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -12,11 +12,11 @@
 
 <div class="mx-auto max-w-[52rem]">
     <header class="mb-5 border-b border-line pb-5">
-        <h1 class="text-[22px] font-bold tracking-[-.015em]">@(Loc.IsEn ? "Search product by name" : "بحث عن منتج بالاسم")</h1>
+        <h1 class="font-bold tracking-[-.015em] text-[22px]">@(Loc.IsEn ? "Search product by name" : "بحث عن منتج بالاسم")</h1>
     </header>
 
     <form asp-area="Catalog" asp-controller="Products" asp-action="SearchByName" method="get"
-          class="mb-5 rounded-lg border border-line bg-surface p-5 shadow-card">
+          class="shadow-card mb-5 rounded-lg border border-line bg-surface p-5">
         <div class="flex flex-wrap items-end gap-3">
             <div class="min-w-[220px] flex-1">
                 <label for="q-name" class="@label">@(Loc.IsEn ? "Product name" : "اسم المنتج")</label>
@@ -43,38 +43,38 @@
 
     @if (Model != null)
     {
-        <div class="rounded-lg border border-line bg-surface shadow-card">
+        <div class="shadow-card rounded-lg border border-line bg-surface">
             <div class="flex items-center gap-2.5 border-b border-line px-5 py-3">
                 <svg class="icon !size-[18px] text-accent"><use href="#i-box" /></svg>
-                <span class="text-[14px] font-semibold text-ink">@Model.Name</span>
+                <span class="font-semibold text-[14px] text-ink">@Model.Name</span>
             </div>
             <dl class="grid gap-x-6 gap-y-5 p-5 sm:grid-cols-2 lg:grid-cols-3">
                 <div class="min-w-0">
                     <dt class="@dt">@(Loc.IsEn ? "ID" : "المعرّف")</dt>
-                    <dd class="num mt-1 break-all font-mono text-[12.5px] text-ink-soft">@Model.Id</dd>
+                    <dd class="num mt-1 font-mono break-all text-[12.5px] text-ink-soft">@Model.Id</dd>
                 </div>
                 <div class="min-w-0">
-                    <dt class="@dt">@(Loc.IsEn ? "Category ID" : "معرّف الفئة")</dt>
-                    <dd class="num mt-1 break-all font-mono text-[12.5px] text-ink-soft">@Model.CategoryId</dd>
+                    <dt class="@dt">@(Loc.IsEn ? "Category ID" : "معرّف التصنيف")</dt>
+                    <dd class="num mt-1 font-mono break-all text-[12.5px] text-ink-soft">@Model.CategoryId</dd>
                 </div>
                 <div class="min-w-0">
                     <dt class="@dt">@(Loc.IsEn ? "Barcode" : "الباركود")</dt>
-                    <dd class="num mt-1 font-mono text-[13.5px] font-semibold text-ink">@Model.Barcode</dd>
+                    <dd class="num mt-1 font-mono font-semibold text-[13.5px] text-ink">@Model.Barcode</dd>
                 </div>
                 <div class="min-w-0">
                     <dt class="@dt">@(Loc.IsEn ? "Price" : "السعر")</dt>
-                    <dd class="num mt-1 text-[16px] font-bold text-ink">@Model.Price.ToString("N2")</dd>
+                    <dd class="num mt-1 font-bold text-[16px] text-ink">@Model.Price.ToString("N2")</dd>
                 </div>
                 <div class="min-w-0">
                     <dt class="@dt">@(Loc.IsEn ? "Status" : "الحالة")</dt>
                     <dd class="mt-1">
                         @if (Model.IsActive)
                         {
-                            <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@(Loc.IsEn ? "Active" : "نشط")</span>
+                            <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 font-semibold text-[11.5px] text-ok">@(Loc.IsEn ? "Active" : "نشط")</span>
                         }
                         else
                         {
-                            <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@(Loc.IsEn ? "Inactive" : "غير نشط")</span>
+                            <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 font-semibold text-[11.5px] text-ink-soft">@(Loc.IsEn ? "Inactive" : "غير نشط")</span>
                         }
                     </dd>
                 </div>

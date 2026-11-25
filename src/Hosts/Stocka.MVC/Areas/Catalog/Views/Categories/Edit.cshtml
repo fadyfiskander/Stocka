@@ -1,6 +1,6 @@
-@model UpdateCategoryCommand
+﻿@model UpdateCategoryCommand
 @{
-    ViewData["Title"] = (Loc.IsEn ? "Edit category" : "تعديل فئة");
+    ViewData["Title"] = (Loc.IsEn ? "Edit category" : "تعديل تصنيف");
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     const string label = "mb-1.5 block text-[12.5px] font-semibold text-ink-soft";
@@ -11,24 +11,24 @@
 
 <div class="mx-auto max-w-[38rem]">
     <header class="mb-5 border-b border-line pb-5">
-        <h1 class="text-[24px] font-bold tracking-[-.02em]">@(Loc.IsEn ? "Edit category" : "تعديل فئة")</h1>
+        <h1 class="font-bold tracking-[-.02em] text-[24px]">@(Loc.IsEn ? "Edit category" : "تعديل تصنيف")</h1>
     </header>
 
     <form asp-area="Catalog" asp-controller="Categories" asp-action="Edit" method="post"
-          class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
+          class="shadow-card overflow-hidden rounded-lg border border-line bg-surface">
         <div class="grid gap-5 p-5 sm:p-7">
             <div asp-validation-summary="ModelOnly" class="rounded-md border border-danger/30 bg-danger-tint px-4 py-3 text-[13px] text-danger empty:hidden"></div>
 
             <input type="hidden" asp-for="CategoryId" />
 
             <div>
-                <span class="@label">@(Loc.IsEn ? "Category ID" : "معرّف الفئة")</span>
-                <div class="num break-all rounded-md border border-line bg-sunken px-3 py-2.5 font-mono text-[12.5px] text-ink-soft">@Model.CategoryId</div>
+                <span class="@label">@(Loc.IsEn ? "Category ID" : "معرّف التصنيف")</span>
+                <div class="num rounded-md border border-line bg-sunken px-3 py-2.5 font-mono break-all text-[12.5px] text-ink-soft">@Model.CategoryId</div>
             </div>
 
             <div>
-                <label asp-for="Name" class="@label">@(Loc.IsEn ? "Category name" : "اسم الفئة")</label>
-                <input asp-for="Name" class="@input" placeholder="@(Loc.IsEn ? "Enter new category name" : "أدخل اسم الفئة الجديد")" />
+                <label asp-for="Name" class="@label">@(Loc.IsEn ? "Category name" : "اسم التصنيف")</label>
+                <input asp-for="Name" class="@input" placeholder="@(Loc.IsEn ? "Enter new category name" : "أدخل اسم التصنيف الجديد")" />
                 <span asp-validation-for="Name" class="@err"></span>
             </div>
         </div>
@@ -36,7 +36,7 @@
         <div class="flex flex-col-reverse gap-2.5 border-t border-line bg-sunken/40 px-5 py-4 sm:flex-row sm:items-center sm:justify-end sm:px-7">
             <a asp-area="Catalog" asp-controller="Categories" asp-action="Index" class="@btnGhost sm:me-auto">@(Loc.IsEn ? "Cancel" : "إلغاء")</a>
             <a asp-area="Catalog" asp-controller="Categories" asp-action="Details" asp-route-id="@Model.CategoryId" class="@btnGhost">@(Loc.IsEn ? "Details" : "التفاصيل")</a>
-            <button type="submit" class="inline-flex h-9 items-center justify-center rounded-md bg-accent px-5 text-[13.5px] font-semibold text-on-accent transition-colors hover:bg-accent-hover">
+            <button type="submit" class="text-on-accent inline-flex h-9 items-center justify-center rounded-md bg-accent px-5 font-semibold text-[13.5px] transition-colors hover:bg-accent-hover">
                 @(Loc.IsEn ? "Save changes" : "حفظ التغييرات")
             </button>
         </div>
