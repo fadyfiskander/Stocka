@@ -1,0 +1,11 @@
+{
+  "name": "stocka-mvc",
+  "private": true,
+  "scripts": {
+    "build": "tailwindcss -i ./src/styles/tailwind.css -o ./wwwroot/css/tailwind.css --minify",
+    "watch": "tailwindcss -i ./src/styles/tailwind.css -o ./wwwroot/css/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.17"
+  }
+}

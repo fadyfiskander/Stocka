@@ -2,29 +2,20 @@
 @using Inventory.Contracts.DTOs.StockMovement
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = Loc.T("Batches_DetailsTitle");
-
-    // Translate with a built-in fallback when a key is missing (Loc returns the key itself)
-    bool isAr = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
-    string T(string key, string? ar = null, string? en = null)
-    {
-        var v = Loc.T(key);
-        if (en != null && v == key) return isAr ? (ar ?? en) : en;
-        return v;
-    }
+    ViewData["Title"] = (Loc.IsEn ? "Batch details" : "تفاصيل الدفعة");
 
     // 0 PurchaseIn, 1 SaleOut, 2 TransferIn, 3 TransferOut, 4 AdjustmentIn, 5 AdjustmentOut, 6 OrderReturn
-    string MoveType(int t) => Loc.T(t switch
+    string MoveType(int t) => t switch
     {
-        0 => "Move_PurchaseIn",
-        1 => "Move_SaleOut",
-        2 => "Move_TransferIn",
-        3 => "Move_TransferOut",
-        4 => "Move_AdjustmentIn",
-        5 => "Move_AdjustmentOut",
-        6 => "Move_OrderReturn",
-        _ => "Move_PurchaseIn"
-    });
+        0 => (Loc.IsEn ? "Purchase in" : "إدخال شراء"),
+        1 => (Loc.IsEn ? "Sale out" : "بيع خارج"),
+        2 => (Loc.IsEn ? "Transfer in" : "تحويل داخل"),
+        3 => (Loc.IsEn ? "Transfer out" : "تحويل خارج"),
+        4 => (Loc.IsEn ? "Adjustment in" : "تسوية داخل"),
+        5 => (Loc.IsEn ? "Adjustment out" : "تسوية خارج"),
+        6 => (Loc.IsEn ? "Order return" : "إرجاع طلب"),
+        _ => (Loc.IsEn ? "Purchase in" : "إدخال شراء")
+    };
     bool IsIncoming(int t) => t == 0 || t == 2 || t == 4 || t == 6;
 
     var movements = ((IEnumerable<StockMovementDto>?)ViewBag.Movements)?.ToList() ?? new List<StockMovementDto>();
@@ -47,765 +38,212 @@
     double Pct(object v) => initial <= 0 ? 0 : Math.Min(100, Math.Max(0, Convert.ToDouble(v) / initial * 100));
     string W(double p) => Math.Round(p, 1).ToString(System.Globalization.CultureInfo.InvariantCulture) + "%";
 
-    string selectText = T("Common_Select", "اختر…", "Select…");
+    string selectText = (Loc.IsEn ? "Select…" : "اختر…");
+
+    // ───── shared Tailwind class sets (literal tokens so the scanner sees them) ─────
+    const string card = "min-w-0 overflow-hidden rounded-lg border border-line bg-surface shadow-card";
+    const string cardHead = "flex items-center justify-between gap-3 border-b border-line px-4 py-3 text-[13.5px] font-semibold text-ink";
+    const string label = "mb-1.5 block text-[12.5px] font-semibold text-ink-soft";
+    const string input = "block h-10 w-full rounded-md border border-line bg-surface px-3 text-[13.5px] text-ink outline-none transition placeholder:text-ink-faint hover:border-line-strong focus:border-accent focus:ring-[3px] focus:ring-[var(--focus-ring)]";
+    const string select = input;
+    const string btn = "inline-flex h-9 items-center justify-center gap-2 rounded-md border border-transparent px-4 text-[13.5px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50";
+    const string tab = "inline-flex items-center gap-2 rounded-md border border-transparent px-3 py-1.5 text-[13px] font-medium text-ink-soft transition-colors hover:bg-sunken hover:text-ink aria-selected:border-line aria-selected:bg-sunken aria-selected:font-semibold aria-selected:text-ink";
+    const string actionsBetween = "col-span-12 flex flex-wrap items-center justify-between gap-3";
+    const string actionsEnd = "col-span-12 flex justify-end";
+    const string note = "text-[11.5px] text-ink-faint";
+    const string formGrid = "grid grid-cols-12 gap-4";
 }
 
-<style>
-    /* Everything is scoped to .bd-page and does not depend on Bootstrap's grid or JS */
-    .bd-page {
-        --bd-line: color-mix(in srgb, currentColor 14%, transparent);
-        --bd-line-strong: color-mix(in srgb, currentColor 26%, transparent);
-        --bd-card: color-mix(in srgb, currentColor 4%, transparent);
-        --bd-muted: color-mix(in srgb, currentColor 62%, transparent);
-        --bd-solid: #16181d;
-        box-sizing: border-box;
-        width: 100%;
-        max-width: 1400px;
-        margin-inline: auto;
-        padding: 1.5rem;
-        line-height: 1.5;
-    }
-
-        .bd-page *, .bd-page *::before, .bd-page *::after {
-            box-sizing: border-box;
-        }
-
-        .bd-page h1, .bd-page h2, .bd-page h3, .bd-page p, .bd-page dl, .bd-page dd {
-            margin: 0;
-        }
-
-    .bd-num {
-        direction: ltr;
-        unicode-bidi: isolate;
-        display: inline-block;
-        font-variant-numeric: tabular-nums;
-    }
-
-    .bd-muted {
-        color: var(--bd-muted);
-    }
-
-    /* colour tokens */
-    .bd-page .is-blue {
-        --c: #4c8dff;
-    }
-
-    .bd-page .is-purple {
-        --c: #9b7cf6;
-    }
-
-    .bd-page .is-amber {
-        --c: #d9a441;
-    }
-
-    .bd-page .is-green {
-        --c: #35b585;
-    }
-
-    .bd-page .is-gray {
-        --c: #8a94a3;
-    }
-
-    .bd-page .is-red {
-        --c: #e5534b;
-    }
-
-    /* header */
-    .bd-head {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .bd-title {
-        display: flex;
-        align-items: center;
-        gap: .75rem;
-        flex-wrap: wrap;
-        font-size: 1.6rem;
-        font-weight: 700;
-    }
-
-    .bd-meta {
-        margin-top: .35rem;
-        font-size: .85rem;
-        color: var(--bd-muted);
-        display: flex;
-        flex-wrap: wrap;
-        gap: .25rem 1.25rem;
-    }
-
-        .bd-meta code {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-            overflow-wrap: anywhere;
-            color: inherit;
-        }
-
-    /* layout */
-    .bd-grid {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) 22rem;
-        gap: 1.25rem;
-        align-items: start;
-    }
-
-    .bd-main, .bd-side {
-        display: grid;
-        gap: 1.25rem;
-        min-width: 0;
-    }
-
-    @@media (max-width: 1100px) {
-        .bd-grid {
-            grid-template-columns: minmax(0, 1fr);
-        }
-
-        .bd-side {
-            order: -1;
-        }
-    }
-
-    /* cards */
-    .bd-card {
-        border: 1px solid var(--bd-line);
-        border-radius: .75rem;
-        background: var(--bd-card);
-        min-width: 0;
-    }
-
-    .bd-card-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: .75rem;
-        padding: .85rem 1.1rem;
-        border-bottom: 1px solid var(--bd-line);
-        font-weight: 600;
-    }
-
-    .bd-card-body {
-        padding: 1.1rem;
-    }
-
-    /* summary */
-    .bd-stats {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1.1rem 1rem;
-        margin-bottom: 1.1rem;
-    }
-
-    .bd-stat-label {
-        font-size: .8rem;
-        color: var(--bd-muted);
-    }
-
-    .bd-stat-value {
-        font-size: 1.6rem;
-        font-weight: 700;
-        line-height: 1.25;
-    }
-
-    .bd-bar {
-        display: flex;
-        height: .6rem;
-        border-radius: 999px;
-        overflow: hidden;
-        background: var(--bd-line);
-    }
-
-        .bd-bar > span {
-            display: block;
-            height: 100%;
-        }
-
-    .bd-legend {
-        display: flex;
-        flex-wrap: wrap;
-        gap: .4rem 1rem;
-        margin-top: .6rem;
-        font-size: .8rem;
-        color: var(--bd-muted);
-    }
-
-    .bd-dot {
-        display: inline-block;
-        width: .6rem;
-        height: .6rem;
-        border-radius: 50%;
-        background: var(--c, currentColor);
-        flex: none;
-    }
-
-    .bd-legend span {
-        display: inline-flex;
-        align-items: center;
-        gap: .4rem;
-    }
-
-    .bd-kv {
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-        gap: 1rem;
-        padding: .6rem 0;
-        border-bottom: 1px solid var(--bd-line);
-    }
-
-        .bd-kv:last-of-type {
-            border-bottom: 0;
-        }
-
-        .bd-kv dt {
-            color: var(--bd-muted);
-        }
-
-        .bd-kv dd {
-            font-weight: 600;
-            text-align: end;
-        }
-
-    .bd-note {
-        display: block;
-        margin-top: .6rem;
-        font-size: .8rem;
-        color: var(--bd-muted);
-    }
-
-    /* operations tabs */
-    .bd-tabs {
-        display: flex;
-        flex-wrap: wrap;
-        gap: .4rem;
-        padding: .75rem 1.1rem;
-        border-bottom: 1px solid var(--bd-line);
-    }
-
-    .bd-tab {
-        display: inline-flex;
-        align-items: center;
-        gap: .5rem;
-        padding: .45rem .8rem;
-        border-radius: .5rem;
-        border: 1px solid transparent;
-        background: transparent;
-        color: inherit;
-        font: inherit;
-        font-size: .9rem;
-        cursor: pointer;
-    }
-
-        .bd-tab:hover {
-            background: var(--bd-card);
-        }
-
-        .bd-tab.is-active {
-            background: var(--bd-card);
-            border-color: var(--bd-line-strong);
-            font-weight: 600;
-        }
-
-    .bd-page :focus-visible {
-        outline: 2px solid #4c8dff;
-        outline-offset: 2px;
-    }
-
-    /* forms */
-    .bd-form {
-        display: grid;
-        grid-template-columns: repeat(12, minmax(0, 1fr));
-        gap: 1rem;
-    }
-
-        .bd-form fieldset {
-            grid-column: 1 / -1;
-            display: grid;
-            grid-template-columns: repeat(12, minmax(0, 1fr));
-            gap: 1rem;
-            border: 0;
-            padding: 0;
-            margin: 0;
-            min-width: 0;
-        }
-
-            .bd-form fieldset:disabled {
-                opacity: .5;
-            }
-
-        .bd-form .c12 {
-            grid-column: span 12;
-        }
-
-        .bd-form .c8 {
-            grid-column: span 8;
-        }
-
-        .bd-form .c6 {
-            grid-column: span 6;
-        }
-
-        .bd-form .c4 {
-            grid-column: span 4;
-        }
-
-        .bd-form .c3 {
-            grid-column: span 3;
-        }
-
-    @@media (max-width: 640px) {
-        .bd-form .c8, .bd-form .c6, .bd-form .c4, .bd-form .c3 {
-            grid-column: span 12;
-        }
-    }
-
-    .bd-label {
-        display: block;
-        margin-bottom: .35rem;
-        font-size: .85rem;
-        color: var(--bd-muted);
-    }
-
-    .bd-input {
-        display: block;
-        width: 100%;
-        padding: .55rem .75rem;
-        border-radius: .5rem;
-        border: 1px solid var(--bd-line-strong);
-        background-color: transparent;
-        color: inherit;
-        font: inherit;
-    }
-
-    select.bd-input {
-        background-color: var(--bd-solid);
-    }
-
-        select.bd-input option {
-            background-color: var(--bd-solid);
-            color: inherit;
-        }
-
-    .bd-input:focus {
-        border-color: #4c8dff;
-        outline: none;
-        box-shadow: 0 0 0 3px color-mix(in srgb, #4c8dff 25%, transparent);
-    }
-
-    .bd-actions {
-        grid-column: 1 / -1;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        align-items: center;
-        gap: .75rem;
-    }
-
-        .bd-actions .bd-note {
-            margin: 0;
-        }
-
-    .bd-error {
-        grid-column: 1 / -1;
-        color: #e5534b;
-        font-size: .85rem;
-    }
-
-    /* buttons / badges */
-    .bd-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: .4rem;
-        padding: .55rem 1.1rem;
-        border-radius: .5rem;
-        border: 1px solid transparent;
-        background: var(--c, #4c8dff);
-        color: #fff;
-        font: inherit;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        margin-inline-start: auto;
-    }
-
-        .bd-btn:hover {
-            filter: brightness(1.08);
-        }
-
-        .bd-btn:disabled {
-            opacity: .55;
-            cursor: not-allowed;
-        }
-
-        .bd-btn.is-amber {
-            color: #1b1405;
-        }
-
-        .bd-btn.sm {
-            padding: .3rem .65rem;
-            font-size: .8rem;
-            margin-inline-start: 0;
-        }
-
-        .bd-btn.ghost {
-            background: transparent;
-            color: inherit;
-            border-color: var(--bd-line-strong);
-            font-weight: 500;
-            margin-inline-start: 0;
-        }
-
-        .bd-btn.ghost-red {
-            background: transparent;
-            color: #e5534b;
-            border-color: color-mix(in srgb, #e5534b 55%, transparent);
-            font-weight: 500;
-        }
-
-    .bd-badge {
-        display: inline-block;
-        padding: .15rem .6rem;
-        border-radius: 999px;
-        font-size: .78rem;
-        font-weight: 600;
-        background: color-mix(in srgb, var(--c, currentColor) 20%, transparent);
-        color: var(--c, inherit);
-        white-space: nowrap;
-    }
-
-        .bd-badge.neutral {
-            --c: #8a94a3;
-        }
-
-    /* history table */
-    .bd-table-wrap {
-        overflow-x: auto;
-    }
-
-    .bd-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: .9rem;
-    }
-
-        .bd-table th {
-            text-align: start;
-            font-weight: 600;
-            font-size: .8rem;
-            color: var(--bd-muted);
-            padding: .65rem .9rem;
-            border-bottom: 1px solid var(--bd-line);
-            white-space: nowrap;
-            background: var(--bd-card);
-        }
-
-        .bd-table td {
-            padding: .7rem .9rem;
-            border-bottom: 1px solid var(--bd-line);
-            vertical-align: middle;
-            white-space: nowrap;
-        }
-
-        .bd-table tr:last-child td {
-            border-bottom: 0;
-        }
-
-        .bd-table tbody tr:hover {
-            background: var(--bd-card);
-        }
-
-        .bd-table td.wrap {
-            white-space: normal;
-            min-width: 9rem;
-            max-width: 18rem;
-        }
-
-    .bd-qty {
-        font-weight: 700;
-    }
-
-        .bd-qty.in {
-            color: #35b585;
-        }
-
-        .bd-qty.out {
-            color: #e5534b;
-        }
-
-    .bd-empty {
-        padding: 2.5rem 1rem;
-        text-align: center;
-        color: var(--bd-muted);
-    }
-
-    /* alerts */
-    .bd-alert {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 1rem;
-        padding: .75rem 1rem;
-        border-radius: .6rem;
-        margin-bottom: 1rem;
-        border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
-        background: color-mix(in srgb, var(--c) 14%, transparent);
-    }
-
-        .bd-alert button {
-            background: none;
-            border: 0;
-            color: inherit;
-            font-size: 1.25rem;
-            line-height: 1;
-            cursor: pointer;
-            opacity: .7;
-        }
-
-    /* reverse dialog */
-    dialog.bd-dialog {
-        width: calc(100% - 2rem);
-        max-width: 28rem;
-        padding: 0;
-        border: 1px solid var(--bd-line-strong);
-        border-radius: .75rem;
-        background: var(--bd-solid);
-        color: inherit;
-    }
-
-        dialog.bd-dialog::backdrop {
-            background: rgba(0, 0, 0, .55);
-        }
-
-    .bd-dialog-head {
-        padding: 1rem 1.25rem;
-        border-bottom: 1px solid var(--bd-line);
-        font-weight: 700;
-    }
-
-    .bd-dialog-body {
-        padding: 1.25rem;
-        display: grid;
-        gap: .9rem;
-    }
-
-    .bd-dialog-foot {
-        padding: 1rem 1.25rem;
-        border-top: 1px solid var(--bd-line);
-        display: flex;
-        justify-content: flex-end;
-        gap: .6rem;
-    }
-
-        .bd-dialog-foot .bd-btn {
-            margin-inline-start: 0;
-        }
-</style>
-
-<div class="bd-page">
-
-    @if (TempData["Success"] != null)
-    {
-        <div class="bd-alert is-green" role="alert">
-            <span>@TempData["Success"]</span>
-            <button type="button" data-dismiss-alert aria-label="Close">&times;</button>
-        </div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="bd-alert is-red" role="alert">
-            <span>@TempData["Error"]</span>
-            <button type="button" data-dismiss-alert aria-label="Close">&times;</button>
-        </div>
-    }
+<div id="bd-page" class="mx-auto w-full max-w-[1400px]">
 
     @* ───────── Header ───────── *@
-    <div class="bd-head">
-        <div>
-            <h1 class="bd-title">
-                @T("Batches_DetailsTitle")
+    <header class="mb-5 flex flex-wrap items-start justify-between gap-4 border-b border-line pb-5">
+        <div class="min-w-0">
+            <h1 class="flex flex-wrap items-center gap-3 text-[22px] font-bold tracking-[-.015em]">
+                @(Loc.IsEn ? "Batch details" : "تفاصيل الدفعة")
                 @if (Model.IsExhausted)
                 {
-                    <span class="bd-badge neutral">@T("Batches_FullyAllocated")</span>
+                    <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@(Loc.IsEn ? " · fully allocated" : " · مخصَّصة بالكامل")</span>
                 }
             </h1>
-            <div class="bd-meta">
-                <span>@T("Common_Product"): <code>@Model.ProductId</code></span>
-                <span>@T("Batches_PurchaseItemId"): <code>@Model.PurchaseItemId</code></span>
+            <div class="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-[12.5px] text-ink-faint">
+                <span>@(Loc.IsEn ? "Product" : "المنتج"): <code class="num break-all font-mono text-ink-soft">@Model.ProductId</code></span>
+                <span>@(Loc.IsEn ? "Purchase item ID (Purchasing)" : "معرّف بند الشراء (المشتريات)"): <code class="num break-all font-mono text-ink-soft">@Model.PurchaseItemId</code></span>
             </div>
         </div>
-        <a class="bd-btn ghost" asp-area="Inventory" asp-controller="Batches" asp-action="Index">@T("Batches_BackToList")</a>
-    </div>
+        <a asp-area="Inventory" asp-controller="Batches" asp-action="Index"
+           class="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-line bg-surface px-4 text-[13.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline">
+            <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Back to batches" : "العودة للدفعات")
+        </a>
+    </header>
 
-    <div class="bd-grid">
+    <div class="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_22rem]">
 
         @* ───────── Main: operations + history ───────── *@
-        <div class="bd-main">
+        <div class="grid min-w-0 gap-5">
 
-            <section class="bd-card">
-                <div class="bd-card-head">@T("Batches_Actions", "العمليات", "Operations")</div>
+            <section class="@card">
+                <div class="@cardHead">@(Loc.IsEn ? "Operations" : "العمليات")</div>
 
-                <div class="bd-tabs" role="tablist">
-                    <button type="button" class="bd-tab is-blue is-active" data-pane="pane-allocate" role="tab" aria-selected="true"><span class="bd-dot"></span>@T("Batches_AllocateTitle")</button>
-                    <button type="button" class="bd-tab is-purple" data-pane="pane-transfer" role="tab" aria-selected="false"><span class="bd-dot"></span>@T("Batches_TransferTitle")</button>
-                    <button type="button" class="bd-tab is-amber" data-pane="pane-sale" role="tab" aria-selected="false"><span class="bd-dot"></span>@T("Batches_SaleTitle")</button>
-                    <button type="button" class="bd-tab is-green" data-pane="pane-return" role="tab" aria-selected="false"><span class="bd-dot"></span>@T("Batches_ReturnTitle")</button>
-                    <button type="button" class="bd-tab is-gray" data-pane="pane-adjust" role="tab" aria-selected="false"><span class="bd-dot"></span>@T("Batches_AdjustTitle")</button>
-                    <button type="button" class="bd-tab is-red" data-pane="pane-damage" role="tab" aria-selected="false"><span class="bd-dot"></span>@T("Batches_DamageTitle")</button>
+                <div class="flex flex-wrap gap-1.5 border-b border-line px-4 py-3" role="tablist">
+                    <button type="button" role="tab" aria-selected="true" data-pane="pane-allocate" class="@tab"><span class="size-2 rounded-full bg-accent"></span>@(Loc.IsEn ? "Allocate stock to a warehouse" : "تخصيص مخزون لمستودع")</button>
+                    <button type="button" role="tab" aria-selected="false" data-pane="pane-transfer" class="@tab"><span class="size-2 rounded-full bg-info"></span>@(Loc.IsEn ? "Transfer between warehouses" : "تحويل بين المستودعات")</button>
+                    <button type="button" role="tab" aria-selected="false" data-pane="pane-sale" class="@tab"><span class="size-2 rounded-full bg-signal"></span>@(Loc.IsEn ? "Record sale (out)" : "تسجيل بيع (خروج)")</button>
+                    <button type="button" role="tab" aria-selected="false" data-pane="pane-return" class="@tab"><span class="size-2 rounded-full bg-ok"></span>@(Loc.IsEn ? "Record customer return (in)" : "تسجيل إرجاع عميل (دخول)")</button>
+                    <button type="button" role="tab" aria-selected="false" data-pane="pane-adjust" class="@tab"><span class="size-2 rounded-full bg-ink-faint"></span>@(Loc.IsEn ? "Physical count adjustment" : "تسوية الجرد الفعلي")</button>
+                    <button type="button" role="tab" aria-selected="false" data-pane="pane-damage" class="@tab"><span class="size-2 rounded-full bg-danger"></span>@(Loc.IsEn ? "Damaged stock write-off" : "شطب المخزون التالف")</button>
                 </div>
 
-                <div class="bd-card-body">
+                <div class="p-4">
 
                     @* Allocate *@
-                    <div class="bd-pane" id="pane-allocate" role="tabpanel">
-                        <form asp-area="Inventory" asp-controller="Stock" asp-action="Allocate" method="post" class="bd-form js-once">
-                            <div asp-validation-summary="ModelOnly" class="bd-error"></div>
+                    <div data-bd-pane id="pane-allocate" role="tabpanel">
+                        <form asp-area="Inventory" asp-controller="Stock" asp-action="Allocate" method="post" class="js-once @formGrid">
+                            <div asp-validation-summary="ModelOnly" class="col-span-12 text-[12.5px] text-danger empty:hidden"></div>
                             <input type="hidden" name="BatchId" value="@Model.Id" />
-                            <fieldset disabled="@(Model.RemainingQuantity <= 0)">
-                                <div class="c8">
-                                    <label class="bd-label">@T("Common_Warehouse")</label>
-                                    <select name="WarehouseId" class="bd-input" asp-items="whWithLocation" required>
+                            <fieldset disabled="@(Model.RemainingQuantity <= 0)" class="col-span-12 m-0 grid min-w-0 grid-cols-12 gap-4 border-0 p-0 disabled:opacity-50">
+                                <div class="col-span-12 sm:col-span-8">
+                                    <label class="@label">@(Loc.IsEn ? "Warehouse" : "المستودع")</label>
+                                    <select name="WarehouseId" class="@select" asp-items="whWithLocation" required>
                                         <option value="">@selectText</option>
                                     </select>
                                 </div>
-                                <div class="c4">
-                                    <label class="bd-label">@T("Common_Quantity")</label>
-                                    <input type="number" name="Quantity" class="bd-input" min="1" max="@Model.RemainingQuantity" required />
+                                <div class="col-span-12 sm:col-span-4">
+                                    <label class="@label">@(Loc.IsEn ? "Quantity" : "الكمية")</label>
+                                    <input type="number" name="Quantity" class="@input num" min="1" max="@Model.RemainingQuantity" required />
                                 </div>
-                                <div class="bd-actions">
-                                    <small class="bd-note">@Loc.F("Batches_AllocateNote", Model.RemainingQuantity)</small>
-                                    <button type="submit" class="bd-btn is-blue">@T("Batches_Allocate")</button>
+                                <div class="@actionsBetween">
+                                    <small class="@note">@(Loc.IsEn ? $"Max {Model.RemainingQuantity} unallocated units. Placement records a PurchaseIn movement." : $"حد أقصى {Model.RemainingQuantity} وحدة غير مخصَّصة. التخزين يسجّل حركة إدخال شراء.")</small>
+                                    <button type="submit" class="@btn bg-accent text-on-accent hover:bg-accent-hover">@(Loc.IsEn ? "Allocate" : "تخصيص")</button>
                                 </div>
                             </fieldset>
                         </form>
                     </div>
 
                     @* Transfer *@
-                    <div class="bd-pane" id="pane-transfer" role="tabpanel" hidden>
-                        <form asp-area="Inventory" asp-controller="Stock" asp-action="Transfer" method="post" class="bd-form js-once" id="transferForm">
-                            <div asp-validation-summary="ModelOnly" class="bd-error"></div>
+                    <div data-bd-pane id="pane-transfer" role="tabpanel" hidden>
+                        <form asp-area="Inventory" asp-controller="Stock" asp-action="Transfer" method="post" id="transferForm" class="js-once @formGrid">
+                            <div asp-validation-summary="ModelOnly" class="col-span-12 text-[12.5px] text-danger empty:hidden"></div>
                             <input type="hidden" name="BatchId" value="@Model.Id" />
-                            <div class="c6">
-                                <label class="bd-label">@T("Batches_Source")</label>
-                                <select name="SourceWarehouseId" class="bd-input" asp-items="whPlain" required>
+                            <div class="col-span-12 sm:col-span-6">
+                                <label class="@label">@(Loc.IsEn ? "Source" : "المصدر")</label>
+                                <select name="SourceWarehouseId" class="@select" asp-items="whPlain" required>
                                     <option value="">@selectText</option>
                                 </select>
                             </div>
-                            <div class="c6">
-                                <label class="bd-label">@T("Batches_Destination")</label>
-                                <select name="DestinationWarehouseId" class="bd-input" asp-items="whPlain" required>
+                            <div class="col-span-12 sm:col-span-6">
+                                <label class="@label">@(Loc.IsEn ? "Destination" : "الوجهة")</label>
+                                <select name="DestinationWarehouseId" class="@select" asp-items="whPlain" required>
                                     <option value="">@selectText</option>
                                 </select>
                             </div>
-                            <div class="c4">
-                                <label class="bd-label">@T("Common_Quantity")</label>
-                                <input type="number" name="Quantity" class="bd-input" min="1" required />
+                            <div class="col-span-12 sm:col-span-4">
+                                <label class="@label">@(Loc.IsEn ? "Quantity" : "الكمية")</label>
+                                <input type="number" name="Quantity" class="@input num" min="1" required />
                             </div>
-                            <div class="c8">
-                                <label class="bd-label">@T("Batches_ReasonOptional")</label>
-                                <input type="text" name="Reason" class="bd-input" maxlength="300" />
+                            <div class="col-span-12 sm:col-span-8">
+                                <label class="@label">@(Loc.IsEn ? "Reason (optional), max 300 chars" : "السبب (اختياري)، بحد أقصى 300 حرف")</label>
+                                <input type="text" name="Reason" class="@input" maxlength="300" />
                             </div>
-                            <div class="bd-actions">
-                                <small class="bd-note">@T("Batches_TransferNote")</small>
-                                <button type="submit" class="bd-btn is-purple">@T("Batches_Transfer", "تحويل", "Transfer")</button>
+                            <div class="@actionsBetween">
+                                <small class="@note">@(Loc.IsEn ? "Both legs (out + in) commit together as one operation." : "الرجلان (خروج + دخول) تُسجَّلان معاً كعملية واحدة.")</small>
+                                <button type="submit" class="@btn border-info/25 bg-info-tint text-info hover:bg-info/15">@(Loc.IsEn ? "Transfer" : "تحويل")</button>
                             </div>
                         </form>
                     </div>
 
                     @* Sale *@
-                    <div class="bd-pane" id="pane-sale" role="tabpanel" hidden>
-                        <form asp-area="Inventory" asp-controller="Stock" asp-action="Sale" method="post" class="bd-form js-once">
+                    <div data-bd-pane id="pane-sale" role="tabpanel" hidden>
+                        <form asp-area="Inventory" asp-controller="Stock" asp-action="Sale" method="post" class="js-once @formGrid">
                             <input type="hidden" name="BatchId" value="@Model.Id" />
-                            <div class="c4">
-                                <label class="bd-label">@T("Common_Quantity")</label>
-                                <input type="number" name="Quantity" class="bd-input" min="1" required />
+                            <div class="col-span-12 sm:col-span-4">
+                                <label class="@label">@(Loc.IsEn ? "Quantity" : "الكمية")</label>
+                                <input type="number" name="Quantity" class="@input num" min="1" required />
                             </div>
-                            <div class="c8">
-                                <label class="bd-label">@T("Batches_OrderRef")</label>
-                                <input type="text" name="OrderReferenceId" class="bd-input" />
+                            <div class="col-span-12 sm:col-span-8">
+                                <label class="@label">@(Loc.IsEn ? "Order reference (optional Guid)" : "مرجع الطلب (Guid اختياري)")</label>
+                                <input type="text" name="OrderReferenceId" class="@input" />
                             </div>
-                            <div class="c12">
-                                <label class="bd-label">@T("Common_Reason")</label>
-                                <input type="text" name="Reason" class="bd-input" maxlength="300" />
+                            <div class="col-span-12">
+                                <label class="@label">@(Loc.IsEn ? "Reason" : "السبب")</label>
+                                <input type="text" name="Reason" class="@input" maxlength="300" />
                             </div>
-                            <div class="bd-actions">
-                                <button type="submit" class="bd-btn is-amber">@T("Batches_SaleOut")</button>
+                            <div class="@actionsEnd">
+                                <button type="submit" class="@btn border-signal/25 bg-signal-tint text-signal hover:bg-signal/15">@(Loc.IsEn ? "Sale out" : "بيع خارج")</button>
                             </div>
                         </form>
                     </div>
 
                     @* Return *@
-                    <div class="bd-pane" id="pane-return" role="tabpanel" hidden>
-                        <form asp-area="Inventory" asp-controller="Stock" asp-action="Return" method="post" class="bd-form js-once">
+                    <div data-bd-pane id="pane-return" role="tabpanel" hidden>
+                        <form asp-area="Inventory" asp-controller="Stock" asp-action="Return" method="post" class="js-once @formGrid">
                             <input type="hidden" name="BatchId" value="@Model.Id" />
-                            <div class="c4">
-                                <label class="bd-label">@T("Common_Quantity")</label>
-                                <input type="number" name="Quantity" class="bd-input" min="1" required />
+                            <div class="col-span-12 sm:col-span-4">
+                                <label class="@label">@(Loc.IsEn ? "Quantity" : "الكمية")</label>
+                                <input type="number" name="Quantity" class="@input num" min="1" required />
                             </div>
-                            <div class="c8">
-                                <label class="bd-label">@T("Batches_OriginalOrder")</label>
-                                <input type="text" name="OrderReferenceId" class="bd-input" />
+                            <div class="col-span-12 sm:col-span-8">
+                                <label class="@label">@(Loc.IsEn ? "Original order (optional Guid)" : "الطلب الأصلي (Guid اختياري)")</label>
+                                <input type="text" name="OrderReferenceId" class="@input" />
                             </div>
-                            <div class="c12">
-                                <label class="bd-label">@T("Common_Reason")</label>
-                                <input type="text" name="Reason" class="bd-input" maxlength="300" />
+                            <div class="col-span-12">
+                                <label class="@label">@(Loc.IsEn ? "Reason" : "السبب")</label>
+                                <input type="text" name="Reason" class="@input" maxlength="300" />
                             </div>
-                            <div class="bd-actions">
-                                <button type="submit" class="bd-btn is-green">@T("Batches_ReturnIn")</button>
+                            <div class="@actionsEnd">
+                                <button type="submit" class="@btn border-ok/25 bg-ok-tint text-ok hover:bg-ok/15">@(Loc.IsEn ? "Return in" : "إرجاع داخل")</button>
                             </div>
                         </form>
                     </div>
 
                     @* Adjust *@
-                    <div class="bd-pane" id="pane-adjust" role="tabpanel" hidden>
-                        <form asp-area="Inventory" asp-controller="Stock" asp-action="Adjust" method="post" class="bd-form js-once">
+                    <div data-bd-pane id="pane-adjust" role="tabpanel" hidden>
+                        <form asp-area="Inventory" asp-controller="Stock" asp-action="Adjust" method="post" class="js-once @formGrid">
                             <input type="hidden" name="BatchId" value="@Model.Id" />
-                            <div class="c8">
-                                <label class="bd-label">@T("Common_Warehouse")</label>
-                                <select name="WarehouseId" class="bd-input" asp-items="whPlain" required>
+                            <div class="col-span-12 sm:col-span-8">
+                                <label class="@label">@(Loc.IsEn ? "Warehouse" : "المستودع")</label>
+                                <select name="WarehouseId" class="@select" asp-items="whPlain" required>
                                     <option value="">@selectText</option>
                                 </select>
                             </div>
-                            <div class="c4">
-                                <label class="bd-label">@T("Batches_Counted")</label>
-                                <input type="number" name="CountedQuantity" class="bd-input" min="0" required />
+                            <div class="col-span-12 sm:col-span-4">
+                                <label class="@label">@(Loc.IsEn ? "Counted" : "المعدود")</label>
+                                <input type="number" name="CountedQuantity" class="@input num" min="0" required />
                             </div>
-                            <div class="c12">
-                                <label class="bd-label">@T("Batches_AdjustReason")</label>
-                                <input type="text" name="Reason" class="bd-input" maxlength="300" required />
+                            <div class="col-span-12">
+                                <label class="@label">@(Loc.IsEn ? "Reason (required for adjustments)" : "السبب (مطلوب للتسويات)")</label>
+                                <input type="text" name="Reason" class="@input" maxlength="300" required />
                             </div>
-                            <div class="bd-actions">
-                                <button type="submit" class="bd-btn is-gray">@T("Batches_Adjust", "حفظ الجرد", "Save count")</button>
+                            <div class="@actionsEnd">
+                                <button type="submit" class="@btn border-line bg-sunken text-ink-soft hover:bg-line hover:text-ink">@(Loc.IsEn ? "Save count" : "حفظ الجرد")</button>
                             </div>
                         </form>
                     </div>
 
                     @* Damage *@
-                    <div class="bd-pane" id="pane-damage" role="tabpanel" hidden>
-                        <form asp-area="Inventory" asp-controller="Stock" asp-action="Damage" method="post" class="bd-form js-once">
+                    <div data-bd-pane id="pane-damage" role="tabpanel" hidden>
+                        <form asp-area="Inventory" asp-controller="Stock" asp-action="Damage" method="post" class="js-once @formGrid">
                             <input type="hidden" name="BatchId" value="@Model.Id" />
-                            <div class="c6">
-                                <label class="bd-label">@T("Common_Warehouse")</label>
-                                <select name="WarehouseId" class="bd-input" asp-items="whPlain" required>
+                            <div class="col-span-12 sm:col-span-6">
+                                <label class="@label">@(Loc.IsEn ? "Warehouse" : "المستودع")</label>
+                                <select name="WarehouseId" class="@select" asp-items="whPlain" required>
                                     <option value="">@selectText</option>
                                 </select>
                             </div>
-                            <div class="c3">
-                                <label class="bd-label">@T("Common_Quantity")</label>
-                                <input type="number" name="Quantity" class="bd-input" min="1" required />
+                            <div class="col-span-12 sm:col-span-3">
+                                <label class="@label">@(Loc.IsEn ? "Quantity" : "الكمية")</label>
+                                <input type="number" name="Quantity" class="@input num" min="1" required />
                             </div>
-                            <div class="c3">
-                                <label class="bd-label">@T("Batches_Ref")</label>
-                                <input type="text" name="ReferenceId" class="bd-input" />
+                            <div class="col-span-12 sm:col-span-3">
+                                <label class="@label">@(Loc.IsEn ? "Ref (optional Guid)" : "مرجع (Guid اختياري)")</label>
+                                <input type="text" name="ReferenceId" class="@input" />
                             </div>
-                            <div class="c12">
-                                <label class="bd-label">@T("Batches_DamageReason")</label>
-                                <input type="text" name="Reason" class="bd-input" maxlength="300" required />
+                            <div class="col-span-12">
+                                <label class="@label">@(Loc.IsEn ? "Damage description (required)" : "وصف التلف (مطلوب)")</label>
+                                <input type="text" name="Reason" class="@input" maxlength="300" required />
                             </div>
-                            <div class="bd-actions">
-                                <button type="submit" class="bd-btn is-red">@T("Batches_WriteOff")</button>
+                            <div class="@actionsEnd">
+                                <button type="submit" class="@btn border-danger/25 bg-danger-tint text-danger hover:bg-danger/15">@(Loc.IsEn ? "Write off" : "شطب")</button>
                             </div>
                         </form>
                     </div>
@@ -813,22 +251,22 @@
             </section>
 
             @* ───────── Movement history ───────── *@
-            <section class="bd-card">
-                <div class="bd-card-head">
-                    <span>@T("Batches_MovementHistory")</span>
-                    <span class="bd-badge neutral"><span class="bd-num">@movements.Count</span></span>
+            <section class="@card">
+                <div class="@cardHead">
+                    <span>@(Loc.IsEn ? "Movement history (audit trail)" : "سجل الحركات (مسار التدقيق)")</span>
+                    <span class="num rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@movements.Count</span>
                 </div>
-                <div class="bd-table-wrap">
-                    <table class="bd-table">
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-[860px] border-collapse text-[13.5px]">
                         <thead>
-                            <tr>
-                                <th>@T("Common_Date")</th>
-                                <th>@T("Common_Type")</th>
-                                <th>@T("Common_Quantity")</th>
-                                <th>@T("Common_Warehouse")</th>
-                                <th>@T("Common_Reference")</th>
-                                <th>@T("Common_Reason")</th>
-                                <th>@T("Batches_Col_Correct")</th>
+                            <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
+                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Date (UTC)" : "التاريخ (UTC)")</th>
+                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Type" : "النوع")</th>
+                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Quantity" : "الكمية")</th>
+                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Warehouse" : "المستودع")</th>
+                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Reference" : "المرجع")</th>
+                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Reason" : "السبب")</th>
+                                <th class="whitespace-nowrap px-3.5 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Correct" : "تصحيح")</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -838,26 +276,45 @@
                                 {
                                     var incoming = IsIncoming(m.MovementType);
                                     var transferLeg = m.MovementType == 2 || m.MovementType == 3;
-                                    <tr>
-                                        <td><span class="bd-num">@m.CreatedAt.ToString("yyyy-MM-dd HH:mm")</span></td>
-                                        <td><span class="bd-badge @(incoming ? "is-green" : "is-red")">@MoveType(m.MovementType)</span></td>
-                                        <td><span class="bd-num bd-qty @(incoming ? "in" : "out")">@(incoming ? "+" : "-")@m.Quantity</span></td>
-                                        <td>@WarehouseLabel(m.WarehouseId)</td>
-                                        <td class="bd-muted">@(m.ReferenceId?.ToString() ?? "-")</td>
-                                        <td class="wrap bd-muted">@(string.IsNullOrWhiteSpace(m.Reason) ? "-" : m.Reason)</td>
-                                        <td>
+                                    <tr class="border-b border-line last:border-0 hover:bg-sunken/50">
+                                        <td class="whitespace-nowrap px-3.5 py-3"><span class="num font-mono text-[12.5px] text-ink-soft" dir="ltr">@m.CreatedAt.ToString("yyyy-MM-dd HH:mm")</span></td>
+                                        <td class="whitespace-nowrap px-3.5 py-3">
+                                            @if (incoming)
+                                            {
+                                                <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@MoveType(m.MovementType)</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="inline-flex items-center rounded-full bg-danger-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-danger">@MoveType(m.MovementType)</span>
+                                            }
+                                        </td>
+                                        <td class="whitespace-nowrap px-3.5 py-3">
+                                            @if (incoming)
+                                            {
+                                                <span class="num font-bold text-ok" dir="ltr">+@m.Quantity</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="num font-bold text-danger" dir="ltr">-@m.Quantity</span>
+                                            }
+                                        </td>
+                                        <td class="whitespace-nowrap px-3.5 py-3 text-ink-soft">@WarehouseLabel(m.WarehouseId)</td>
+                                        <td class="whitespace-nowrap px-3.5 py-3 text-ink-faint">@(m.ReferenceId?.ToString() ?? "-")</td>
+                                        <td class="max-w-72 min-w-36 px-3.5 py-3 text-ink-soft">@(string.IsNullOrWhiteSpace(m.Reason) ? "-" : m.Reason)</td>
+                                        <td class="whitespace-nowrap px-3.5 py-3">
                                             @if (!transferLeg)
                                             {
-                                                <button type="button" class="bd-btn sm ghost-red"
+                                                <button type="button"
                                                         data-reverse-url="@Url.Action("ReverseMovement", "Stock", new { area = "Inventory", id = m.Id })"
                                                         data-summary="@MoveType(m.MovementType) (@m.Quantity)"
-                                                        title="@T("Batches_ReverseTitle")">
-                                                    @T("Batches_Reverse")
+                                                        title="@(Loc.IsEn ? "Appends an opposite, auditable correction movement" : "يضيف حركة تصحيح معاكسة قابلة للتدقيق")"
+                                                        class="inline-flex h-8 items-center rounded-md border border-danger/35 bg-transparent px-2.5 text-[12px] font-medium text-danger transition-colors hover:bg-danger-tint">
+                                                    @(Loc.IsEn ? "Reverse" : "عكس")
                                                 </button>
                                             }
                                             else
                                             {
-                                                <small class="bd-muted">@T("Batches_CounterTransfer")</small>
+                                                <small class="@note">@(Loc.IsEn ? "counter-transfer required" : "مطلوب تحويل مقابل")</small>
                                             }
                                         </td>
                                     </tr>
@@ -865,7 +322,7 @@
                             }
                             else
                             {
-                                <tr><td colspan="7" class="bd-empty">@T("Batches_NoMovements")</td></tr>
+                                <tr><td colspan="7" class="px-4 py-12 text-center text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No movements recorded for this batch yet." : "لا توجد حركات مسجّلة لهذه الدفعة بعد.")</td></tr>
                             }
                         </tbody>
                     </table>
@@ -873,73 +330,90 @@
             </section>
         </div>
 
-        @* ───────── Side: quantities + cost ───────── *@
-        <aside class="bd-side">
+        @* ───────── Side: quantities + cost (first on small screens) ───────── *@
+        <aside class="order-first grid min-w-0 gap-5 xl:order-none">
 
-            <section class="bd-card">
-                <div class="bd-card-head">@T("Batches_QuantitiesTitle")</div>
-                <div class="bd-card-body">
-                    <div class="bd-stats">
+            <section class="@card">
+                <div class="@cardHead">@(Loc.IsEn ? "Quantities (distinct concepts)" : "الكميات (مفاهيم متمايزة)")</div>
+                <div class="p-4">
+                    <div class="mb-4 grid grid-cols-2 gap-x-4 gap-y-4">
                         <div>
-                            <div class="bd-stat-label">@T("Batches_InitialReceived")</div>
-                            <div class="bd-stat-value"><span class="bd-num">@Model.InitialQuantity</span></div>
+                            <div class="text-[11.5px] text-ink-faint">@(Loc.IsEn ? "Initial received" : "المستلم أولاً")</div>
+                            <div class="text-[24px] font-bold leading-tight tracking-[-.02em] text-ink"><span class="num" dir="ltr">@Model.InitialQuantity</span></div>
                         </div>
                         <div>
-                            <div class="bd-stat-label">@T("Batches_UnallocatedRemaining")</div>
-                            <div class="bd-stat-value"><span class="bd-num">@Model.RemainingQuantity</span></div>
+                            <div class="text-[11.5px] text-ink-faint">@(Loc.IsEn ? "Unallocated (RemainingQuantity)" : "غير مخصَّص (الكمية المتبقية)")</div>
+                            <div class="text-[24px] font-bold leading-tight tracking-[-.02em] text-signal"><span class="num" dir="ltr">@Model.RemainingQuantity</span></div>
                         </div>
                         <div>
-                            <div class="bd-stat-label">@T("Batches_InWarehouses")</div>
-                            <div class="bd-stat-value"><span class="bd-num">@Model.QuantityInWarehouses</span></div>
+                            <div class="text-[11.5px] text-ink-faint">@(Loc.IsEn ? "Currently in warehouses" : "الموجود حالياً بالمستودعات")</div>
+                            <div class="text-[24px] font-bold leading-tight tracking-[-.02em] text-ok"><span class="num" dir="ltr">@Model.QuantityInWarehouses</span></div>
                         </div>
                         <div>
-                            <div class="bd-stat-label">@T("Batches_EverAllocated")</div>
-                            <div class="bd-stat-value"><span class="bd-num">@Model.AllocatedQuantity</span></div>
+                            <div class="text-[11.5px] text-ink-faint">@(Loc.IsEn ? "Ever allocated" : "إجمالي المخصَّص سابقاً")</div>
+                            <div class="text-[24px] font-bold leading-tight tracking-[-.02em] text-ink"><span class="num" dir="ltr">@Model.AllocatedQuantity</span></div>
                         </div>
                     </div>
 
-                    <div class="bd-bar" role="img" aria-label="@T("Batches_UnallocatedRemaining") / @T("Batches_InWarehouses")">
-                        <span style="width:@W(Pct(Model.RemainingQuantity)); background:#d9a441"></span>
-                        <span style="width:@W(Pct(Model.QuantityInWarehouses)); background:#35b585"></span>
+                    <div class="flex h-2 overflow-hidden rounded-full bg-sunken" role="img"
+                         aria-label="@(Loc.IsEn ? "Unallocated (RemainingQuantity)" : "غير مخصَّص (الكمية المتبقية)") / @(Loc.IsEn ? "Currently in warehouses" : "الموجود حالياً بالمستودعات")">
+                        <span class="block h-full bg-signal" style="width:@W(Pct(Model.RemainingQuantity))"></span>
+                        <span class="block h-full bg-ok" style="width:@W(Pct(Model.QuantityInWarehouses))"></span>
                     </div>
-                    <div class="bd-legend">
-                        <span><i class="bd-dot" style="--c:#d9a441"></i>@T("Batches_UnallocatedRemaining")</span>
-                        <span><i class="bd-dot" style="--c:#35b585"></i>@T("Batches_InWarehouses")</span>
+                    <div class="mt-2.5 flex flex-wrap gap-x-4 gap-y-1 text-[11.5px] text-ink-faint">
+                        <span class="inline-flex items-center gap-1.5"><i class="size-2 rounded-full bg-signal"></i>@(Loc.IsEn ? "Unallocated (RemainingQuantity)" : "غير مخصَّص (الكمية المتبقية)")</span>
+                        <span class="inline-flex items-center gap-1.5"><i class="size-2 rounded-full bg-ok"></i>@(Loc.IsEn ? "Currently in warehouses" : "الموجود حالياً بالمستودعات")</span>
                     </div>
                 </div>
             </section>
 
-            <section class="bd-card">
-                <div class="bd-card-head">@T("Batches_CostTitle")</div>
-                <div class="bd-card-body">
-                    <dl>
-                        <div class="bd-kv"><dt>@T("Batches_UnitCost")</dt><dd><span class="bd-num">@Model.UnitCost.ToString("N2")</span></dd></div>
-                        <div class="bd-kv"><dt>@T("Batches_InitialTotalCost")</dt><dd><span class="bd-num">@Model.InitialTotalCost.ToString("N2")</span></dd></div>
-                        <div class="bd-kv"><dt>@T("Batches_RemainingValue")</dt><dd><span class="bd-num">@Model.RemainingValue.ToString("N2")</span></dd></div>
-                        <div class="bd-kv"><dt>@T("Batches_ReceivedAt")</dt><dd><span class="bd-num">@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm") UTC</span></dd></div>
+            <section class="@card">
+                <div class="@cardHead">@(Loc.IsEn ? "Cost (recorded batch unit cost)" : "التكلفة (تكلفة وحدة الدفعة المسجّلة)")</div>
+                <div class="p-4">
+                    <dl class="text-[13.5px]">
+                        <div class="flex items-baseline justify-between gap-4 border-b border-line py-2.5">
+                            <dt class="text-ink-soft">@(Loc.IsEn ? "Unit cost" : "تكلفة الوحدة")</dt>
+                            <dd class="num font-semibold text-ink" dir="ltr">@Model.UnitCost.ToString("N2")</dd>
+                        </div>
+                        <div class="flex items-baseline justify-between gap-4 border-b border-line py-2.5">
+                            <dt class="text-ink-soft">@(Loc.IsEn ? "Initial total cost" : "إجمالي التكلفة الأولية")</dt>
+                            <dd class="num font-semibold text-ink" dir="ltr">@Model.InitialTotalCost.ToString("N2")</dd>
+                        </div>
+                        <div class="flex items-baseline justify-between gap-4 border-b border-line py-2.5">
+                            <dt class="text-ink-soft">@(Loc.IsEn ? "Unallocated value" : "قيمة غير المخصَّص")</dt>
+                            <dd class="num font-semibold text-ink" dir="ltr">@Model.RemainingValue.ToString("N2")</dd>
+                        </div>
+                        <div class="flex items-baseline justify-between gap-4 py-2.5">
+                            <dt class="text-ink-soft">@(Loc.IsEn ? "Received at" : "تاريخ الاستلام")</dt>
+                            <dd class="num font-semibold text-ink" dir="ltr">@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm") UTC</dd>
+                        </div>
                     </dl>
-                    <small class="bd-note">@T("Batches_CostNote")</small>
+                    <small class="@note mt-3 block">@(Loc.IsEn ? "Traceable recorded costs only — no FIFO / weighted-average valuation policy is approved yet." : "تكاليف مسجّلة قابلة للتتبع فقط — لا توجد سياسة تقييم FIFO أو متوسط مرجّح معتمدة بعد.")</small>
                 </div>
             </section>
         </aside>
     </div>
 
     @* One shared dialog for reversing any movement *@
-    <dialog class="bd-dialog" id="bdReverseDialog" aria-labelledby="bdReverseTitle">
+    <dialog id="bdReverseDialog" aria-labelledby="bdReverseTitle"
+            class="m-auto w-[calc(100%-2rem)] max-w-md rounded-lg border border-line bg-surface p-0 text-ink shadow-pop backdrop:bg-black/50">
         <form method="post" id="bdReverseForm" class="js-once" asp-antiforgery="false">
             @Html.AntiForgeryToken()
             <input type="hidden" name="batchId" value="@Model.Id" />
-            <div class="bd-dialog-head" id="bdReverseTitle">@T("Batches_ReverseTitle")</div>
-            <div class="bd-dialog-body">
-                <div id="bdReverseSummary" style="font-weight:600"></div>
+            <div id="bdReverseTitle" class="border-b border-line px-5 py-4 text-[14px] font-semibold">@(Loc.IsEn ? "Appends an opposite, auditable correction movement" : "يضيف حركة تصحيح معاكسة قابلة للتدقيق")</div>
+            <div class="grid gap-3.5 p-5">
+                <div id="bdReverseSummary" class="font-semibold"></div>
                 <div>
-                    <label class="bd-label" for="bdReverseReason">@T("Batches_CorrectionReason")</label>
-                    <input type="text" id="bdReverseReason" name="reason" class="bd-input" required maxlength="290" />
+                    <label for="bdReverseReason" class="@label">@(Loc.IsEn ? "Correction reason" : "سبب التصحيح")</label>
+                    <input type="text" id="bdReverseReason" name="reason" class="@input" required maxlength="290" />
                 </div>
             </div>
-            <div class="bd-dialog-foot">
-                <button type="button" class="bd-btn ghost" id="bdReverseCancel">@T("Common_Cancel", "إلغاء", "Cancel")</button>
-                <button type="submit" class="bd-btn is-red">@T("Batches_Reverse")</button>
+            <div class="flex justify-end gap-2.5 border-t border-line px-5 py-4">
+                <button type="button" id="bdReverseCancel"
+                        class="@btn border-line bg-surface font-medium text-ink hover:bg-sunken">
+                    @(Loc.IsEn ? "Cancel" : "إلغاء")
+                </button>
+                <button type="submit" class="@btn border-danger/25 bg-danger-tint text-danger hover:bg-danger/15">@(Loc.IsEn ? "Reverse" : "عكس")</button>
             </div>
         </form>
     </dialog>
@@ -947,32 +421,15 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        var page = document.querySelector('.bd-page');
+        var page = document.getElementById('bd-page');
         if (!page) return;
-
-        // 0) Solid surface colour (for select dropdowns / dialog), taken from the app's own theme
-        (function () {
-            var el = page.parentElement;
-            while (el) {
-                var c = getComputedStyle(el).backgroundColor;
-                if (c && c !== 'rgba(0, 0, 0, 0)' && c !== 'transparent') { page.style.setProperty('--bd-solid', c); return; }
-                el = el.parentElement;
-            }
-            var t = (getComputedStyle(page).color.match(/\d+/g) || [0, 0, 0]).map(Number);
-            var lum = 0.299 * t[0] + 0.587 * t[1] + 0.114 * t[2];
-            page.style.setProperty('--bd-solid', lum > 140 ? '#16181d' : '#ffffff');
-        })();
 
         // 1) Operation tabs (remembers the last one, so a failed submit lands on the same form)
         var key = 'batch-details-tab';
-        var tabs = Array.prototype.slice.call(page.querySelectorAll('.bd-tab'));
-        var panes = Array.prototype.slice.call(page.querySelectorAll('.bd-pane'));
+        var tabs = Array.prototype.slice.call(page.querySelectorAll('[data-pane]'));
+        var panes = Array.prototype.slice.call(page.querySelectorAll('[data-bd-pane]'));
         function show(id, remember) {
-            tabs.forEach(function (t) {
-                var on = t.getAttribute('data-pane') === id;
-                t.classList.toggle('is-active', on);
-                t.setAttribute('aria-selected', on ? 'true' : 'false');
-            });
+            tabs.forEach(function (t) { t.setAttribute('aria-selected', t.getAttribute('data-pane') === id ? 'true' : 'false'); });
             panes.forEach(function (p) { p.hidden = p.id !== id; });
             if (remember) { try { sessionStorage.setItem(key, id); } catch (e) { } }
         }
@@ -1024,7 +481,7 @@
 
         // 5) Dismissible alerts
         page.querySelectorAll('[data-dismiss-alert]').forEach(function (b) {
-            b.addEventListener('click', function () { b.closest('.bd-alert').remove(); });
+            b.addEventListener('click', function () { b.parentElement.remove(); });
         });
     });
 </script>

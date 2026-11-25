@@ -1,4 +1,5 @@
-﻿using Identity.Contracts;
+﻿using Identity.Application.Common.Interfaces;
+using Identity.Contracts;
 using Identity.Contracts.DTOs;
 using Identity.Infrastructure.Authentication;
 using Microsoft.Extensions.Options;

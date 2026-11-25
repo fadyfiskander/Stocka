@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stocka.MVC.Areas.Account.Models;
+using Stocka.MVC.Localization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -127,7 +128,7 @@ namespace Stocka.MVC.Areas.Account.Controllers
 
                         AllowRefresh = true,
 
-                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(1)
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
                     };
 
                 // 6. Issue Authentication Cookie.
@@ -146,7 +147,7 @@ namespace Stocka.MVC.Areas.Account.Controllers
             {
                 ModelState.AddModelError(
                     string.Empty,
-                    Stocka.MVC.Localization.Loc.T("Login_InvalidCredentials")
+                    (Loc.IsEn ? "Invalid email or password." : "البريد الإلكتروني أو كلمة المرور غير صحيحة.")
                 );
 
                 return View(model);
@@ -175,7 +176,7 @@ namespace Stocka.MVC.Areas.Account.Controllers
         [HttpGet("AccessDenied")]
         public IActionResult AccessDenied()
         {
-            ViewBag.Title = Stocka.MVC.Localization.Loc.T("Denied_Title");
+            ViewBag.Title = (Loc.IsEn ? "Access denied" : "تم رفض الوصول");
             return View();
         }
 

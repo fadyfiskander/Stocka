@@ -7,6 +7,12 @@
     <UserSecretsId>472fc2ec-2db4-4450-8e7e-845497e6edaa</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..\..</DockerfileContext>
+
+    <!-- Tailwind CSS build integration (see the TailwindBuild target below).
+         Set SkipTailwindBuild=true to skip it (e.g. on machines without Node/npm). -->
+    <SkipTailwindBuild Condition="'$(SkipTailwindBuild)' == ''">false</SkipTailwindBuild>
+    <TailwindInput>$(MSBuildProjectDirectory)\src\styles\tailwind.css</TailwindInput>
+    <TailwindOutput>$(MSBuildProjectDirectory)\wwwroot\css\tailwind.css</TailwindOutput>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,6 +24,13 @@
     <EmbeddedResource Remove="Areas\Catalog\Data\**" />
     <None Remove="Areas\Account\Data\**" />
     <None Remove="Areas\Catalog\Data\**" />
+  </ItemGroup>
+
+  <!-- Tailwind rebuild triggers: templates and scripts that carry utility classes. -->
+  <ItemGroup>
+    <TailwindSources Include="Views\**\*.cshtml" />
+    <TailwindSources Include="Areas\**\*.cshtml" />
+    <TailwindSources Include="wwwroot\js\**\*.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,5 +56,23 @@
     <ProjectReference Include="..\..\Modules\Organization\Organization.Contracts\Organization.Contracts.csproj" />
     <ProjectReference Include="..\..\Modules\Organization\Organization.Infrastructure\Organization.Infrastructure.csproj" />
   </ItemGroup>
+
+  <!-- ============================================================
+       Tailwind CSS
+       Builds wwwroot/css/tailwind.css from src/styles/tailwind.css
+       as part of `dotnet build`. Skipped when SkipTailwindBuild=true.
+       ============================================================ -->
+  <Target Name="TailwindBuild"
+          BeforeTargets="Build;Publish"
+          Inputs="$(TailwindInput);$(MSBuildProjectDirectory)\package.json;$(MSBuildProjectDirectory)\package-lock.json;@(TailwindSources)"
+          Outputs="$(TailwindOutput)"
+          Condition="'$(SkipTailwindBuild)' != 'true'">
+    <Error Condition="!Exists('$(TailwindInput)')"
+           Text="Tailwind input not found at $(TailwindInput)." />
+    <Error Condition="!Exists('$(MSBuildProjectDirectory)\node_modules')"
+           Text="Tailwind dependencies are not installed. Run `npm install` in $(MSBuildProjectDirectory), or build with -p:SkipTailwindBuild=true to skip the CSS build." />
+
+    <Exec Command="npm run build" WorkingDirectory="$(MSBuildProjectDirectory)" />
+  </Target>
 
 </Project>
