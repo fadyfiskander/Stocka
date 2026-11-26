@@ -28,7 +28,7 @@
     <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div class="rounded-lg border border-line bg-surface p-4 shadow-card">
             <div class="flex items-center gap-1.5 text-[11.5px] font-semibold text-ink-soft">
-                <svg class="icon !size-[15px] text-accent"><use href="#i-store" /></svg>@(Loc.IsEn ? "Warehouses" : "المستودعات")
+                <icon name="store" class="!size-[15px] text-accent" />@(Loc.IsEn ? "Warehouses" : "المستودعات")
             </div>
             <div class="mt-1.5 flex items-baseline gap-2">
                 <span class="num text-[26px] font-bold tracking-[-.02em] text-ink">@Model.TotalWarehouses</span>
@@ -37,7 +37,7 @@
         </div>
         <div class="rounded-lg border border-line bg-surface p-4 shadow-card">
             <div class="flex items-center gap-1.5 text-[11.5px] font-semibold text-ink-soft">
-                <svg class="icon !size-[15px] text-accent"><use href="#i-layers" /></svg>@(Loc.IsEn ? "Batches" : "الدفعات")
+                <icon name="layers" class="!size-[15px] text-accent" />@(Loc.IsEn ? "Batches" : "الدفعات")
             </div>
             <div class="mt-1.5 flex items-baseline gap-2">
                 <span class="num text-[26px] font-bold tracking-[-.02em] text-ink">@Model.TotalBatches</span>
@@ -46,14 +46,14 @@
         </div>
         <div class="rounded-lg border border-line bg-surface p-4 shadow-card">
             <div class="flex items-center gap-1.5 text-[11.5px] font-semibold text-ink-soft">
-                <svg class="icon !size-[15px] text-accent"><use href="#i-box" /></svg>@(Loc.IsEn ? "Units in warehouses" : "وحدات بالمستودعات")
+                <icon name="package" class="!size-[15px] text-accent" />@(Loc.IsEn ? "Units in warehouses" : "وحدات بالمستودعات")
             </div>
             <div class="mt-1.5 num text-[26px] font-bold tracking-[-.02em] text-ink">@Model.UnitsInWarehouses</div>
             <div class="mt-0.5 text-[11px] text-ink-faint">@(Loc.IsEn ? "raw unit count, not capacity" : "عدد وحدات خام، ليس سعة")</div>
         </div>
         <div class="rounded-lg border border-line bg-surface p-4 shadow-card">
             <div class="flex items-center gap-1.5 text-[11.5px] font-semibold text-ink-soft">
-                <svg class="icon !size-[15px] text-signal"><use href="#i-swap" /></svg>@(Loc.IsEn ? "Total unallocated" : "إجمالي غير المخصَّص")
+                <icon name="arrow-left-right" class="!size-[15px] text-signal" />@(Loc.IsEn ? "Total unallocated" : "إجمالي غير المخصَّص")
             </div>
             <div class="mt-1.5 num text-[26px] font-bold tracking-[-.02em] text-signal">@Model.UnallocatedUnits</div>
             <div class="mt-0.5 text-[11px] text-ink-faint">@(Loc.IsEn ? "units never placed" : "وحدات لم تُوضع أبداً")</div>
@@ -63,7 +63,7 @@
     <div class="rounded-lg border border-line bg-surface shadow-card">
         <div class="flex flex-wrap items-baseline justify-between gap-3 border-b border-line px-5 py-3">
             <span class="flex items-center gap-2.5 text-[14px] font-semibold text-ink">
-                <svg class="icon !size-[18px] text-accent"><use href="#i-chart" /></svg>@(Loc.IsEn ? "Total inventory cost (recorded batch unit costs)" : "إجمالي تكلفة المخزون (تكاليف وحدات الدفعات المسجّلة)")
+                <icon name="chart-column" class="!size-[18px] text-accent" />@(Loc.IsEn ? "Total inventory cost (recorded batch unit costs)" : "إجمالي تكلفة المخزون (تكاليف وحدات الدفعات المسجّلة)")
             </span>
             <span class="num text-[24px] font-bold tracking-[-.02em] text-ink">@Model.TotalInventoryCost.ToString("N2")</span>
         </div>
@@ -72,7 +72,7 @@
 
     <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
         <div class="flex items-center gap-2.5 border-b border-line px-5 py-3">
-            <svg class="icon !size-[18px] text-accent"><use href="#i-chart" /></svg>
+            <icon name="chart-column" class="!size-[18px] text-accent" />
             <span class="text-[14px] font-semibold text-ink">@(Loc.IsEn ? "Movement totals by type (all time)" : "إجماليات الحركات حسب النوع (كل الوقت)")</span>
         </div>
         <div class="overflow-x-auto">
@@ -117,9 +117,9 @@
     </div>
 
     <div class="flex flex-wrap gap-2">
-        <a class="@btnGhost" asp-area="Inventory" asp-controller="Reports" asp-action="Warehouses"><svg class="icon !size-4"><use href="#i-store" /></svg>@(Loc.IsEn ? "Warehouse reports" : "تقارير المستودعات")</a>
-        <a class="@btnGhost" asp-area="Inventory" asp-controller="Reports" asp-action="Products"><svg class="icon !size-4"><use href="#i-box" /></svg>@(Loc.IsEn ? "Zero-stock products" : "منتجات نفاد المخزون")</a>
-        <a class="@btnGhost" asp-area="Inventory" asp-controller="Reports" asp-action="Movements"><svg class="icon !size-4"><use href="#i-swap" /></svg>@(Loc.IsEn ? "Movement reports" : "تقارير الحركات")</a>
-        <a class="@btnGhost" asp-area="Inventory" asp-controller="Reports" asp-action="Balance"><svg class="icon !size-4"><use href="#i-chart" /></svg>@(Loc.IsEn ? "Historical balance" : "الرصيد التاريخي")</a>
+        <a class="@btnGhost" asp-area="Inventory" asp-controller="Reports" asp-action="Warehouses"><icon name="store" class="!size-4" />@(Loc.IsEn ? "Warehouse reports" : "تقارير المستودعات")</a>
+        <a class="@btnGhost" asp-area="Inventory" asp-controller="Reports" asp-action="Products"><icon name="package" class="!size-4" />@(Loc.IsEn ? "Zero-stock products" : "منتجات نفاد المخزون")</a>
+        <a class="@btnGhost" asp-area="Inventory" asp-controller="Reports" asp-action="Movements"><icon name="arrow-left-right" class="!size-4" />@(Loc.IsEn ? "Movement reports" : "تقارير الحركات")</a>
+        <a class="@btnGhost" asp-area="Inventory" asp-controller="Reports" asp-action="Balance"><icon name="chart-column" class="!size-4" />@(Loc.IsEn ? "Historical balance" : "الرصيد التاريخي")</a>
     </div>
 </section>

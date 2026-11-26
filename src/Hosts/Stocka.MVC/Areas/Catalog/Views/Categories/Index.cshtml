@@ -16,10 +16,10 @@
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <a class="@btnGhost" asp-area="Catalog" asp-controller="Categories" asp-action="SearchByName">
-                <svg class="icon !size-4"><use href="#i-search" /></svg>@(Loc.IsEn ? "Search by name" : "بحث بالاسم")
+                <icon name="search" class="!size-4" />@(Loc.IsEn ? "Search by name" : "بحث بالاسم")
             </a>
             <a class="@btnPrimary" asp-area="Catalog" asp-controller="Categories" asp-action="Create">
-                <svg class="icon !size-4"><use href="#i-plus" /></svg>@(Loc.IsEn ? "Add category" : "إضافة تصنيف")
+                <icon name="plus" class="!size-4" />@(Loc.IsEn ? "Add category" : "إضافة تصنيف")
             </a>
         </div>
     </header>
@@ -78,7 +78,7 @@
                     {
                         <tr>
                             <td colspan="4" class="px-6 py-14 text-center">
-                                <svg class="icon mx-auto !size-8 text-ink-faint"><use href="#i-tag" /></svg>
+                                <icon name="tag" class="mx-auto !size-8 text-ink-faint" />
                                 <p class="mt-2 font-semibold text-[14px] text-ink">@(Loc.IsEn ? "No categories found" : "لا توجد فئات")</p>
                                 <p class="mx-auto mt-1 max-w-[46ch] text-[12.5px] text-ink-soft">@(Loc.IsEn ? "There are no categories to display. Try creating one." : "لا توجد فئات للعرض. جرّب إنشاء تصنيف.")</p>
                             </td>

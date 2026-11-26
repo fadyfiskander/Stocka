@@ -1,4 +1,4 @@
-@model PaginatedResult<ZeroStockProductDto>
+﻿@model PaginatedResult<ZeroStockProductDto>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = (Loc.IsEn ? "Zero-stock products" : "منتجات نفاد المخزون");
@@ -41,7 +41,7 @@
                     {
                         <tr>
                             <td colspan="4" class="px-6 py-14 text-center">
-                                <svg class="icon mx-auto !size-8 text-ink-faint"><use href="#i-box" /></svg>
+                                <icon name="package" class="mx-auto !size-8 text-ink-faint" />
                                 <p class="mt-2 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No zero-stock products." : "لا توجد منتجات نفاد مخزون.")</p>
                             </td>
                         </tr>
@@ -57,22 +57,22 @@
             @if (Model.HasPrevious)
             {
                 <a class="@pageBtn" asp-area="Inventory" asp-controller="Reports" asp-action="Products" asp-route-page="@(Model.Page - 1)">
-                    <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Previous" : "السابق")
+                    <icon name="chevron-left" class="!size-4 scale-x-[var(--dir-flip)]" />@(Loc.IsEn ? "Previous" : "السابق")
                 </a>
             }
             else
             {
-                <span class="@pageOff"><svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Previous" : "السابق")</span>
+                <span class="@pageOff"><icon name="chevron-left" class="!size-4 scale-x-[var(--dir-flip)]" />@(Loc.IsEn ? "Previous" : "السابق")</span>
             }
             @if (Model.HasNext)
             {
                 <a class="@pageBtn" asp-area="Inventory" asp-controller="Reports" asp-action="Products" asp-route-page="@(Model.Page + 1)">
-                    @(Loc.IsEn ? "Next" : "التالي")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg>
+                    @(Loc.IsEn ? "Next" : "التالي")<icon name="chevron-right" class="!size-4 scale-x-[var(--dir-flip)]" />
                 </a>
             }
             else
             {
-                <span class="@pageOff">@(Loc.IsEn ? "Next" : "التالي")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg></span>
+                <span class="@pageOff">@(Loc.IsEn ? "Next" : "التالي")<icon name="chevron-right" class="!size-4 scale-x-[var(--dir-flip)]" /></span>
             }
         </div>
     </div>

@@ -16,10 +16,10 @@
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <a class="@btnGhost" asp-area="Catalog" asp-controller="Products" asp-action="SearchByName">
-                <svg class="icon !size-4"><use href="#i-search" /></svg>@(Loc.IsEn ? "Search by name" : "بحث بالاسم")
+                <icon name="search" class="!size-4" />@(Loc.IsEn ? "Search by name" : "بحث بالاسم")
             </a>
             <a class="@btnPrimary" asp-area="Catalog" asp-controller="Products" asp-action="Create">
-                <svg class="icon !size-4"><use href="#i-plus" /></svg>@(Loc.IsEn ? "Add product" : "إضافة منتج")
+                <icon name="plus" class="!size-4" />@(Loc.IsEn ? "Add product" : "إضافة منتج")
             </a>
         </div>
     </header>
@@ -82,7 +82,7 @@
                     {
                         <tr>
                             <td colspan="5" class="px-6 py-14 text-center">
-                                <svg class="icon mx-auto !size-8 text-ink-faint"><use href="#i-box" /></svg>
+                                <icon name="package" class="mx-auto !size-8 text-ink-faint" />
                                 <p class="mt-2 font-semibold text-[14px] text-ink">@(Loc.IsEn ? "No products found" : "لا توجد منتجات")</p>
                                 <p class="mx-auto mt-1 max-w-[46ch] text-[12.5px] text-ink-soft">@(Loc.IsEn ? "There are no products to display. Try adding one." : "لا توجد منتجات للعرض. جرّب إضافة منتج.")</p>
                             </td>

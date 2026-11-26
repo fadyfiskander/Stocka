@@ -23,7 +23,8 @@ settings-2, languages, globe, sun, moon, paintbrush, currency, hard-drive, cloud
 plug, webhook, server, file-up, file-down, file-json, file-code, link, unlink, terminal, code, key,
 files, file, file-image, file-archive, folder, folder-open, folder-plus, paperclip,
 check, x, alert-circle, info, loader-circle, shield-alert, wifi-off, cloud-off, circle-dot, circle-minus, badge-alert,
-wrench, toolbox, hammer
+wrench, toolbox, hammer,
+plus, pencil, arrow-up, arrow-down
 '@ -split '[,\s]+' | Where-Object { $_ } | Select-Object -Unique
 
 # old name -> new name in recent Lucide

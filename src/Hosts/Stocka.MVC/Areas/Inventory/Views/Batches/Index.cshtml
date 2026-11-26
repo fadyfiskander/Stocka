@@ -20,7 +20,7 @@
             <p class="mt-1.5 max-w-[80ch] text-[13.5px] text-ink-soft">@(Loc.IsEn ? "Received stock batches. RemainingQuantity = units not yet allocated to warehouses." : "دفعات المخزون المستلمة. الكمية المتبقية = وحدات لم تُخصَّص للمستودعات بعد.")</p>
         </div>
         <a class="@btnPrimary" asp-area="Inventory" asp-controller="Batches" asp-action="Create">
-            <svg class="icon !size-4"><use href="#i-plus" /></svg>@(Loc.IsEn ? "Register batch" : "تسجيل دفعة")
+            <icon name="plus" class="!size-4" />@(Loc.IsEn ? "Register batch" : "تسجيل دفعة")
         </a>
     </header>
 
@@ -31,7 +31,7 @@
             <input type="text" name="purchaseItemId" class="@input num font-mono" placeholder="@(Loc.IsEn ? "Purchase item ID (Guid)" : "معرّف بند الشراء (Guid)")" value="@purchaseItemId" />
             <input type="text" name="warehouseId" class="@input num font-mono" placeholder="@(Loc.IsEn ? "Warehouse holding stock" : "المستودع الحامل للمخزون")" value="@warehouseId" />
             <button type="submit" class="inline-flex h-10 items-center justify-center gap-1.5 rounded-md border border-line bg-surface px-4 font-medium text-[13.5px] text-ink transition-colors hover:bg-sunken">
-                <svg class="icon !size-4"><use href="#i-filter" /></svg>@(Loc.IsEn ? "Filter" : "تصفية")
+                <icon name="filter" class="!size-4" />@(Loc.IsEn ? "Filter" : "تصفية")
             </button>
             <a class="inline-flex h-10 items-center justify-center rounded-md px-4 font-medium text-[13.5px] text-ink-soft transition-colors hover:bg-sunken hover:text-ink hover:no-underline"
                asp-area="Inventory" asp-controller="Batches" asp-action="Index">@(Loc.IsEn ? "Clear" : "مسح")</a>
@@ -74,7 +74,7 @@
                     {
                         <tr>
                             <td colspan="7" class="px-6 py-14 text-center">
-                                <svg class="icon mx-auto !size-8 text-ink-faint"><use href="#i-layers" /></svg>
+                                <icon name="layers" class="mx-auto !size-8 text-ink-faint" />
                                 <p class="mt-2 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No batches found." : "لا توجد دفعات.")</p>
                             </td>
                         </tr>
@@ -90,22 +90,22 @@
             @if (Model.HasPrevious)
             {
                 <a class="@pageBtn" asp-area="Inventory" asp-controller="Batches" asp-action="Index" asp-route-productId="@productId" asp-route-purchaseItemId="@purchaseItemId" asp-route-warehouseId="@warehouseId" asp-route-page="@(Model.Page - 1)">
-                    <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Previous" : "السابق")
+                    <icon name="chevron-left" class="!size-4 scale-x-[var(--dir-flip)]" />@(Loc.IsEn ? "Previous" : "السابق")
                 </a>
             }
             else
             {
-                <span class="@pageOff"><svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Previous" : "السابق")</span>
+                <span class="@pageOff"><icon name="chevron-left" class="!size-4 scale-x-[var(--dir-flip)]" />@(Loc.IsEn ? "Previous" : "السابق")</span>
             }
             @if (Model.HasNext)
             {
                 <a class="@pageBtn" asp-area="Inventory" asp-controller="Batches" asp-action="Index" asp-route-productId="@productId" asp-route-purchaseItemId="@purchaseItemId" asp-route-warehouseId="@warehouseId" asp-route-page="@(Model.Page + 1)">
-                    @(Loc.IsEn ? "Next" : "التالي")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg>
+                    @(Loc.IsEn ? "Next" : "التالي")<icon name="chevron-right" class="!size-4 scale-x-[var(--dir-flip)]" />
                 </a>
             }
             else
             {
-                <span class="@pageOff">@(Loc.IsEn ? "Next" : "التالي")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg></span>
+                <span class="@pageOff">@(Loc.IsEn ? "Next" : "التالي")<icon name="chevron-right" class="!size-4 scale-x-[var(--dir-flip)]" /></span>
             }
         </div>
     </div>
