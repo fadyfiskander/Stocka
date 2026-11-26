@@ -57,20 +57,18 @@
     <ProjectReference Include="..\..\Modules\Organization\Organization.Infrastructure\Organization.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\icons\" />
+  </ItemGroup>
+
   <!-- ============================================================
        Tailwind CSS
        Builds wwwroot/css/tailwind.css from src/styles/tailwind.css
        as part of `dotnet build`. Skipped when SkipTailwindBuild=true.
        ============================================================ -->
-  <Target Name="TailwindBuild"
-          BeforeTargets="Build;Publish"
-          Inputs="$(TailwindInput);$(MSBuildProjectDirectory)\package.json;$(MSBuildProjectDirectory)\package-lock.json;@(TailwindSources)"
-          Outputs="$(TailwindOutput)"
-          Condition="'$(SkipTailwindBuild)' != 'true'">
-    <Error Condition="!Exists('$(TailwindInput)')"
-           Text="Tailwind input not found at $(TailwindInput)." />
-    <Error Condition="!Exists('$(MSBuildProjectDirectory)\node_modules')"
-           Text="Tailwind dependencies are not installed. Run `npm install` in $(MSBuildProjectDirectory), or build with -p:SkipTailwindBuild=true to skip the CSS build." />
+  <Target Name="TailwindBuild" BeforeTargets="Build;Publish" Inputs="$(TailwindInput);$(MSBuildProjectDirectory)\package.json;$(MSBuildProjectDirectory)\package-lock.json;@(TailwindSources)" Outputs="$(TailwindOutput)" Condition="'$(SkipTailwindBuild)' != 'true'">
+    <Error Condition="!Exists('$(TailwindInput)')" Text="Tailwind input not found at $(TailwindInput)." />
+    <Error Condition="!Exists('$(MSBuildProjectDirectory)\node_modules')" Text="Tailwind dependencies are not installed. Run `npm install` in $(MSBuildProjectDirectory), or build with -p:SkipTailwindBuild=true to skip the CSS build." />
 
     <Exec Command="npm run build" WorkingDirectory="$(MSBuildProjectDirectory)" />
   </Target>
