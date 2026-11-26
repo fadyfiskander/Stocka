@@ -28,6 +28,11 @@ namespace Catalog.Infrastructure.Configurations
                 .IsRequired(false);
 
             builder
+                .HasIndex(p => new { p.Barcode, p.OrganizationId })
+                .IsUnique()
+                .HasFilter("[Barcode] IS NOT NULL");
+
+            builder
                 .Property(p => p.SellingPrice)
                 .HasColumnType("DECIMAL(7,2)");
 
