@@ -25,13 +25,13 @@ public record RetrieveProductQueryMediatR(RetrieveProductQuery Contract) : IRequ
 {
     object IContractRequest.Contract => Contract;
 }
-public record RetrieveProductByNameQueryMediatR(RetrieveProductByNameQuery Contract) : IRequest<ProductDto>, IContractRequest
+public record RetrieveProductByNameQueryMediatR(RetrieveProductByNameQuery Contract) : IRequest<IEnumerable<ProductDto>>, IContractRequest
 {
     object IContractRequest.Contract => Contract;
 }
-public record ListProductsQueryMediatR(ListProductsQuery Contract) : IRequest<IEnumerable<ProductDto>>, IContractRequest
+public record ListProductsQueryMediatR() : IRequest<IEnumerable<ProductDto>>, IContractRequest
 {
-    object IContractRequest.Contract => Contract;
+    object IContractRequest.Contract => new();
 }
 
 public record ListProductsByIdsQueryMediatR(ListProductsByIdsQuery Contract) : IRequest<IEnumerable<ProductDto>>, IContractRequest

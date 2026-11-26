@@ -24,7 +24,7 @@ namespace Catalog.Application.UseCases.Categories
             if (string.IsNullOrWhiteSpace(request.Contract.Name))
                 throw new ArgumentException("Category name is required.", nameof(request.Contract.Name));
 
-            return await _categoryQueryRepository.GetByNameAsync(request.Contract.Name.Trim())
+            return await _categoryQueryRepository.GetByNameAsync(request.Contract.Name.Trim(), cancellationToken)
                 ?? throw new KeyNotFoundException($"Category with name '{request.Contract.Name}' was not found.");
         }
     }

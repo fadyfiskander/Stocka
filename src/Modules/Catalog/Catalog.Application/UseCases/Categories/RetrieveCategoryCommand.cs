@@ -24,7 +24,7 @@ namespace Catalog.Application.UseCases.Categories
             if (request.Contract.CategoryId == Guid.Empty)
                 throw new ArgumentException("Category ID is required.", nameof(request.Contract.CategoryId));
 
-            return await _categoryQueryRepository.GetByIdAsync(request.Contract.CategoryId)
+            return await _categoryQueryRepository.GetByIdAsync(request.Contract.CategoryId, cancellationToken)
                 ?? throw new KeyNotFoundException($"Category with id '{request.Contract.CategoryId}' was not found.");
         }
     }

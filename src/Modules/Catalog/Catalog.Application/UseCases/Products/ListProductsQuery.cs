@@ -28,7 +28,7 @@ namespace Catalog.Application.UseCases.Products
             if(organizationId is null)
                 throw new ArgumentNullException("organizationId is null, organizationId cannot be null");
 
-            var products = await _productQueryRepository.GetAllAsync(organizationId.Value);
+            var products = await _productQueryRepository.GetAllAsync(cancellationToken);
             return products;
         }
     }

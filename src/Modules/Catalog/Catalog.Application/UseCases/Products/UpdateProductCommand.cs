@@ -54,7 +54,7 @@ namespace Catalog.Application.UseCases.Products
                 if (request.Contract.CategoryId.Value == Guid.Empty)
                     throw new ArgumentException("Category ID must be a valid value.", nameof(request.Contract.CategoryId));
 
-                var categoryExists = await _categoryQueryRepository.GetByIdAsync(request.Contract.CategoryId.Value);
+                var categoryExists = await _categoryQueryRepository.GetByIdAsync(request.Contract.CategoryId.Value, cancellationToken);
                 if (categoryExists is null)
                     throw new KeyNotFoundException($"Category with id '{request.Contract.CategoryId}' was not found.");
 

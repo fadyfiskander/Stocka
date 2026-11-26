@@ -28,10 +28,10 @@ public interface IProductCases
     Task<ProductDto> RetrieveProductAsync(RetrieveProductQuery query, CancellationToken cancellationToken = default);
 
     /// <summary>Retrieves one product by its exact name.</summary>
-    Task<ProductDto> RetrieveProductByNameAsync(RetrieveProductByNameQuery query, CancellationToken cancellationToken = default);
+    Task<IEnumerable<ProductDto>> RetrieveProductByNameAsync(RetrieveProductByNameQuery query, CancellationToken cancellationToken = default);
 
     /// <summary>Retrieves the product listing for the current (or explicitly requested) Organization.</summary>
-    Task<IEnumerable<ProductDto>> ListProductsAsync(ListProductsQuery query, CancellationToken cancellationToken = default);
+    Task<IEnumerable<ProductDto>> ListProductsAsync(CancellationToken cancellationToken = default);
 
     /// <summary>Retrieves a set of products by ID for the current Organization.</summary>
     Task<IEnumerable<ProductDto>> ListProductsByIdsAsync(ListProductsByIdsQuery query, CancellationToken cancellationToken = default);

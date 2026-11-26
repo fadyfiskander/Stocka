@@ -9,6 +9,4 @@ namespace Catalog.Contracts.UseCases.ProductCases;
 /// </remarks>
 public record ListProductsQuery
 {
-    /// <summary>Optional explicit organization override; null/empty uses the current Organization.</summary>
-    public Guid? OrganizationId { get; init; }
 }

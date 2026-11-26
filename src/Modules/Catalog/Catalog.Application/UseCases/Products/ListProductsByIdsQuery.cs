@@ -10,22 +10,17 @@ namespace Catalog.Application.UseCases.Products;
 public sealed class ListProductsByIdsQueryHandler : IRequestHandler<ListProductsByIdsQueryMediatR, IEnumerable<ProductDto>>
 {
     private readonly IProductQueryRepository _productQueryRepository;
-    private readonly ICurrentUserService _currentContext;
 
     public ListProductsByIdsQueryHandler(
-        IProductQueryRepository productQueryRepository,
-        ICurrentUserService currentContext)
+        IProductQueryRepository productQueryRepository)
     {
         _productQueryRepository = productQueryRepository;
-        _currentContext = currentContext;
     }
 
     public async Task<IEnumerable<ProductDto>> Handle(
         ListProductsByIdsQueryMediatR request,
         CancellationToken cancellationToken)
     {
-        var organizationId = _currentContext.OrganizationId
-            ?? throw new ArgumentNullException("organizationId is null, organizationId cannot be null");
 
         var productIds = request.Contract.ProductIds
             .Where(id => id != Guid.Empty)
@@ -35,6 +30,6 @@ public sealed class ListProductsByIdsQueryHandler : IRequestHandler<ListProducts
         if (productIds.Length == 0)
             return Array.Empty<ProductDto>();
 
-        return await _productQueryRepository.GetByIdsAsync(productIds, organizationId, cancellationToken);
+        return await _productQueryRepository.GetByIdsAsync(productIds, cancellationToken);
     }
 }

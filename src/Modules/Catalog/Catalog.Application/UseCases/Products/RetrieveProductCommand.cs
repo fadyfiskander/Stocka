@@ -24,7 +24,7 @@ namespace Catalog.Application.UseCases.Products
             if (request.Contract.ProductId == Guid.Empty)
                 throw new ArgumentException("ProductId cannot be empty.", nameof(request.Contract.ProductId));
 
-            var product = await _productQuery.GetByIdAsync(request.Contract.ProductId);
+            var product = await _productQuery.GetByIdAsync(request.Contract.ProductId, cancellationToken);
             return product ?? throw new KeyNotFoundException($"Product '{request.Contract.ProductId}' is not found.");
         }
     }

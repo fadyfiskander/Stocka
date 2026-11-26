@@ -9,7 +9,6 @@ namespace Catalog.Contracts.DTOs.Product
     /// </summary>
     public record ProductDto(
         Guid Id,
-        Guid OrganizationId,
         string Name,
         string Barcode,
         Guid CategoryId,

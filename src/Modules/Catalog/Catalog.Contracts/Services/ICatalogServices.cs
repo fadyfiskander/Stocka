@@ -29,10 +29,10 @@ namespace Catalog.Contracts.Services
         Task<ProductDto> RetrieveProductAsync(Guid productId, CancellationToken cancellationToken = default);
 
         /// <summary>Retrieves one product by its exact name.</summary>
-        Task<ProductDto> RetrieveProductByNameAsync(string name, CancellationToken cancellationToken = default);
+        Task<IEnumerable<ProductDto>> RetrieveProductByNameAsync(string name, CancellationToken cancellationToken = default);
 
         /// <summary>Retrieves the product listing for the current (or explicitly requested) Organization.</summary>
-        Task<IEnumerable<ProductDto>> ListProductsAsync(Guid? organizationId = null, CancellationToken cancellationToken = default);
+        Task<IEnumerable<ProductDto>> ListProductsAsync(CancellationToken cancellationToken = default);
 
         Task<IEnumerable<ProductDto>> GetProductsByIdsAsync(List<Guid> Ids, CancellationToken cancellationToken = default);
         #endregion

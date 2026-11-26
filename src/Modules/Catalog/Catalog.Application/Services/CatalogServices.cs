@@ -39,11 +39,11 @@ namespace Catalog.Application.Services
         public Task<ProductDto> RetrieveProductAsync(Guid productId, CancellationToken cancellationToken = default)
             => _productCases.RetrieveProductAsync(new RetrieveProductQuery(productId), cancellationToken);
 
-        public Task<ProductDto> RetrieveProductByNameAsync(string name, CancellationToken cancellationToken = default)
+        public Task<IEnumerable<ProductDto>> RetrieveProductByNameAsync(string name, CancellationToken cancellationToken = default)
             => _productCases.RetrieveProductByNameAsync(new RetrieveProductByNameQuery(name), cancellationToken);
 
-        public Task<IEnumerable<ProductDto>> ListProductsAsync(Guid? organizationId = null, CancellationToken cancellationToken = default)
-            => _productCases.ListProductsAsync(new ListProductsQuery { OrganizationId = organizationId }, cancellationToken);
+        public Task<IEnumerable<ProductDto>> ListProductsAsync(CancellationToken cancellationToken = default)
+            => _productCases.ListProductsAsync(cancellationToken);
 
         public Task<IEnumerable<ProductDto>> GetProductsByIdsAsync(List<Guid> ids, CancellationToken cancellationToken = default)
             => _productCases.ListProductsByIdsAsync(new ListProductsByIdsQuery(ids), cancellationToken);

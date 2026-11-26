@@ -11,7 +11,6 @@ namespace Catalog.Application.DTOs.Product
         public static ProductDto ToDto(this Catalog.Domain.Products.Product product)
             => new(
                 product.Id.Value,
-                product.OrganizationId,
                 product.Name,
                 product.Barcode ?? string.Empty,
                 product.CategoryId.Value,

@@ -1,106 +1,201 @@
-﻿using Catalog.Application.Common.Interfaces;
-using Catalog.Contracts.DTOs.Product;
+﻿using BuildingBlocks.Application.Abstractions;
+using BuildingBlocks.Application.Common.Models;
+using Catalog.Application.Common.Interfaces;
 using Catalog.Application.Repositories.Queries.Bases;
 using Catalog.Application.Repositories.Queries.Product;
-using Catalog.Infrastructure.Contexts;
+using Catalog.Contracts.DTOs.Product;
 using Dapper;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Catalog.Infrastructure.Repositories.Queries
+internal sealed class ProductQueryRepository : QueryRepository, IProductQueryRepository
 {
-    internal class ProductQueryRepository : QueryRepository, IProductQueryRepository
+    private const string ProductColumns =
+        """
+        Id,
+        Name,
+        Barcode,
+        CategoryId,
+        SellingPrice AS [Price],
+        IsActive,
+        ImagePath
+        """;
+
+    public ProductQueryRepository(
+        ICatalogDbConnection connection,
+        ICurrentUserService currentUser)
+        : base(connection, currentUser)
     {
-        public ProductQueryRepository(ICatalogDbConnection connection) : base(connection)
-        {
+    }
 
-        }
+    public async Task<IReadOnlyList<ProductDto>> GetAllAsync(
+        CancellationToken cancellationToken)
+    {
+        var sql = $"""
+            SELECT {ProductColumns}
+            FROM {TableProducts}
+            WHERE OrganizationId = @OrganizationId
+            ORDER BY Name, Id
+            """;
 
-        public async Task<IEnumerable<ProductDto>> GetAllAsync(Guid organizationId)
-        {
-            var query = "SELECT " +
-                        "Id, " +
-                        "OrganizationId, " +
-                        "Name, " +
-                        "Barcode, " +
-                        "CategoryId, " +
-                        "SellingPrice AS [Price], " +
-                        "IsActive, " +
-                        "ImagePath " +
-                       $"FROM {TableProducts} " +
-                         "WHERE OrganizationId = @OrganizationId " +
-                         "ORDER BY Name";
-            var parameters = new { OrganizationId = organizationId };
-            var result = await _connection.QueryAsync<ProductDto>(query, parameters);
-            return result;
-        }
+        var command = new CommandDefinition(
+            sql,
+            new { OrganizationId },
+            cancellationToken: cancellationToken);
 
-        public async Task<IEnumerable<ProductDto>> GetByIdsAsync(
-            IReadOnlyCollection<Guid> ids,
-            Guid organizationId,
-            CancellationToken cancellationToken = default)
-        {
-            var query = "SELECT Id, OrganizationId, Name, Barcode, CategoryId, SellingPrice AS [Price], IsActive, ImagePath " +
-                        $"FROM {TableProducts} WHERE OrganizationId = @OrganizationId AND Id IN @Ids ORDER BY Name";
+        var result = await _connection.QueryAsync<ProductDto>(command);
 
-            var command = new CommandDefinition(
-                query,
-                new { OrganizationId = organizationId, Ids = ids },
-                cancellationToken: cancellationToken);
+        return result.ToList();
+    }
 
-            return await _connection.QueryAsync<ProductDto>(command);
-        }
+    public async Task<IReadOnlyList<ProductDto>> GetByIdsAsync(
+        IReadOnlyCollection<Guid> ids,
+        CancellationToken cancellationToken)
+    {
+        if (ids is null || ids.Count == 0)
+            return [];
 
-        public async Task<BuildingBlocks.Application.Common.Models.PaginatedResult<ProductDto>> GetPagedAsync(Guid organizationId, int page, int pageSize)
-        {
-            page = Math.Max(1, page);
-            pageSize = Math.Clamp(pageSize, 1, 100);
-            var countSql = $"SELECT COUNT(*) FROM {TableProducts} WHERE OrganizationId = @OrganizationId";
-            var total = await _connection.ExecuteScalarAsync<int>(countSql, new { OrganizationId = organizationId });
+        var sql = $"""
+            SELECT {ProductColumns}
+            FROM {TableProducts}
+            WHERE OrganizationId = @OrganizationId
+              AND Id IN @Ids
+            ORDER BY Name, Id
+            """;
 
-            var offset = (page - 1) * pageSize;
-            var query = "SELECT " +
-                        "Id, OrganizationId, Name, Barcode, CategoryId, SellingPrice AS [Price], IsActive, ImagePath " +
-                       $"FROM {TableProducts} WHERE OrganizationId = @OrganizationId ORDER BY Name OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
-            var items = await _connection.QueryAsync<ProductDto>(query, new { OrganizationId = organizationId, Offset = offset, PageSize = pageSize });
-            return new BuildingBlocks.Application.Common.Models.PaginatedResult<ProductDto>(items.ToList(), total, page, pageSize);
-        }
+        var command = new CommandDefinition(
+            sql,
+            new { OrganizationId, Ids = ids },
+            cancellationToken: cancellationToken);
 
-        public async Task<ProductDto?> GetByIdAsync(Guid id)
-        {
-            var query = "SELECT " +
-                        "Id, " +
-                        "OrganizationId, " +
-                        "Name, " +               
-                        "Barcode, " +            
-                        "CategoryId, " +        
-                        "SellingPrice AS [Price], " +
-                        "IsActive, " +          
-                        "ImagePath " +           
-                       $"FROM {TableProducts} " +
-                        "WHERE Id = @Id";
+        var result = await _connection.QueryAsync<ProductDto>(command);
 
-            var parameters = new { Id = id };
-            return await _connection.QueryFirstOrDefaultAsync<ProductDto>(query, parameters);
-        }
+        return result.ToList();
+    }
 
-        public async Task<ProductDto?> GetByNameAsync(string name)
-        {
-            var query = "SELECT " +
-                        "Id, " +
-                        "OrganizationId, " +
-                        "Name, " +
-                        "Barcode, " +
-                        "CategoryId, " +
-                        "SellingPrice AS [Price], " +
-                        "IsActive, " +
-                        "ImagePath " +
-                       $"FROM {TableProducts} " +
-                        "WHERE Name = @Name";
-            var parameters = new { Name = name };
-            var result = await _connection.QueryFirstOrDefaultAsync<ProductDto>(query, parameters);
-            return result;
-        }
+    public async Task<PaginatedResult<ProductDto>> GetPagedAsync(
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken)
+    {
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        var offset = (long)(page - 1) * pageSize;
+
+        var countSql = $"""
+            SELECT COUNT_BIG(*)
+            FROM {TableProducts}
+            WHERE OrganizationId = @OrganizationId
+            """;
+
+        var countCommand = new CommandDefinition(
+            countSql,
+            new { OrganizationId },
+            cancellationToken: cancellationToken);
+
+        var total = await _connection.ExecuteScalarAsync<long>(countCommand);
+
+        var querySql = $"""
+            SELECT {ProductColumns}
+            FROM {TableProducts}
+            WHERE OrganizationId = @OrganizationId
+            ORDER BY Name, Id
+            OFFSET @Offset ROWS
+            FETCH NEXT @PageSize ROWS ONLY
+            """;
+
+        var queryCommand = new CommandDefinition(
+            querySql,
+            new { OrganizationId, Offset = offset, PageSize = pageSize },
+            cancellationToken: cancellationToken);
+
+        var items = await _connection.QueryAsync<ProductDto>(queryCommand);
+
+        return new PaginatedResult<ProductDto>(
+            items.ToList(),
+            total,
+            page,
+            pageSize);
+    }
+
+    public async Task<ProductDto?> GetByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var sql = $"""
+            SELECT {ProductColumns}
+            FROM {TableProducts}
+            WHERE OrganizationId = @OrganizationId
+              AND Id = @Id
+            """;
+
+        var command = new CommandDefinition(
+            sql,
+            new { OrganizationId, Id = id },
+            cancellationToken: cancellationToken);
+
+        return await _connection.QueryFirstOrDefaultAsync<ProductDto>(command);
+    }
+
+    public async Task<IReadOnlyList<ProductDto>> GetByNameAsync(
+        string name,
+        CancellationToken cancellationToken)
+    {
+        var sql = $"""
+            SELECT {ProductColumns}
+            FROM {TableProducts}
+            WHERE OrganizationId = @OrganizationId
+              AND Name = @Name
+            ORDER BY Name, Id
+            """;
+
+        var command = new CommandDefinition(
+            sql,
+            new { OrganizationId, Name = name },
+            cancellationToken: cancellationToken);
+
+        var result = await _connection.QueryAsync<ProductDto>(command);
+
+        return result.ToList();
+    }
+
+    public async Task<IReadOnlyList<ProductDto>> GetByCategoryAsync(
+        Guid categoryId,
+        CancellationToken cancellationToken)
+    {
+        var sql = $"""
+            SELECT {ProductColumns}
+            FROM {TableProducts}
+            WHERE OrganizationId = @OrganizationId
+              AND CategoryId = @CategoryId
+            ORDER BY Name, Id
+            """;
+
+        var command = new CommandDefinition(
+            sql,
+            new { OrganizationId, CategoryId = categoryId },
+            cancellationToken: cancellationToken);
+
+        var result = await _connection.QueryAsync<ProductDto>(command);
+
+        return result.ToList();
+    }
+
+    public async Task<ProductDto?> GetByBarcodeAsync(
+        string barcode,
+        CancellationToken cancellationToken)
+    {
+        var sql = $"""
+            SELECT {ProductColumns}
+            FROM {TableProducts}
+            WHERE OrganizationId = @OrganizationId
+              AND Barcode = @Barcode
+            """;
+
+        var command = new CommandDefinition(
+            sql,
+            new { OrganizationId, Barcode = barcode },
+            cancellationToken: cancellationToken);
+
+        return await _connection.QueryFirstOrDefaultAsync<ProductDto>(command);
     }
 }

@@ -5,10 +5,13 @@ namespace Catalog.Application.Repositories.Queries.Product
 {
     public interface IProductQueryRepository
     {
-        Task<ProductDto?> GetByIdAsync(Guid id);
-        Task<ProductDto?> GetByNameAsync(string name);
-        Task<IEnumerable<ProductDto>> GetAllAsync(Guid organizationId);
-        Task<IEnumerable<ProductDto>> GetByIdsAsync(IReadOnlyCollection<Guid> ids, Guid organizationId, CancellationToken cancellationToken = default);
-        Task<PaginatedResult<ProductDto>> GetPagedAsync(Guid organizationId, int page, int pageSize);
+        Task<IReadOnlyList<ProductDto>> GetAllAsync(CancellationToken cancellationToken);
+        Task<ProductDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+        Task<IReadOnlyList<ProductDto>> GetByNameAsync(string name, CancellationToken cancellationToken);
+        Task<IReadOnlyList<ProductDto>> GetByIdsAsync(IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken);
+        Task<PaginatedResult<ProductDto>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken);
+
+        Task<IReadOnlyList<ProductDto>> GetByCategoryAsync(Guid categoryId, CancellationToken cancellationToken);
+        Task<ProductDto?> GetByBarcodeAsync(string barcode, CancellationToken cancellationToken);
     }
 }

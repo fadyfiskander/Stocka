@@ -9,17 +9,12 @@ namespace Catalog.Application.UseCases.Categories
     /// <summary>
     /// Lists categories of the current Organization (or an explicitly requested one).
     /// </summary>
-    public class ListCategoriesQueryHandler(ICategoryQueryRepository categoryQuery, ICurrentUserService currentUser)
+    public class ListCategoriesQueryHandler(ICategoryQueryRepository categoryQuery)
         : IRequestHandler<ListCategoriesQueryMediatR, IEnumerable<CategoryDto>>
     {
         public async Task<IEnumerable<CategoryDto>> Handle(ListCategoriesQueryMediatR request, CancellationToken cancellationToken)
         {
-            var organizationId = currentUser.OrganizationId;
-
-            if (organizationId is null)
-                throw new ArgumentNullException();
-
-            return await categoryQuery.GetAllAsync(organizationId.Value);
+            return await categoryQuery.GetAllAsync(cancellationToken);
         }
     }
 }
