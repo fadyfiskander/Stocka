@@ -41,7 +41,7 @@
             <input id="to" type="date" class="@input num font-mono" name="to" value="@(to?.ToString("yyyy-MM-dd"))" />
         </div>
         <button type="submit" class="@btnPrimary">
-            <svg class="icon !size-4"><use href="#i-filter" /></svg>@(Loc.IsEn ? "Apply" : "تطبيق")
+            <icon name="filter" class="!size-4" />@(Loc.IsEn ? "Apply" : "تطبيق")
         </button>
     </form>
 
@@ -50,13 +50,13 @@
         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <div class="rounded-lg border border-line bg-surface p-4 shadow-card">
                 <div class="flex items-center gap-1.5 text-[11.5px] font-semibold text-ink-soft">
-                    <svg class="icon !size-[15px] text-ok"><use href="#i-arrow-down" /></svg>@(Loc.IsEn ? "Inbound units (net)" : "وحدات داخلة (صافي)")
+                    <icon name="arrow-down" class="!size-[15px] text-ok" />@(Loc.IsEn ? "Inbound units (net)" : "وحدات داخلة (صافي)")
                 </div>
                 <div class="num mt-1.5 text-[26px] font-bold tracking-[-.02em] text-ok">@inboundOutbound.InboundUnits</div>
             </div>
             <div class="rounded-lg border border-line bg-surface p-4 shadow-card">
                 <div class="flex items-center gap-1.5 text-[11.5px] font-semibold text-ink-soft">
-                    <svg class="icon !size-[15px] text-danger"><use href="#i-arrow-up" /></svg>@(Loc.IsEn ? "Outbound units (net)" : "وحدات خارجة (صافي)")
+                    <icon name="arrow-up" class="!size-[15px] text-danger" />@(Loc.IsEn ? "Outbound units (net)" : "وحدات خارجة (صافي)")
                 </div>
                 <div class="num mt-1.5 text-[26px] font-bold tracking-[-.02em] text-danger">@inboundOutbound.OutboundUnits</div>
             </div>
@@ -69,7 +69,7 @@
 
     <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
         <div class="flex items-center gap-2.5 border-b border-line px-5 py-3">
-            <svg class="icon !size-[18px] text-accent"><use href="#i-chart" /></svg>
+            <icon name="chart-column" class="!size-[18px] text-accent" />
             <span class="text-[14px] font-semibold text-ink">@(Loc.IsEn ? "Totals by movement type" : "الإجماليات حسب نوع الحركة")</span>
         </div>
         <div class="overflow-x-auto">
@@ -115,7 +115,7 @@
 
     <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
         <div class="flex items-center gap-2.5 border-b border-line px-5 py-3">
-            <svg class="icon !size-[18px] text-info"><use href="#i-swap" /></svg>
+            <icon name="arrow-left-right" class="!size-[18px] text-info" />
             <span class="text-[14px] font-semibold text-ink">@(Loc.IsEn ? "Transfer history (source → destination)" : "سجل التحويلات (المصدر ← الوجهة)")</span>
         </div>
         <div class="overflow-x-auto">
@@ -154,7 +154,7 @@
 
     <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
         <div class="flex items-center gap-2.5 border-b border-line px-5 py-3">
-            <svg class="icon !size-[18px] text-signal"><use href="#i-undo" /></svg>
+            <icon name="undo-2" class="!size-[18px] text-signal" />
             <span class="text-[14px] font-semibold text-ink">@(Loc.IsEn ? "Adjustments, damage & reversals (with recorded reasons)" : "التسويات والتلف وعمليات العكس (مع الأسباب المسجّلة)")</span>
         </div>
         <div class="overflow-x-auto">

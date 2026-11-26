@@ -23,20 +23,20 @@
                 <input id="q-name" name="name" value="@Context.Request.Query["name"]" class="@input" placeholder="@(Loc.IsEn ? "Enter category name to search" : "أدخل اسم التصنيف للبحث")" />
             </div>
             <button type="submit" class="@btnPrimary">
-                <svg class="icon !size-4"><use href="#i-search" /></svg>@(Loc.IsEn ? "Search" : "بحث")
+                <icon name="search" class="!size-4" />@(Loc.IsEn ? "Search" : "بحث")
             </button>
         </div>
 
         @if (ViewBag.NotFound != null)
         {
             <div class="mt-4 flex items-start gap-3 rounded-md border border-warn/30 bg-warn-tint px-4 py-3 text-[13px] text-warn">
-                <svg class="icon mt-0.5 !size-4 shrink-0"><use href="#i-alert" /></svg><span>@ViewBag.NotFound</span>
+                <icon name="alert-triangle" class="mt-0.5 !size-4 shrink-0" /><span>@ViewBag.NotFound</span>
             </div>
         }
         @if (ViewBag.Error != null)
         {
             <div class="mt-4 flex items-start gap-3 rounded-md border border-danger/30 bg-danger-tint px-4 py-3 text-[13px] text-danger">
-                <svg class="icon mt-0.5 !size-4 shrink-0"><use href="#i-alert" /></svg><span>@ViewBag.Error</span>
+                <icon name="alert-triangle" class="mt-0.5 !size-4 shrink-0" /><span>@ViewBag.Error</span>
             </div>
         }
     </form>
@@ -45,7 +45,7 @@
     {
         <div class="shadow-card rounded-lg border border-line bg-surface">
             <div class="flex items-center gap-2.5 border-b border-line px-5 py-3">
-                <svg class="icon !size-[18px] text-accent"><use href="#i-tag" /></svg>
+                <icon name="tag" class="!size-[18px] text-accent" />
                 <span class="font-semibold text-[14px] text-ink">@(Loc.IsEn ? "Result" : "النتيجة")</span>
             </div>
             <dl class="grid gap-x-6 gap-y-5 p-5 sm:grid-cols-2">
@@ -84,14 +84,14 @@
     else if (!string.IsNullOrWhiteSpace(Context.Request.Query["name"]) && ViewBag.NotFound == null)
     {
         <div class="rounded-lg border border-dashed border-line-strong px-6 py-12 text-center">
-            <svg class="icon mx-auto !size-7 text-ink-faint"><use href="#i-search" /></svg>
+            <icon name="search" class="mx-auto !size-7 text-ink-faint" />
             <p class="mt-2 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No category found. Try another name." : "لم يتم العثور على تصنيف. جرّب اسماً آخر.")</p>
         </div>
     }
 
     <div class="mt-5">
         <a class="@btnGhost" asp-area="Catalog" asp-controller="Categories" asp-action="Index">
-            <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Back to list" : "العودة للقائمة")
+            <icon name="chevron-left" class="!size-4 scale-x-[var(--dir-flip)]" />@(Loc.IsEn ? "Back to list" : "العودة للقائمة")
         </a>
     </div>
 </div>

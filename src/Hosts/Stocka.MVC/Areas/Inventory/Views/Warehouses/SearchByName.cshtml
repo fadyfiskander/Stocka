@@ -1,4 +1,4 @@
-@model IEnumerable<WarehouseDto>
+﻿@model IEnumerable<WarehouseDto>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = (Loc.IsEn ? "Search warehouses" : "بحث عن مستودعات");
@@ -16,13 +16,13 @@
     @if (ViewBag.NotFound != null)
     {
         <div class="flex items-start gap-3 rounded-md border border-warn/30 bg-warn-tint px-4 py-3 text-[13px] text-warn">
-            <svg class="icon mt-0.5 !size-4 shrink-0"><use href="#i-alert" /></svg><span>@ViewBag.NotFound</span>
+            <icon name="alert-triangle" class="mt-0.5 !size-4 shrink-0" /><span>@ViewBag.NotFound</span>
         </div>
     }
     @if (ViewBag.Error != null)
     {
         <div class="flex items-start gap-3 rounded-md border border-danger/30 bg-danger-tint px-4 py-3 text-[13px] text-danger">
-            <svg class="icon mt-0.5 !size-4 shrink-0"><use href="#i-alert" /></svg><span>@ViewBag.Error</span>
+            <icon name="alert-triangle" class="mt-0.5 !size-4 shrink-0" /><span>@ViewBag.Error</span>
         </div>
     }
 
@@ -33,7 +33,7 @@
                 <input type="text" name="name" class="@input" placeholder="@(Loc.IsEn ? "Warehouse name (contains)" : "اسم المستودع (يحتوي على)")" value="@Context.Request.Query["name"]" />
             </div>
             <button type="submit" class="@btnPrimary">
-                <svg class="icon !size-4"><use href="#i-search" /></svg>@(Loc.IsEn ? "Search" : "بحث")
+                <icon name="search" class="!size-4" />@(Loc.IsEn ? "Search" : "بحث")
             </button>
         </div>
     </form>
@@ -82,7 +82,7 @@
     else if (!string.IsNullOrWhiteSpace(Context.Request.Query["name"]))
     {
         <div class="rounded-lg border border-dashed border-line-strong px-6 py-12 text-center">
-            <svg class="icon mx-auto !size-7 text-ink-faint"><use href="#i-search" /></svg>
+            <icon name="search" class="mx-auto !size-7 text-ink-faint" />
             <p class="mt-2 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No warehouses matched the search." : "لا توجد مستودعات مطابقة للبحث.")</p>
         </div>
     }

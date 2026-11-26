@@ -1,4 +1,4 @@
-@model PaginatedResult<HistoricalBalanceDto>
+﻿@model PaginatedResult<HistoricalBalanceDto>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = (Loc.IsEn ? "Historical balance" : "الرصيد التاريخي");
@@ -23,7 +23,7 @@
             <input id="asOf" type="date" class="@input num font-mono" name="asOf" value="@asOf.ToString("yyyy-MM-dd")" />
         </div>
         <button type="submit" class="@btnPrimary">
-            <svg class="icon !size-4"><use href="#i-undo" /></svg>@(Loc.IsEn ? "Recalculate" : "إعادة الحساب")
+            <icon name="undo-2" class="!size-4" />@(Loc.IsEn ? "Recalculate" : "إعادة الحساب")
         </button>
     </form>
 
@@ -55,7 +55,7 @@
                     {
                         <tr>
                             <td colspan="4" class="px-6 py-14 text-center">
-                                <svg class="icon mx-auto !size-8 text-ink-faint"><use href="#i-chart" /></svg>
+                                <icon name="chart-column" class="mx-auto !size-8 text-ink-faint" />
                                 <p class="mt-2 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No stock existed at this date." : "لا يوجد مخزون في هذا التاريخ.")</p>
                             </td>
                         </tr>
@@ -71,22 +71,22 @@
             @if (Model.HasPrevious)
             {
                 <a class="@pageBtn" asp-area="Inventory" asp-controller="Reports" asp-action="Balance" asp-route-asOf="@asOf.ToString("yyyy-MM-dd")" asp-route-page="@(Model.Page - 1)">
-                    <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Previous" : "السابق")
+                    <icon name="chevron-left" class="!size-4 scale-x-[var(--dir-flip)]" />@(Loc.IsEn ? "Previous" : "السابق")
                 </a>
             }
             else
             {
-                <span class="@pageOff"><svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Previous" : "السابق")</span>
+                <span class="@pageOff"><icon name="chevron-left" class="!size-4 scale-x-[var(--dir-flip)]" />@(Loc.IsEn ? "Previous" : "السابق")</span>
             }
             @if (Model.HasNext)
             {
                 <a class="@pageBtn" asp-area="Inventory" asp-controller="Reports" asp-action="Balance" asp-route-asOf="@asOf.ToString("yyyy-MM-dd")" asp-route-page="@(Model.Page + 1)">
-                    @(Loc.IsEn ? "Next" : "التالي")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg>
+                    @(Loc.IsEn ? "Next" : "التالي")<icon name="chevron-right" class="!size-4 scale-x-[var(--dir-flip)]" />
                 </a>
             }
             else
             {
-                <span class="@pageOff">@(Loc.IsEn ? "Next" : "التالي")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg></span>
+                <span class="@pageOff">@(Loc.IsEn ? "Next" : "التالي")<icon name="chevron-right" class="!size-4 scale-x-[var(--dir-flip)]" /></span>
             }
         </div>
     </div>

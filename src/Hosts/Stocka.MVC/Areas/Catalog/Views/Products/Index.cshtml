@@ -11,29 +11,29 @@
 <section class="grid gap-5">
     <header class="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
         <div>
-            <h1 class="text-[22px] font-bold tracking-[-.015em]">@(Loc.IsEn ? "Products" : "المنتجات")</h1>
+            <h1 class="font-bold tracking-[-.015em] text-[22px]">@(Loc.IsEn ? "Products" : "المنتجات")</h1>
             <p class="mt-1.5 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "Manage your products." : "أدر منتجاتك.")</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <a class="@btnGhost" asp-area="Catalog" asp-controller="Products" asp-action="SearchByName">
-                <svg class="icon !size-4"><use href="#i-search" /></svg>@(Loc.IsEn ? "Search by name" : "بحث بالاسم")
+                <icon name="search" class="!size-4" />@(Loc.IsEn ? "Search by name" : "بحث بالاسم")
             </a>
             <a class="@btnPrimary" asp-area="Catalog" asp-controller="Products" asp-action="Create">
-                <svg class="icon !size-4"><use href="#i-plus" /></svg>@(Loc.IsEn ? "Add product" : "إضافة منتج")
+                <icon name="plus" class="!size-4" />@(Loc.IsEn ? "Add product" : "إضافة منتج")
             </a>
         </div>
     </header>
 
-    <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
+    <div class="shadow-card overflow-hidden rounded-lg border border-line bg-surface">
         <div class="overflow-x-auto">
             <table class="w-full min-w-[720px] border-collapse text-[13.5px]">
                 <thead>
                     <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Name" : "الاسم")</th>
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Barcode" : "الباركود")</th>
-                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Price" : "السعر")</th>
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Status" : "الحالة")</th>
-                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Actions" : "الإجراءات")</th>
+                        <th class="px-4 py-2.5 text-start font-semibold text-[11.5px]">@(Loc.IsEn ? "Name" : "الاسم")</th>
+                        <th class="px-4 py-2.5 text-start font-semibold text-[11.5px]">@(Loc.IsEn ? "Barcode" : "الباركود")</th>
+                        <th class="px-4 py-2.5 text-end font-semibold text-[11.5px]">@(Loc.IsEn ? "Price" : "السعر")</th>
+                        <th class="px-4 py-2.5 text-start font-semibold text-[11.5px]">@(Loc.IsEn ? "Status" : "الحالة")</th>
+                        <th class="px-4 py-2.5 text-end font-semibold text-[11.5px]">@(Loc.IsEn ? "Actions" : "الإجراءات")</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,18 +44,17 @@
                             <tr class="border-b border-line last:border-0 hover:bg-sunken/50">
                                 <td class="px-4 py-3">
                                     <div class="font-semibold text-ink">@product.Name</div>
-                                    <div class="num mt-0.5 font-mono text-[11.5px] text-ink-faint">@product.Id.ToString().Substring(0, 8)…</div>
                                 </td>
                                 <td class="px-4 py-3"><span class="num font-mono text-[12.5px] text-ink-soft">@product.Barcode</span></td>
                                 <td class="num px-4 py-3 text-end font-semibold text-ink">@product.Price.ToString("N2")</td>
                                 <td class="px-4 py-3">
                                     @if (product.IsActive)
                                     {
-                                        <span class="inline-flex items-center gap-1.5 rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@(Loc.IsEn ? "Active" : "نشط")</span>
+                                        <span class="inline-flex items-center gap-1.5 rounded-full bg-ok-tint px-2.5 py-0.5 font-semibold text-[11.5px] text-ok">@(Loc.IsEn ? "Active" : "نشط")</span>
                                     }
                                     else
                                     {
-                                        <span class="inline-flex items-center gap-1.5 rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@(Loc.IsEn ? "Inactive" : "غير نشط")</span>
+                                        <span class="inline-flex items-center gap-1.5 rounded-full bg-sunken px-2.5 py-0.5 font-semibold text-[11.5px] text-ink-soft">@(Loc.IsEn ? "Inactive" : "غير نشط")</span>
                                     }
                                 </td>
                                 <td class="px-4 py-3">
@@ -65,13 +64,13 @@
                                         @if (product.IsActive)
                                         {
                                             <form asp-area="Catalog" asp-controller="Products" asp-action="Deactivate" asp-route-id="@product.Id" method="post" class="inline-flex">
-                                                <button type="submit" class="inline-flex h-8 items-center justify-center rounded-md border border-warn/35 bg-transparent px-2.5 text-[12.5px] font-medium text-warn transition-colors hover:bg-warn-tint">@(Loc.IsEn ? "Deactivate" : "إيقاف")</button>
+                                                <button type="submit" class="inline-flex h-8 items-center justify-center rounded-md border border-warn/35 bg-transparent px-2.5 font-medium text-[12.5px] text-warn transition-colors hover:bg-warn-tint">@(Loc.IsEn ? "Deactivate" : "إيقاف")</button>
                                             </form>
                                         }
                                         else
                                         {
                                             <form asp-area="Catalog" asp-controller="Products" asp-action="Activate" asp-route-id="@product.Id" method="post" class="inline-flex">
-                                                <button type="submit" class="inline-flex h-8 items-center justify-center rounded-md border border-ok/35 bg-transparent px-2.5 text-[12.5px] font-medium text-ok transition-colors hover:bg-ok-tint">@(Loc.IsEn ? "Activate" : "تفعيل")</button>
+                                                <button type="submit" class="inline-flex h-8 items-center justify-center rounded-md border border-ok/35 bg-transparent px-2.5 font-medium text-[12.5px] text-ok transition-colors hover:bg-ok-tint">@(Loc.IsEn ? "Activate" : "تفعيل")</button>
                                             </form>
                                         }
                                     </div>
@@ -83,8 +82,8 @@
                     {
                         <tr>
                             <td colspan="5" class="px-6 py-14 text-center">
-                                <svg class="icon mx-auto !size-8 text-ink-faint"><use href="#i-box" /></svg>
-                                <p class="mt-2 text-[14px] font-semibold text-ink">@(Loc.IsEn ? "No products found" : "لا توجد منتجات")</p>
+                                <icon name="package" class="mx-auto !size-8 text-ink-faint" />
+                                <p class="mt-2 font-semibold text-[14px] text-ink">@(Loc.IsEn ? "No products found" : "لا توجد منتجات")</p>
                                 <p class="mx-auto mt-1 max-w-[46ch] text-[12.5px] text-ink-soft">@(Loc.IsEn ? "There are no products to display. Try adding one." : "لا توجد منتجات للعرض. جرّب إضافة منتج.")</p>
                             </td>
                         </tr>

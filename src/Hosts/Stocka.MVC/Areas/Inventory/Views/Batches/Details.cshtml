@@ -73,7 +73,7 @@
         </div>
         <a asp-area="Inventory" asp-controller="Batches" asp-action="Index"
            class="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-line bg-surface px-4 text-[13.5px] font-medium text-ink transition-colors hover:bg-sunken hover:no-underline">
-            <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Back to batches" : "العودة للدفعات")
+            <icon name="chevron-left" class="!size-4 scale-x-[var(--dir-flip)]" />@(Loc.IsEn ? "Back to batches" : "العودة للدفعات")
         </a>
     </header>
 

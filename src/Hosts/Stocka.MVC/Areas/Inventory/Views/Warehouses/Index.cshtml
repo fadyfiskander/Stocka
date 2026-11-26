@@ -1,4 +1,4 @@
-@model PaginatedResult<WarehouseDto>
+﻿@model PaginatedResult<WarehouseDto>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = (Loc.IsEn ? "Warehouses" : "المستودعات");
@@ -18,35 +18,35 @@
 <section class="grid gap-5">
     <header class="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
         <div>
-            <h1 class="text-[22px] font-bold tracking-[-.015em]">@(Loc.IsEn ? "Warehouses" : "المستودعات")</h1>
+            <h1 class="font-bold tracking-[-.015em] text-[22px]">@(Loc.IsEn ? "Warehouses" : "المستودعات")</h1>
             <p class="mt-1.5 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "Storage locations of the current organization." : "مواقع التخزين الخاصة بالمؤسسة الحالية.")</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <a class="@btnGhost" asp-area="Inventory" asp-controller="Warehouses" asp-action="SearchByName">
-                <svg class="icon !size-4"><use href="#i-search" /></svg>@(Loc.IsEn ? "Search by name" : "بحث بالاسم")
+                <icon name="search" class="!size-4" />@(Loc.IsEn ? "Search by name" : "بحث بالاسم")
             </a>
             <a class="@btnPrimary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Create">
-                <svg class="icon !size-4"><use href="#i-plus" /></svg>@(Loc.IsEn ? "Register warehouse" : "تسجيل مستودع")
+                <icon name="plus" class="!size-4" />@(Loc.IsEn ? "Register warehouse" : "تسجيل مستودع")
             </a>
         </div>
     </header>
 
-    <div class="inline-flex w-fit items-center gap-1 rounded-full border border-line bg-surface p-1 shadow-card">
+    <div class="shadow-card inline-flex w-fit items-center gap-1 rounded-full border border-line bg-surface p-1">
         <a class="@seg(activeFilter is null)" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index">@(Loc.IsEn ? $"All ({Model.TotalCount})" : $"الكل ({Model.TotalCount})")</a>
         <a class="@seg(activeFilter == true)" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index" asp-route-isActive="true">@(Loc.IsEn ? "Active" : "نشط")</a>
         <a class="@seg(activeFilter == false)" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index" asp-route-isActive="false">@(Loc.IsEn ? "Inactive" : "غير نشط")</a>
     </div>
 
-    <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
+    <div class="shadow-card overflow-hidden rounded-lg border border-line bg-surface">
         <div class="overflow-x-auto">
             <table class="w-full min-w-[760px] border-collapse text-[13.5px]">
                 <thead>
                     <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Name" : "الاسم")</th>
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Location" : "الموقع")</th>
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Type" : "النوع")</th>
-                        <th class="px-4 py-2.5 text-start text-[11.5px] font-semibold">@(Loc.IsEn ? "Status" : "الحالة")</th>
-                        <th class="px-4 py-2.5 text-end text-[11.5px] font-semibold">@(Loc.IsEn ? "Actions" : "الإجراءات")</th>
+                        <th class="px-4 py-2.5 text-start font-semibold text-[11.5px]">@(Loc.IsEn ? "Name" : "الاسم")</th>
+                        <th class="px-4 py-2.5 text-start font-semibold text-[11.5px]">@(Loc.IsEn ? "Location" : "الموقع")</th>
+                        <th class="px-4 py-2.5 text-start font-semibold text-[11.5px]">@(Loc.IsEn ? "Type" : "النوع")</th>
+                        <th class="px-4 py-2.5 text-start font-semibold text-[11.5px]">@(Loc.IsEn ? "Status" : "الحالة")</th>
+                        <th class="px-4 py-2.5 text-end font-semibold text-[11.5px]">@(Loc.IsEn ? "Actions" : "الإجراءات")</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -57,22 +57,21 @@
                             <tr class="border-b border-line last:border-0 hover:bg-sunken/50">
                                 <td class="px-4 py-3">
                                     <div class="font-semibold text-ink">@warehouse.Name</div>
-                                    <div class="num mt-0.5 break-all font-mono text-[11.5px] text-ink-faint">@warehouse.Id</div>
                                 </td>
                                 <td class="px-4 py-3 text-ink-soft">@warehouse.Location</td>
                                 <td class="px-4 py-3">
-                                    <span class="inline-flex items-center gap-1.5 rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">
+                                    <span class="inline-flex items-center gap-1.5 rounded-full bg-sunken px-2.5 py-0.5 font-semibold text-[11.5px] text-ink-soft">
                                         @(warehouse.Type == 0 ? (Loc.IsEn ? "Shop" : "متجر") : (Loc.IsEn ? "Storage" : "مخزن"))
                                     </span>
                                 </td>
                                 <td class="px-4 py-3">
                                     @if (warehouse.IsActive)
                                     {
-                                        <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 text-[11.5px] font-semibold text-ok">@(Loc.IsEn ? "Active" : "نشط")</span>
+                                        <span class="inline-flex items-center rounded-full bg-ok-tint px-2.5 py-0.5 font-semibold text-[11.5px] text-ok">@(Loc.IsEn ? "Active" : "نشط")</span>
                                     }
                                     else
                                     {
-                                        <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 text-[11.5px] font-semibold text-ink-soft">@(Loc.IsEn ? "Inactive" : "غير نشط")</span>
+                                        <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 font-semibold text-[11.5px] text-ink-soft">@(Loc.IsEn ? "Inactive" : "غير نشط")</span>
                                     }
                                 </td>
                                 <td class="px-4 py-3">
@@ -82,13 +81,13 @@
                                         @if (warehouse.IsActive)
                                         {
                                             <form asp-area="Inventory" asp-controller="Warehouses" asp-action="Deactivate" asp-route-id="@warehouse.Id" method="post" class="inline-flex">
-                                                <button type="submit" class="inline-flex h-8 items-center justify-center rounded-md border border-warn/35 bg-transparent px-2.5 text-[12.5px] font-medium text-warn transition-colors hover:bg-warn-tint">@(Loc.IsEn ? "Deactivate" : "إيقاف")</button>
+                                                <button type="submit" class="inline-flex h-8 items-center justify-center rounded-md border border-warn/35 bg-transparent px-2.5 font-medium text-[12.5px] text-warn transition-colors hover:bg-warn-tint">@(Loc.IsEn ? "Deactivate" : "إيقاف")</button>
                                             </form>
                                         }
                                         else
                                         {
                                             <form asp-area="Inventory" asp-controller="Warehouses" asp-action="Activate" asp-route-id="@warehouse.Id" method="post" class="inline-flex">
-                                                <button type="submit" class="inline-flex h-8 items-center justify-center rounded-md border border-ok/35 bg-transparent px-2.5 text-[12.5px] font-medium text-ok transition-colors hover:bg-ok-tint">@(Loc.IsEn ? "Activate" : "تفعيل")</button>
+                                                <button type="submit" class="inline-flex h-8 items-center justify-center rounded-md border border-ok/35 bg-transparent px-2.5 font-medium text-[12.5px] text-ok transition-colors hover:bg-ok-tint">@(Loc.IsEn ? "Activate" : "تفعيل")</button>
                                             </form>
                                         }
                                     </div>
@@ -100,8 +99,8 @@
                     {
                         <tr>
                             <td colspan="5" class="px-6 py-14 text-center">
-                                <svg class="icon mx-auto !size-8 text-ink-faint"><use href="#i-store" /></svg>
-                                <p class="mt-2 text-[14px] font-semibold text-ink">@(Loc.IsEn ? "No warehouses found." : "لا توجد مستودعات.")</p>
+                                <icon name="store" class="mx-auto !size-8 text-ink-faint" />
+                                <p class="mt-2 font-semibold text-[14px] text-ink">@(Loc.IsEn ? "No warehouses found." : "لا توجد مستودعات.")</p>
                             </td>
                         </tr>
                     }
@@ -116,23 +115,23 @@
             @if (Model.HasPrevious)
             {
                 <a class="@pageBtn" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index" asp-route-isActive="@isActive" asp-route-page="@(Model.Page - 1)">
-                    <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Previous" : "السابق")
+                    <icon name="chevron-left" class="!size-4 scale-x-[var(--dir-flip)]" />@(Loc.IsEn ? "Previous" : "السابق")
                 </a>
             }
             else
             {
-                <span class="@pageOff"><svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Previous" : "السابق")</span>
+                <span class="@pageOff"><icon name="chevron-left" class="!size-4 scale-x-[var(--dir-flip)]" />@(Loc.IsEn ? "Previous" : "السابق")</span>
             }
 
             @if (Model.HasNext)
             {
                 <a class="@pageBtn" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index" asp-route-isActive="@isActive" asp-route-page="@(Model.Page + 1)">
-                    @(Loc.IsEn ? "Next" : "التالي")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg>
+                    @(Loc.IsEn ? "Next" : "التالي")<icon name="chevron-right" class="!size-4 scale-x-[var(--dir-flip)]" />
                 </a>
             }
             else
             {
-                <span class="@pageOff">@(Loc.IsEn ? "Next" : "التالي")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg></span>
+                <span class="@pageOff">@(Loc.IsEn ? "Next" : "التالي")<icon name="chevron-right" class="!size-4 scale-x-[var(--dir-flip)]" /></span>
             }
         </div>
     </div>

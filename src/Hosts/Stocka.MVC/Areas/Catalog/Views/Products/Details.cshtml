@@ -15,14 +15,14 @@
             <p class="mt-1.5 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "Products" : "المنتجات")</p>
         </div>
         <a class="@btnGhost" asp-area="Catalog" asp-controller="Products" asp-action="Index">
-            <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Back to list" : "العودة للقائمة")
+            <icon name="chevron-left" class="!size-4 scale-x-[var(--dir-flip)]" />@(Loc.IsEn ? "Back to list" : "العودة للقائمة")
         </a>
     </header>
 
     @if (Model == null)
     {
         <div class="flex items-start gap-3 rounded-md border border-warn/30 bg-warn-tint px-4 py-3 text-[13.5px] text-warn">
-            <svg class="icon mt-0.5 !size-[17px]"><use href="#i-alert" /></svg>
+            <icon name="alert-triangle" class="mt-0.5 !size-[17px]" />
             <span>@(Loc.IsEn ? "Product not found." : "المنتج غير موجود.")</span>
         </div>
     }
@@ -87,7 +87,7 @@
 
             <div class="flex flex-wrap items-center justify-end gap-2 border-t border-line bg-sunken/30 px-5 py-4 sm:px-6">
                 <a class="@btnPrimary" asp-area="Catalog" asp-controller="Products" asp-action="Edit" asp-route-id="@Model.Id">
-                    <svg class="icon !size-4"><use href="#i-pencil" /></svg>@(Loc.IsEn ? "Edit" : "تعديل")
+                    <icon name="pencil" class="!size-4" />@(Loc.IsEn ? "Edit" : "تعديل")
                 </a>
                 @if (Model.IsActive)
                 {

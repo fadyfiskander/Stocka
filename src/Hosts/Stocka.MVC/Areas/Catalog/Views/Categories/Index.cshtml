@@ -16,10 +16,10 @@
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <a class="@btnGhost" asp-area="Catalog" asp-controller="Categories" asp-action="SearchByName">
-                <svg class="icon !size-4"><use href="#i-search" /></svg>@(Loc.IsEn ? "Search by name" : "بحث بالاسم")
+                <icon name="search" class="!size-4" />@(Loc.IsEn ? "Search by name" : "بحث بالاسم")
             </a>
             <a class="@btnPrimary" asp-area="Catalog" asp-controller="Categories" asp-action="Create">
-                <svg class="icon !size-4"><use href="#i-plus" /></svg>@(Loc.IsEn ? "Add category" : "إضافة تصنيف")
+                <icon name="plus" class="!size-4" />@(Loc.IsEn ? "Add category" : "إضافة تصنيف")
             </a>
         </div>
     </header>
@@ -31,7 +31,6 @@
                     <tr class="border-b border-line-strong bg-sunken/60 text-ink-soft">
                         <th class="px-4 py-2.5 text-start font-semibold text-[11.5px]">@(Loc.IsEn ? "Name" : "الاسم")</th>
                         <th class="px-4 py-2.5 text-start font-semibold text-[11.5px]">@(Loc.IsEn ? "Status" : "الحالة")</th>
-                        <th class="px-4 py-2.5 text-start font-semibold text-[11.5px]">@(Loc.IsEn ? "Organization" : "المؤسسة")</th>
                         <th class="px-4 py-2.5 text-end font-semibold text-[11.5px]">@(Loc.IsEn ? "Actions" : "الإجراءات")</th>
                     </tr>
                 </thead>
@@ -43,7 +42,6 @@
                             <tr class="border-b border-line last:border-0 hover:bg-sunken/50">
                                 <td class="px-4 py-3">
                                     <div class="font-semibold text-ink">@category.Name</div>
-                                    <div class="num mt-0.5 font-mono break-all text-[11.5px] text-ink-faint">@category.Id</div>
                                 </td>
                                 <td class="px-4 py-3">
                                     @if (category.IsActive)
@@ -55,7 +53,6 @@
                                         <span class="inline-flex items-center rounded-full bg-sunken px-2.5 py-0.5 font-semibold text-[11.5px] text-ink-soft">@(Loc.IsEn ? "Inactive" : "غير نشط")</span>
                                     }
                                 </td>
-                                <td class="px-4 py-3"><span class="num font-mono break-all text-[11.5px] text-ink-soft">@category.OrganizationId</span></td>
                                 <td class="px-4 py-3">
                                     <div class="flex flex-wrap items-center justify-end gap-1.5">
                                         <a class="@rowBtn" asp-area="Catalog" asp-controller="Categories" asp-action="Details" asp-route-id="@category.Id">@(Loc.IsEn ? "Details" : "التفاصيل")</a>
@@ -81,7 +78,7 @@
                     {
                         <tr>
                             <td colspan="4" class="px-6 py-14 text-center">
-                                <svg class="icon mx-auto !size-8 text-ink-faint"><use href="#i-tag" /></svg>
+                                <icon name="tag" class="mx-auto !size-8 text-ink-faint" />
                                 <p class="mt-2 font-semibold text-[14px] text-ink">@(Loc.IsEn ? "No categories found" : "لا توجد فئات")</p>
                                 <p class="mx-auto mt-1 max-w-[46ch] text-[12.5px] text-ink-soft">@(Loc.IsEn ? "There are no categories to display. Try creating one." : "لا توجد فئات للعرض. جرّب إنشاء تصنيف.")</p>
                             </td>

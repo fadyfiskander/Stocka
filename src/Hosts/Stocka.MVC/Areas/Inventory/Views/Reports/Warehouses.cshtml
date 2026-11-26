@@ -1,4 +1,4 @@
-@{
+﻿@{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = (Loc.IsEn ? "Warehouse inventory reports" : "تقارير مخزون المستودعات");
 
@@ -67,7 +67,7 @@
         @* ───────── Ranking by stock ───────── *@
         <section class="@card">
             <div class="@cardHead">
-                <span class="flex items-center gap-2.5"><svg class="icon !size-[18px] text-accent"><use href="#i-store" /></svg>@(Loc.IsEn ? "Ranked by total stock" : "الأعلى حسب إجمالي المخزون")</span>
+                <span class="flex items-center gap-2.5"><icon name="store" class="!size-[18px] text-accent" />@(Loc.IsEn ? "Ranked by total stock" : "الأعلى حسب إجمالي المخزون")</span>
                 <span class="@count">@rankedStock.Count</span>
             </div>
             <div class="overflow-x-auto">
@@ -123,7 +123,7 @@
         @* ───────── Ranking by cost ───────── *@
         <section class="@card">
             <div class="@cardHead">
-                <span class="flex items-center gap-2.5"><svg class="icon !size-[18px] text-accent"><use href="#i-chart" /></svg>@(Loc.IsEn ? "Ranked by inventory cost (recorded)" : "الأعلى حسب تكلفة المخزون (مسجّلة)")</span>
+                <span class="flex items-center gap-2.5"><icon name="chart-column" class="!size-[18px] text-accent" />@(Loc.IsEn ? "Ranked by inventory cost (recorded)" : "الأعلى حسب تكلفة المخزون (مسجّلة)")</span>
                 <span class="@count">@rankedCost.Count</span>
             </div>
             <div class="overflow-x-auto">
@@ -168,7 +168,7 @@
         @* ───────── Warehouses with zero stock ───────── *@
         <section class="@card">
             <div class="@cardHead">
-                <span class="flex items-center gap-2.5"><svg class="icon !size-[18px] text-ink-faint"><use href="#i-box" /></svg>@(Loc.IsEn ? "Warehouses with no stock" : "مستودعات بلا مخزون")</span>
+                <span class="flex items-center gap-2.5"><icon name="package" class="!size-[18px] text-ink-faint" />@(Loc.IsEn ? "Warehouses with no stock" : "مستودعات بلا مخزون")</span>
                 <span class="@count">@zeroStock.Count</span>
             </div>
             <div class="overflow-x-auto">
@@ -211,7 +211,7 @@
         @* ───────── Inactive warehouses that still hold stock (needs attention) ───────── *@
         <section class="@(inactiveWithStock.Count > 0 ? cardWarn : card)">
             <div class="@cardHead">
-                <span class="flex items-center gap-2.5"><svg class="icon !size-[18px] text-signal"><use href="#i-alert" /></svg>@(Loc.IsEn ? "Inactive warehouses containing stock (control)" : "مستودعات غير نشطة تحمل مخزوناً (رقابة)")</span>
+                <span class="flex items-center gap-2.5"><icon name="alert-triangle" class="!size-[18px] text-signal" />@(Loc.IsEn ? "Inactive warehouses containing stock (control)" : "مستودعات غير نشطة تحمل مخزوناً (رقابة)")</span>
                 <span class="@count">@inactiveWithStock.Count</span>
             </div>
             <div class="overflow-x-auto">

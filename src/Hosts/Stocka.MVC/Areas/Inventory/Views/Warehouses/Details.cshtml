@@ -35,20 +35,20 @@
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <a class="@btnGhost" asp-area="Inventory" asp-controller="Stock" asp-action="Movements" asp-route-warehouseId="@Model.Id">
-                <svg class="icon !size-4"><use href="#i-swap" /></svg>@(Loc.IsEn ? "Movements" : "الحركات")
+                <icon name="arrow-left-right" class="!size-4" />@(Loc.IsEn ? "Movements" : "الحركات")
             </a>
             <a class="@btnGhost" asp-area="Inventory" asp-controller="Warehouses" asp-action="Edit" asp-route-id="@Model.Id">
-                <svg class="icon !size-4"><use href="#i-pencil" /></svg>@(Loc.IsEn ? "Edit" : "تعديل")
+                <icon name="pencil" class="!size-4" />@(Loc.IsEn ? "Edit" : "تعديل")
             </a>
             <a class="@btnPrimary" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index">
-                <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Back to list" : "العودة للقائمة")
+                <icon name="chevron-left" class="!size-4 scale-x-[var(--dir-flip)]" />@(Loc.IsEn ? "Back to list" : "العودة للقائمة")
             </a>
         </div>
     </header>
 
     <div class="rounded-lg border border-line bg-surface shadow-card">
         <div class="flex items-center gap-2.5 border-b border-line px-5 py-3">
-            <svg class="icon !size-[18px] text-accent"><use href="#i-store" /></svg>
+            <icon name="store" class="!size-[18px] text-accent" />
             <span class="text-[14px] font-semibold text-ink">@(Loc.IsEn ? "Warehouse details" : "تفاصيل المستودع")</span>
         </div>
         <dl class="grid gap-x-6 gap-y-5 p-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -78,7 +78,7 @@
     <div class="overflow-hidden rounded-lg border border-line bg-surface shadow-card">
         <div class="flex items-center justify-between gap-3 border-b border-line px-5 py-3">
             <span class="flex items-center gap-2.5 text-[14px] font-semibold text-ink">
-                <svg class="icon !size-[18px] text-accent"><use href="#i-layers" /></svg>
+                <icon name="layers" class="!size-[18px] text-accent" />
                 @(Loc.IsEn ? "Inventory (product & batch breakdown)" : "المخزون (تفصيل المنتج والدفعة)")
             </span>
             @if (inventory != null)
@@ -117,7 +117,7 @@
                     {
                         <tr>
                             <td colspan="5" class="px-6 py-12 text-center">
-                                <svg class="icon mx-auto !size-7 text-ink-faint"><use href="#i-layers" /></svg>
+                                <icon name="layers" class="mx-auto !size-7 text-ink-faint" />
                                 <p class="mt-2 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No stock placements recorded in this warehouse." : "لا توجد أرصدة مخزون مسجّلة في هذا المستودع.")</p>
                             </td>
                         </tr>
@@ -135,22 +135,22 @@
                 @if (inventory.HasPrevious)
                 {
                     <a class="@pageBtn" asp-area="Inventory" asp-controller="Warehouses" asp-action="Details" asp-route-id="@Model.Id" asp-route-inventoryPage="@(inventory.Page - 1)">
-                        <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Previous" : "السابق")
+                        <icon name="chevron-left" class="!size-4 scale-x-[var(--dir-flip)]" />@(Loc.IsEn ? "Previous" : "السابق")
                     </a>
                 }
                 else
                 {
-                    <span class="@pageOff"><svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Previous" : "السابق")</span>
+                    <span class="@pageOff"><icon name="chevron-left" class="!size-4 scale-x-[var(--dir-flip)]" />@(Loc.IsEn ? "Previous" : "السابق")</span>
                 }
                 @if (inventory.HasNext)
                 {
                     <a class="@pageBtn" asp-area="Inventory" asp-controller="Warehouses" asp-action="Details" asp-route-id="@Model.Id" asp-route-inventoryPage="@(inventory.Page + 1)">
-                        @(Loc.IsEn ? "Next" : "التالي")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg>
+                        @(Loc.IsEn ? "Next" : "التالي")<icon name="chevron-right" class="!size-4 scale-x-[var(--dir-flip)]" />
                     </a>
                 }
                 else
                 {
-                    <span class="@pageOff">@(Loc.IsEn ? "Next" : "التالي")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg></span>
+                    <span class="@pageOff">@(Loc.IsEn ? "Next" : "التالي")<icon name="chevron-right" class="!size-4 scale-x-[var(--dir-flip)]" /></span>
                 }
             </div>
         </div>

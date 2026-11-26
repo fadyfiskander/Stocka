@@ -53,7 +53,7 @@
             }
             <div class="ms-auto flex items-center gap-2">
                 <button type="submit" class="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-line bg-surface px-4 text-[13.5px] font-medium text-ink transition-colors hover:bg-sunken">
-                    <svg class="icon !size-4"><use href="#i-filter" /></svg>@(Loc.IsEn ? "Apply filters" : "تطبيق التصفية")
+                    <icon name="filter" class="!size-4" />@(Loc.IsEn ? "Apply filters" : "تطبيق التصفية")
                 </button>
                 <a class="inline-flex h-9 items-center justify-center rounded-md px-4 text-[13.5px] font-medium text-ink-soft transition-colors hover:bg-sunken hover:text-ink hover:no-underline"
                    asp-area="Inventory" asp-controller="Stock" asp-action="Movements">@(Loc.IsEn ? "Clear" : "مسح")</a>
@@ -117,7 +117,7 @@
                     {
                         <tr>
                             <td colspan="8" class="px-6 py-14 text-center">
-                                <svg class="icon mx-auto !size-8 text-ink-faint"><use href="#i-swap" /></svg>
+                                <icon name="arrow-left-right" class="mx-auto !size-8 text-ink-faint" />
                                 <p class="mt-2 text-[13.5px] text-ink-soft">@(Loc.IsEn ? "No movements match the filters." : "لا توجد حركات مطابقة للتصفية.")</p>
                             </td>
                         </tr>
@@ -137,24 +137,24 @@
                     <a class="@pageBtn" asp-area="Inventory" asp-controller="Stock" asp-action="Movements"
                        asp-route-warehouseId="@warehouseId" asp-route-batchId="@batchId" asp-route-productId="@productId"
                        asp-route-from="@from" asp-route-to="@to" asp-route-page="@(Model.Page - 1)">
-                        <svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Previous" : "السابق")
+                        <icon name="chevron-left" class="!size-4 scale-x-[var(--dir-flip)]" />@(Loc.IsEn ? "Previous" : "السابق")
                     </a>
                 }
                 else
                 {
-                    <span class="@pageOff"><svg class="icon !size-4"><use href="#i-chevron-start" /></svg>@(Loc.IsEn ? "Previous" : "السابق")</span>
+                    <span class="@pageOff"><icon name="chevron-left" class="!size-4 scale-x-[var(--dir-flip)]" />@(Loc.IsEn ? "Previous" : "السابق")</span>
                 }
                 @if (Model.HasNext)
                 {
                     <a class="@pageBtn" asp-area="Inventory" asp-controller="Stock" asp-action="Movements"
                        asp-route-warehouseId="@warehouseId" asp-route-batchId="@batchId" asp-route-productId="@productId"
                        asp-route-from="@from" asp-route-to="@to" asp-route-page="@(Model.Page + 1)">
-                        @(Loc.IsEn ? "Next" : "التالي")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg>
+                        @(Loc.IsEn ? "Next" : "التالي")<icon name="chevron-right" class="!size-4 scale-x-[var(--dir-flip)]" />
                     </a>
                 }
                 else
                 {
-                    <span class="@pageOff">@(Loc.IsEn ? "Next" : "التالي")<svg class="icon !size-4"><use href="#i-chevron-end" /></svg></span>
+                    <span class="@pageOff">@(Loc.IsEn ? "Next" : "التالي")<icon name="chevron-right" class="!size-4 scale-x-[var(--dir-flip)]" /></span>
                 }
             </div>
         </div>

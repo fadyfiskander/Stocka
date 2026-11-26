@@ -13,7 +13,7 @@
     <header class="mb-5 border-b border-line pb-5">
         <nav class="mb-2 flex items-center gap-1.5 text-[12.5px] text-ink-faint" aria-label="@(Loc.IsEn ? "Create product" : "إنشاء منتج")">
             <span>@(Loc.IsEn ? "Catalog" : "الكتالوج")</span>
-            <svg class="icon !size-3.5 opacity-60 rtl:rotate-180"><use href="#i-chevron-end" /></svg>
+            <icon name="chevron-right" class="!size-3.5 opacity-60 rtl:rotate-180 scale-x-[var(--dir-flip)]" />
             <span class="text-ink-soft">@(Loc.IsEn ? "Create product" : "إنشاء منتج")</span>
         </nav>
         <h1 class="font-bold tracking-[-.02em] text-[24px]">@(Loc.IsEn ? "Create product" : "إنشاء منتج")</h1>
@@ -67,7 +67,7 @@
             </a>
             <button type="submit"
                     class="text-on-accent inline-flex h-9 items-center justify-center gap-2 rounded-md bg-accent px-5 font-semibold text-[13.5px] transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
-                <svg class="icon !size-4"><use href="#i-plus" /></svg>@(Loc.IsEn ? "Create product" : "إنشاء منتج")
+                <icon name="plus" class="!size-4" />@(Loc.IsEn ? "Create product" : "إنشاء منتج")
             </button>
         </div>
     </form>

@@ -103,93 +103,6 @@
 </head>
 <body>
 
-    @* ============ icon sprite (hand-drawn, 24×24, stroke) ============ *@
-    <svg xmlns="http://www.w3.org/2000/svg" class="hidden" aria-hidden="true">
-        <symbol id="i-home" viewBox="0 0 24 24">
-            <path d="M4 11.2 12 4.4l8 6.8" /><path d="M6.3 9.7V20h11.4V9.7" /><path d="M10 20v-5.4h4V20" />
-        </symbol>
-        <symbol id="i-box" viewBox="0 0 24 24">
-            <path d="M12 3 3.5 7.7v8.6L12 21l8.5-4.7V7.7L12 3z" /><path d="M3.8 8 12 12.5l8.2-4.5" /><path d="M12 12.5V21" />
-        </symbol>
-        <symbol id="i-tag" viewBox="0 0 24 24">
-            <path d="M4 4.7h6.9l9.2 9.2a2 2 0 0 1 0 2.8l-3.4 3.4a2 2 0 0 1-2.8 0L4 11.6V4.7z" />
-            <circle cx="7.7" cy="8.4" r="1.2" />
-        </symbol>
-        <symbol id="i-store" viewBox="0 0 24 24">
-            <path d="M4 21V9.3l8-5.7 8 5.7V21" /><path d="M2.8 9.6 12 3.6l9.2 6" /><path d="M9.3 21v-6.4h5.4V21" /><path d="M4 21h16" />
-        </symbol>
-        <symbol id="i-layers" viewBox="0 0 24 24">
-            <path d="M12 3 3.3 7.7 12 12.4l8.7-4.7L12 3z" /><path d="M3.3 12.2 12 17l8.7-4.8" /><path d="M3.3 16.6 12 21.4l8.7-4.8" />
-        </symbol>
-        <symbol id="i-swap" viewBox="0 0 24 24">
-            <path d="M4 7.3h16.6" /><path d="M17.3 4.2l3.2 3.1-3.2 3.1" />
-            <path d="M20 16.7H3.4" /><path d="M6.7 13.6 3.4 16.7l3.3 3.1" />
-        </symbol>
-        <symbol id="i-chart" viewBox="0 0 24 24">
-            <path d="M3.8 20h16.4" /><path d="M6.5 20v-6.2" /><path d="M12 20V6.4" /><path d="M17.5 20V10.8" />
-        </symbol>
-        <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16" /><path d="M4 12h16" /><path d="M4 17h16" /></symbol>
-        <symbol id="i-chevrons" viewBox="0 0 24 24"><path d="M4.5 5.5 11 12l-6.5 6.5" /><path d="M11.5 5.5 18 12l-6.5 6.5" /></symbol>
-        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.6" /><path d="M20 20l-4.1-4.1" /></symbol>
-        <symbol id="i-globe" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="8.6" /><path d="M3.4 12h17.2" />
-            <path d="M12 3.4c2.5 2.3 4 5.3 4 8.6s-1.5 6.3-4 8.6c-2.5-2.3-4-5.3-4-8.6s1.5-6.3 4-8.6z" />
-        </symbol>
-        <symbol id="i-sun" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="4.2" />
-            <path d="M12 2.6v2.4M12 19v2.4M2.6 12h2.4M19 12h2.4M5 5l1.7 1.7M17.3 17.3 19 19M19 5l-1.7 1.7M6.7 17.3 5 19" />
-        </symbol>
-        <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.6 13.2A8.6 8.6 0 1 1 10.8 3.4a7 7 0 0 0 9.8 9.8z" /></symbol>
-        <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5.4v13.2" /><path d="M5.4 12h13.2" /></symbol>
-        <symbol id="i-pencil" viewBox="0 0 24 24">
-            <path d="M16.2 4.2a1.9 1.9 0 0 1 2.7 2.7L7.6 18.2 4 19l.8-3.6 11.4-11.2z" /><path d="M14.8 5.6l2.7 2.7" />
-        </symbol>
-        <symbol id="i-eye" viewBox="0 0 24 24">
-            <path d="M2.8 12S6 5.9 12 5.9 21.2 12 21.2 12 18 18.1 12 18.1 2.8 12 2.8 12z" /><circle cx="12" cy="12" r="2.7" />
-        </symbol>
-        <symbol id="i-archive" viewBox="0 0 24 24">
-            <path d="M4 5h16v3.4H4z" /><path d="M5.6 8.4V19a1 1 0 0 0 1 1h10.8a1 1 0 0 0 1-1V8.4" /><path d="M9.7 12.3h4.6" />
-        </symbol>
-        <symbol id="i-check-circle" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="8.6" /><path d="M8.2 12.3l2.6 2.6 5-5.4" />
-        </symbol>
-        <symbol id="i-check" viewBox="0 0 24 24"><path d="M5.5 12.6l4.2 4.2 8.8-9.6" /></symbol>
-        <symbol id="i-x" viewBox="0 0 24 24"><path d="M6.4 6.4l11.2 11.2" /><path d="M17.6 6.4 6.4 17.6" /></symbol>
-        <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="M6.5 9.5 12 15l5.5-5.5" /></symbol>
-        <symbol id="i-chevron-start" viewBox="0 0 24 24"><path d="M14.5 5.5 8 12l6.5 6.5" /></symbol>
-        <symbol id="i-chevron-end" viewBox="0 0 24 24"><path d="M9.5 5.5 16 12l-6.5 6.5" /></symbol>
-        <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="M12 19V5" /><path d="M5.8 11.2 12 5l6.2 6.2" /></symbol>
-        <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14" /><path d="M5.8 12.8 12 19l6.2-6.2" /></symbol>
-        <symbol id="i-trash" viewBox="0 0 24 24">
-            <path d="M4.5 7h15" /><path d="M9.5 7V4.8h5V7" />
-            <path d="M6.6 7l.9 13h9l.9-13" /><path d="M10 11v5.4" /><path d="M14 11v5.4" />
-        </symbol>
-        <symbol id="i-alert" viewBox="0 0 24 24">
-            <path d="M12 3.6 22 20.4H2L12 3.6z" /><path d="M12 10v4.6" /><path d="M12 17.7h.01" />
-        </symbol>
-        <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6" /><path d="M12 11.2v5" /><path d="M12 8.1h.01" /></symbol>
-        <symbol id="i-image" viewBox="0 0 24 24">
-            <rect x="4" y="5" width="16" height="14" rx="2" /><circle cx="8.6" cy="9.4" r="1.5" />
-            <path d="M5.5 17.5l4.3-4.3 2.7 2.7 3.2-3.2 3.3 3.3" />
-        </symbol>
-        <symbol id="i-upload" viewBox="0 0 24 24">
-            <path d="M12 15.6V4.4" /><path d="M7.6 8.8 12 4.4l4.4 4.4" />
-            <path d="M4.4 15.6v3.2a1 1 0 0 0 1 1h13.2a1 1 0 0 0 1-1v-3.2" />
-        </symbol>
-        <symbol id="i-calendar" viewBox="0 0 24 24">
-            <rect x="4.4" y="5.6" width="15.2" height="13.6" rx="2" /><path d="M4.4 9.8h15.2" />
-            <path d="M8.5 3.6v3.4" /><path d="M15.5 3.6v3.4" />
-        </symbol>
-        <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 5h16l-6.2 7.2v5.6l-3.6 2V12.2L4 5z" /></symbol>
-        <symbol id="i-undo" viewBox="0 0 24 24">
-            <path d="M4.4 9.2h10.8a4.6 4.6 0 1 1 0 9.2H9.4" /><path d="M8.4 5 4.4 9.2l4 4.2" />
-        </symbol>
-        <symbol id="i-external" viewBox="0 0 24 24">
-            <path d="M18.6 13.2v5.2a1.4 1.4 0 0 1-1.4 1.4H5.2a1.4 1.4 0 0 1-1.4-1.4V6.8a1.4 1.4 0 0 1 1.4-1.4h5.2" />
-            <path d="M14.6 4h5.4v5.4" /><path d="M20 4l-8.4 8.4" />
-        </symbol>
-    </svg>
-
     <a class="sr-only focus:text-on-accent focus:not-sr-only focus:fixed focus:start-4 focus:top-3 focus:z-100 focus:rounded-md focus:bg-accent focus:px-4 focus:py-2.5 focus:font-semibold"
        href="#content">@(Loc.IsEn ? "Skip to content" : "انتقل إلى المحتوى")</a>
 
@@ -202,7 +115,7 @@
             <a class="text-aside-ink flex min-h-14 items-center gap-2.5 px-4 py-3.5 hover:text-aside-ink lg:group-data-[rail=true]/shell:border-aside-line lg:group-data-[rail=true]/shell:justify-center lg:group-data-[rail=true]/shell:border-b lg:group-data-[rail=true]/shell:px-3"
                asp-area="" asp-controller="Home" asp-action="Index">
                 <span class="text-aside-accent grid size-9 shrink-0 place-items-center rounded-[10px] bg-white/10">
-                    <svg class="icon !size-5 !stroke-2"><use href="#i-box" /></svg>
+                    <icon name="package" class="!size-5 !stroke-2" />
                 </span>
                 <span class="grid leading-[1.15] lg:group-data-[rail=true]/shell:hidden">
                     <b class="font-semibold tracking-[.01em] text-[15.5px]">Stocka</b>
@@ -212,33 +125,37 @@
 
             <nav class="grid flex-1 content-start gap-1 px-2.5 pt-1 pb-4">
                 <a class="@navLink @NavActive("", "Home")" asp-area="" asp-controller="Home" asp-action="Index">
-                    <svg class="icon text-aside-accent/80"><use href="#i-home" /></svg><span class="@navText">@(Loc.IsEn ? "Home" : "الرئيسية")</span>
+                    <icon name="house" class="text-aside-accent/80" /><span class="@navText">@(Loc.IsEn ? "Home" : "الرئيسية")</span>
                 </a>
 
                 <span class="@groupLabel" aria-hidden="true">@(Loc.IsEn ? "Catalog" : "المنتجات")</span>
-                <a class="@navLink @NavActive("Catalog", "Products")" asp-area="Catalog" asp-controller="Products" asp-action="Index">
-                    <svg class="icon text-aside-accent/80"><use href="#i-box" /></svg><span class="@navText">@(Loc.IsEn ? "Products" : "المنتجات")</span>
+                <a class="@navLink @NavActive("Catalog", "Products", "Index")" asp-area="Catalog" asp-controller="Products" asp-action="Index">
+                    <icon name="package" class="text-aside-accent/80" /><span class="@navText">@(Loc.IsEn ? "Products" : "المنتجات")</span>
+                </a>
+                <a class="@navLink @NavActive("Catalog", "Products", "Create")" asp-area="Catalog" asp-controller="Products" asp-action="Create">
+                    <icon name="package-plus" class="text-aside-accent/80" />
+                    <span class="@navText">@(Loc.IsEn ? "Create Product" : "انشاء منتج")</span>
                 </a>
                 <a class="@navLink @NavActive("Catalog", "Categories")" asp-area="Catalog" asp-controller="Categories" asp-action="Index">
-                    <svg class="icon text-aside-accent/80"><use href="#i-tag" /></svg><span class="@navText">@(Loc.IsEn ? "Categories" : "التصنيفات")</span>
+                    <icon name="tags" class="text-aside-accent/80" /><span class="@navText">@(Loc.IsEn ? "Categories" : "التصنيفات")</span>
                 </a>
 
                 <span class="@groupLabel" aria-hidden="true">@(Loc.IsEn ? "Inventory" : "المخزون")</span>
                 <a class="@navLink @NavActive("Inventory", "Warehouses")" asp-area="Inventory" asp-controller="Warehouses" asp-action="Index">
-                    <svg class="icon text-aside-accent/80"><use href="#i-store" /></svg><span class="@navText">@(Loc.IsEn ? "Warehouses" : "المستودعات")</span>
+                    <icon name="warehouse" class="text-aside-accent/80" /><span class="@navText">@(Loc.IsEn ? "Warehouses" : "المستودعات")</span>
                 </a>
                 <a class="@navLink @NavActive("Inventory", "Batches")" asp-area="Inventory" asp-controller="Batches" asp-action="Index">
-                    <svg class="icon text-aside-accent/80"><use href="#i-layers" /></svg><span class="@navText">@(Loc.IsEn ? "Batches" : "الدفعات")</span>
+                    <icon name="layers" class="text-aside-accent/80" /><span class="@navText">@(Loc.IsEn ? "Batches" : "الدفعات")</span>
                 </a>
                 <a class="@navLink @NavActive("Inventory", "Stock", "Movements")" asp-area="Inventory" asp-controller="Stock" asp-action="Movements">
-                    <svg class="icon text-aside-accent/80"><use href="#i-swap" /></svg><span class="@navText">@(Loc.IsEn ? "Movements" : "الحركات")</span>
+                    <icon name="arrow-left-right" class="text-aside-accent/80" /><span class="@navText">@(Loc.IsEn ? "Movements" : "الحركات")</span>
                 </a>
 
                 <details class="nav-group rounded-md @(NavGroupActive("Inventory", "Reports") ? "is-open" : "")">
                     <summary title="@(Loc.IsEn ? "Reports" : "التقارير")" aria-label="@(Loc.IsEn ? "Reports" : "التقارير")"
                              class="relative flex cursor-pointer list-none items-center justify-between gap-2 rounded-md px-2.5 py-2 font-semibold tracking-wide text-[11px] text-aside-soft transition-colors select-none hover:text-aside-ink hover:bg-white/[0.055] lg:group-data-[rail=true]/shell:justify-center lg:group-data-[rail=true]/shell:px-0 [&::-webkit-details-marker]:hidden">
                         <span class="@navText">@(Loc.IsEn ? "Reports" : "التقارير")</span>
-                        <svg class="icon !size-[13px] transition-transform duration-150 group-open:rotate-180 lg:group-data-[rail=true]/shell:hidden"><use href="#i-chevron-down" /></svg>
+                        <icon name="chevron-down" class="!size-[13px] transition-transform duration-150 group-open:rotate-180 lg:group-data-[rail=true]/shell:hidden" />
                     </summary>
                     <div class="grid gap-1 pb-1">
                         <a class="@navLink @NavActive("Inventory", "Reports", "Index")" asp-area="Inventory" asp-controller="Reports" asp-action="Index">
@@ -264,7 +181,8 @@
                 <button type="button"
                         class="inline-flex size-9 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-aside-soft transition-colors hover:text-aside-ink hover:bg-white/[0.055]"
                         data-rail-toggle aria-label="@(Loc.IsEn ? "Collapse navigation" : "طي القائمة")" title="@(Loc.IsEn ? "Collapse navigation" : "طي القائمة")">
-                    <svg class="icon !size-[17px] scale-x-[var(--dir-flip)] group-data-[rail=true]/shell:scale-x-[calc(var(--dir-flip)*-1)]"><use href="#i-chevrons" /></svg>
+                    <icon name="panel-left-close" class="!size-[18px] scale-x-[var(--dir-flip)] group-data-[rail=true]/shell:hidden" />
+                    <icon name="panel-left-open" class="hidden !size-[18px] scale-x-[var(--dir-flip)] group-data-[rail=true]/shell:inline-block" />
                 </button>
             </div>
         </aside>
@@ -276,13 +194,13 @@
         <div class="flex min-w-0 flex-col">
             <header class="sticky top-0 z-30 flex min-h-[58px] items-center gap-2.5 border-b border-line bg-bg/85 px-6 py-2 backdrop-blur-md max-lg:px-4">
                 <button type="button" class="@toolBtn lg:hidden" data-nav-toggle aria-label="@(Loc.IsEn ? "Open navigation" : "فتح القائمة")">
-                    <svg class="icon !size-[19px]"><use href="#i-menu" /></svg>
+                    <icon name="menu" class="!size-[19px]" />
                 </button>
 
                 <a class="hidden items-center gap-2 font-semibold text-[15px] text-ink hover:no-underline max-lg:inline-flex"
                    asp-area="" asp-controller="Home" asp-action="Index">
                     <span class="grid size-[26px] place-items-center rounded-[7px] bg-accent-tint text-accent">
-                        <svg class="icon !size-[15px]"><use href="#i-box" /></svg>
+                        <icon name="package" class="!size-[15px]" />
                     </span>
                     Stocka
                 </a>
@@ -290,7 +208,7 @@
                 <form class="flex h-9 w-[min(340px,42vw)] items-center gap-2 rounded-md border border-line bg-surface px-3 text-ink-faint transition focus-within:border-accent focus-within:ring-[var(--focus-ring)] focus-within:ring-[3px] max-lg:hidden"
                       role="search" method="get"
                       asp-area="Catalog" asp-controller="Products" asp-action="SearchByName">
-                    <svg class="icon !size-[17px]"><use href="#i-search" /></svg>
+                    <icon name="search" class="!size-[17px]" />
                     <input type="search" name="name" autocomplete="off" placeholder="@(Loc.IsEn ? "Search products" : "ابحث عن منتج")" aria-label="@(Loc.IsEn ? "Search products" : "ابحث عن منتج")"
                            class="min-w-0 flex-1 border-0 bg-transparent text-[13.5px] text-ink outline-none placeholder:text-ink-faint" />
                 </form>
@@ -300,15 +218,15 @@
                        asp-controller="Localization" asp-action="SetLanguage"
                        asp-route-culture="@other" asp-route-returnUrl="@returnUrl"
                        title="@(Loc.IsEn ? "Switch to Arabic" : "التبديل إلى الإنجليزية")">
-                        <svg class="icon !size-[15px]"><use href="#i-globe" /></svg>
+                        <icon name="globe" class="!size-[15px]" />
                         <span>@otherLabel</span>
                     </a>
                     <button type="button" class="@toolBtn"
                             data-theme-toggle
                             data-aria-label-light="@(Loc.IsEn ? "Light theme" : "الوضع الفاتح")" data-aria-label-dark="@(Loc.IsEn ? "Dark theme" : "الوضع الداكن")"
                             aria-label="@(Loc.IsEn ? "Dark theme" : "الوضع الداكن")">
-                        <svg class="icon hidden !size-[19px] dark:inline-block"><use href="#i-sun" /></svg>
-                        <svg class="icon hidden !size-[19px] light:inline-block"><use href="#i-moon" /></svg>
+                        <icon name="sun" class="hidden !size-[19px] dark:inline-block" />
+                        <icon name="moon" class="hidden !size-[19px] light:inline-block" />
                     </button>
                 </div>
             </header>
